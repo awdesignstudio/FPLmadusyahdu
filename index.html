@@ -74,8 +74,18 @@
       .msg-actions span { cursor: pointer; text-decoration: underline; }
       .msg-actions span:hover { font-weight: bold; }
 
-      .input-area { display: flex; gap: 10px; margin-top: 10px; align-items: flex-end; }
+      /* INPUT AREA & REPLY PREVIEW STYLING */
+      .input-area { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+      .input-row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
       .input-area textarea { flex: 1; margin: 0; font-size: 16px; padding: 10px 12px; border: 1px solid #4b0053; border-radius: 8px; background: #ffffff; color: #000; resize: none; min-height: 24px; max-height: 120px; line-height: 1.4; overflow-y: auto; }
+      
+      .reply-preview { display: none; background: rgba(0, 255, 133, 0.1); border-left: 3px solid #00ff85; padding: 6px 10px; border-radius: 4px; font-size: 12px; position: relative; }
+      .reply-preview-title { color: #00ff85; font-weight: bold; margin-bottom: 2px; }
+      .reply-preview-text { color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .reply-preview-close { position: absolute; top: 4px; right: 8px; cursor: pointer; color: #ff4a4a; font-weight: bold; font-size: 14px; }
+
+      .quoted-msg { background: rgba(0, 0, 0, 0.25); border-left: 3px solid #00ff85; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 6px; opacity: 0.9; }
+      .quoted-sender { font-weight: bold; color: #00ff85; }
 
       .card { background: rgba(255,255,255,0.05); padding: 18px; border-radius: 8px; margin-bottom: 18px; border: 1px solid #4b0053; }
       .card h3 { margin-top: 0; color: #00ff85; font-size: 19px; border-bottom: 1px solid #4b0053; padding-bottom: 10px; }
@@ -195,8 +205,15 @@
       <div id="chat-box"></div>
       
       <div class="input-area" id="chat-input-area">
-        <textarea id="chatMessage" placeholder="Ketik pesan... 😊" rows="1" oninput="autoResizeTextarea(this)"></textarea>
-        <button id="send-btn" onclick="sendMessage()">Kirim</button>
+        <div class="reply-preview" id="reply-preview-box">
+          <div class="reply-preview-title" id="reply-preview-sender">Membalas...</div>
+          <div class="reply-preview-text" id="reply-preview-content">...</div>
+          <span class="reply-preview-close" onclick="cancelReply()">✕</span>
+        </div>
+        <div class="input-row">
+          <textarea id="chatMessage" placeholder="Ketik pesan... 😊" rows="1" oninput="autoResizeTextarea(this)"></textarea>
+          <button id="send-btn" onclick="sendMessage()">Kirim</button>
+        </div>
       </div>
     </div>
 
@@ -255,9 +272,9 @@
   let currentUser = {};
   let currentChatRef = null;
   const MY_LEAGUE_ID = 182620;
-  
-  // CURRENT_LIVE_GW diset manual ke 3 (aktif saat ini), otomatis bertambah ke depan seiring berjalannya waktu
   const CURRENT_LIVE_GW = 3; 
+
+  let activeReplyData = null;
 
   window.onload = function() {
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
@@ -267,7 +284,6 @@
       }
     }
 
-    // Generate dropdown dinamis hanya dari GW 1 sampai CURRENT_LIVE_GW
     let gwOptionsHTML = "";
     for (let i = 1; i <= CURRENT_LIVE_GW; i++) {
       let label = (i === CURRENT_LIVE_GW) ? " (Live)" : " (Arsip)";
@@ -298,7 +314,6 @@
     }
   };
 
-  // SISTEM DETEKSI USER ONLINE REAL-TIME DI FIREBASE
   function setupPresenceSystem() {
     const userStatusRef = db.ref(`presence/${currentUser.managerId}`);
     const connectedRef = db.ref(".info/connected");
@@ -314,7 +329,6 @@
       }
     });
 
-    // Pantau siapa saja yang sedang aktif terhubung
     db.ref("presence").on("value", function(snapshot) {
       const activeUsers = snapshot.val();
       const onlineTextEl = document.getElementById("online-users-text");
@@ -630,23 +644,40 @@
     const isMe = (data.managerId.toString() === currentUser.managerId.toString());
     const msgClass = isMe ? "msg me" : "msg others";
     
+    let replyActionHtml = `<span onclick="prepareReply('${data.senderName}', \`${encodeURIComponent(data.message)}\`)">Balas</span>`;
     let actionsHtml = "";
+
     if (isMe) {
       const now = Date.now();
       const msgTime = data.timestamp || now;
       const diffMinutes = (now - msgTime) / (1000 * 60);
       if (diffMinutes <= 10) {
         actionsHtml = `<div class="msg-actions" id="actions-${key}">
+          ${replyActionHtml}
           <span onclick="editMessage('${key}', \`${encodeURIComponent(data.message)}\`)">Edit</span>
           <span onclick="deleteMessage('${key}')">Hapus</span>
         </div>`;
+      } else {
+        actionsHtml = `<div class="msg-actions">${replyActionHtml}</div>`;
       }
+    } else {
+      actionsHtml = `<div class="msg-actions">${replyActionHtml}</div>`;
+    }
+
+    let quotedHtml = "";
+    if (data.replyTo) {
+      const safeQuoteText = (data.replyTo.text || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      quotedHtml = `<div class="quoted-msg">
+        <div class="quoted-sender">${data.replyTo.sender}</div>
+        <div class="quoted-text">${safeQuoteText}</div>
+      </div>`;
     }
 
     const formattedMsg = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
 
     const msgHTML = `<div class="${msgClass}" id="msg-${key}">
       <div class="sender-name">${data.senderName}</div>
+      ${quotedHtml}
       <div class="msg-text">${formattedMsg}</div>
       ${actionsHtml}
     </div>`;
@@ -670,6 +701,22 @@
     if (el) el.remove();
   }
 
+  function prepareReply(senderName, encodedText) {
+    const text = decodeURIComponent(encodedText);
+    activeReplyData = { sender: senderName, text: text };
+    
+    document.getElementById("reply-preview-sender").innerText = "Membalas " + senderName;
+    document.getElementById("reply-preview-content").innerText = text;
+    document.getElementById("reply-preview-box").style.display = "block";
+    
+    document.getElementById("chatMessage").focus();
+  }
+
+  function cancelReply() {
+    activeReplyData = null;
+    document.getElementById("reply-preview-box").style.display = "none";
+  }
+
   function sendMessage() {
     const gw = parseInt(document.getElementById("gwSelect").value);
     
@@ -682,15 +729,22 @@
     const text = textarea.value.trim();
     if(!text) return;
 
-    db.ref("chats/gw" + gw).push({
+    let messageData = {
       managerId: currentUser.managerId,
       senderName: currentUser.teamName + " (" + currentUser.managerName + ")",
       message: text,
       timestamp: firebase.database.ServerValue.TIMESTAMP
-    });
+    };
+
+    if (activeReplyData) {
+      messageData.replyTo = activeReplyData;
+    }
+
+    db.ref("chats/gw" + gw).push(messageData);
 
     textarea.value = "";
     textarea.style.height = "auto";
+    cancelReply();
   }
 
   function editMessage(key, encodedOldText) {
