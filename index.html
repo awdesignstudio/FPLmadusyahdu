@@ -97,8 +97,9 @@
       /* INPUT AREA & REPLY PREVIEW */
       .input-area { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; }
       .input-row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
-      .input-area textarea { flex: 1; margin: 0; font-size: 16px; padding: 12px; border: 1px solid #4b0053; border-radius: 10px; background: #2a0030; color: #fff; resize: none; min-height: 24px; max-height: 120px; line-height: 1.4; overflow-y: auto; }
+      .input-area textarea { flex: 1; margin: 0; font-size: 15px; padding: 10px 12px; border: 1px solid #4b0053; border-radius: 10px; background: #2a0030; color: #fff; resize: none; height: 40px; max-height: 120px; line-height: 1.3; overflow-y: auto; box-sizing: border-box; }
       .input-area textarea::placeholder { color: #aaa; }
+      #send-btn { padding: 0 16px; height: 40px; font-size: 15px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
       
       .reply-preview { display: none; background: rgba(0, 92, 75, 0.6); border-left: 4px solid #00ff85; padding: 8px 10px; border-radius: 6px; font-size: 12px; position: relative; }
       .reply-preview-title { color: #00ff85; font-weight: bold; margin-bottom: 3px; }
@@ -751,8 +752,12 @@
   }
 
   function autoResizeTextarea(textarea) {
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
+    if (textarea.value === '') {
+      textarea.style.height = '40px';
+    } else {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
   }
 
   function loadChat(gw) {
@@ -1005,7 +1010,7 @@
     if (text.startsWith("/")) {
       processSlashCommand(text, gw);
       textarea.value = "";
-      textarea.style.height = "auto";
+      textarea.style.height = "40px";
       return;
     }
 
@@ -1032,7 +1037,7 @@
     db.ref("chats/gw" + gw).push(messageData);
 
     textarea.value = "";
-    textarea.style.height = "auto";
+    textarea.style.height = "40px";
     cancelReply();
   }
 
