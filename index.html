@@ -851,9 +851,9 @@
       <div class="sender-name" ${senderNameStyle}>${data.senderName}</div>
       ${quotedHtml}
       <div class="msg-text">${formattedMsg}</div>
-      <div style="display: flex; justify-content: space-between; align-items: center; position: relative;">
-        ${reactionPickerHtml}
-        ${actionsHtml}
+      <div style="display: flex; justify-content: space-between; align-items: center; position: relative; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 4px;">
+        <div>${reactionPickerHtml}</div>
+        <div>${actionsHtml}</div>
       </div>
       ${reactionsListHtml}
       ${reactionPopupHtml}
