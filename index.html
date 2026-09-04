@@ -1065,14 +1065,20 @@
   // LOGIKA SLASH COMMANDS & BOT VAR
   // ==========================================
   function processSlashCommand(commandText, gw) {
-    const args = commandText.split(" ");
+    const args = commandText.trim().split(/\s+/);
     const cmd = args[0].toLowerCase();
 
-    // Deteksi jika user mengetik argumen GW (contoh: /captain 1 atau /captain gw1)
+    // Deteksi argumen GW opsional (bisa di indeks ke-1 atau ke-2 tergantung perintah)
     let targetGw = gw; 
-    if (args.length > 1) {
-      // Hapus semua huruf, sisakan angkanya saja (jadi "gw1" atau "1" sama-sama jadi 1)
-      const parsedGw = parseInt(args[1].replace(/\D/g, ''));
+    let argIndex = 1;
+
+    // Jika perintahnya /h2h, argumen ke-1 adalah nama target, jadi cari angka GW di argumen ke-2 (jika ada)
+    if (cmd === "/h2h") {
+      argIndex = 2;
+    }
+
+    if (args.length > argIndex) {
+      const parsedGw = parseInt(args[argIndex].replace(/\D/g, ''));
       if (!isNaN(parsedGw) && parsedGw >= 1 && parsedGw <= 38) {
         targetGw = parsedGw;
       }
@@ -1084,7 +1090,6 @@
     }).key;
 
     if (cmd === "/captain" || cmd === "/chips") {
-      // Perhatikan parameter gw diganti menjadi targetGw untuk pemanggilan data
       callGAS('getLeagueCaptains', MY_LEAGUE_ID, targetGw, function(res) {
         if (res.success) {
           let botText = "";
@@ -1103,14 +1108,55 @@
               botText += `<div class='bot-row'><span>${c.team}</span> <strong>${c.chip.toUpperCase()}</strong></div>`;
             });
           }
-          // Pesan tetap diposting ke gw saat ini (gw live), bukan ke arsip
           db.ref(`chats/gw${gw}/${tempKey}`).update({ message: botText, isBotHtml: true });
         } else {
           db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "API Request Failed. Report: " + (res.message || "Unknown Error") });
         }
       });
-    } else {
-      db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain, /chips, or /captain gw1" });
+    } 
+    else if (cmd === "/h2h") {
+      // Ambil nama target (bisa berupa teks setelah /h2h, di-join kembali jika ada spasi sebelum argumen GW)
+      let nameArgs = args.slice(1);
+      if (nameArgs.length > 1 && !isNaN(parseInt(nameArgs[nameArgs.length - 1].replace(/\D/g, '')))) {
+        nameArgs.pop(); // Buang bagian angka GW jika disertakan di belakang
+      }
+      let targetName = nameArgs.join(" ").replace("@", "").trim();
+
+      if (!targetName) {
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Format salah! Gunakan: <b>/h2h @NamaManajer</b> (Contoh: /h2h Budi)" });
+        return;
+      }
+
+      callGAS('getH2HByName', MY_LEAGUE_ID, { gw: targetGw, myId: currentUser.managerId, targetName: targetName }, function(res) {
+        if (res.success) {
+          let h2hHtml = `<div class='bot-header'>⚔️ H2H BATTLE (GW ${targetGw})</div>`;
+          h2hHtml += `<div class='bot-row'><span><b>${res.me.team}</b><br><small>${res.me.name}</small></span> <span style="text-align:right;"><b>GW: ${res.me.gwPts}</b><br>Tot: ${res.me.totPts} (Rank ${res.me.rank})</span></div>`;
+          h2hHtml += `<div class='bot-row' style="margin-top:6px; color:#ff4a4a;"><span><b>${res.opponent.team}</b><br><small>${res.opponent.name}</small></span> <span style="text-align:right;"><b>GW: ${res.opponent.gwPts}</b><br>Tot: ${res.opponent.totPts} (Rank ${res.opponent.rank})</span></div>`;
+          db.ref(`chats/gw${gw}/${tempKey}`).update({ message: h2hHtml, isBotHtml: true });
+        } else {
+          db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "H2H Error: " + res.message });
+        }
+      });
+    }
+    else if (cmd === "/diff") {
+      callGAS('getLeagueDifferentials', MY_LEAGUE_ID, targetGw, function(res) {
+        if (res.success) {
+          let diffHtml = `<div class='bot-header'>💎 Mini-League Differentials (GW ${targetGw})</div>`;
+          if (res.diffs.length === 0) {
+            diffHtml += "<i style='font-size:12px; color:#aaa;'>Tidak ada differential unik yang ditemukan di bawah ambang batas.</i>";
+          } else {
+            res.diffs.forEach(d => {
+              diffHtml += `<div class='bot-row'><span><b>${d.name}</b> (${d.team})</span> <span>Owned by <b>${d.count}</b> manager(s) <small>(${d.globalOwnership}% global)</small></span></div>`;
+            });
+          }
+          db.ref(`chats/gw${gw}/${tempKey}`).update({ message: diffHtml, isBotHtml: true });
+        } else {
+          db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Diff Error: " + res.message });
+        }
+      });
+    }
+    else {
+      db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain, /chips, /h2h @Name, /diff" });
     }
   }
   // ==========================================
