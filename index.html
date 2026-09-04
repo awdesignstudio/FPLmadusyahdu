@@ -71,7 +71,8 @@
       /* CHAT CONTROLS DIBUAT LEBIH TIPIS & RAPAT */
       .chat-controls, .dashboard-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 6px; font-size: 13px; }
       
-      #chat-box { height: 420px; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: scroll; display: flex; flex-direction: column; gap: 14px; }
+      /* === RUANG CHAT DINAMIS (OTOMATIS PENUH KE BAWAH) === */
+      #chat-box { height: calc(100vh - 350px); min-height: 380px; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: scroll; display: flex; flex-direction: column; gap: 14px; }
       
       /* === GELEMBUNG CHAT (GELAP ALA WHATSAPP) === */
       .msg { max-width: 82%; padding: 10px 14px; border-radius: 12px; font-size: 15.5px; line-height: 1.4; word-wrap: break-word; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.2); }
