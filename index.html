@@ -318,20 +318,9 @@
           </table>
         </div>
       </div>
+      <!-- TOMBOL LOGOUT DIPINDAH KE BAWAH TAB KLASEMEN -->
+      <button class="logout-btn-small" onclick="confirmLogout()" style="width: 100%; padding: 14px; font-size: 16px; margin-top: 15px; margin-bottom: 20px;">🚪 Keluar Akun (Logout)</button>
     </div>
-
-    <div id="bottom-panel-ui" style="display: none; flex-direction: column; margin-top: auto; gap: 6px;">
-      <div class="bottom-panel" style="margin-top: 0;">
-        <div class="running-ticker" style="width: 100%;">
-          <span id="ticker-text">Memuat klasemen real-time...</span>
-        </div>
-      </div>
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <button class="logout-btn-small" onclick="confirmLogout()" style="padding: 4px 8px; opacity: 0.85;">Logout</button>
-        <div class="footer-brand" style="margin-top: 0;">supported by AW Design</div>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -399,7 +388,6 @@
       currentUser = JSON.parse(savedUser);
       document.getElementById("login-section").style.display = "none";
       document.getElementById("main-section").style.display = "block";
-      document.getElementById("bottom-panel-ui").style.display = "flex";
       
       setupPresenceSystem();
 
@@ -573,7 +561,6 @@
 
         document.getElementById("login-section").style.display = "none";
         document.getElementById("main-section").style.display = "block";
-        document.getElementById("bottom-panel-ui").style.display = "flex";
         
         setupPresenceSystem();
 
@@ -656,7 +643,6 @@
         document.getElementById("display-league-name").innerText = res.leagueName;
         
         let standingsHTML = "";
-        let tickerString = "Klasemen Real-Time: ";
         res.leaderboard.forEach(item => {
           const isMe = (item.id.toString() === currentUser.managerId.toString());
           const rowClass = isMe ? "my-row" : "";
@@ -670,12 +656,8 @@
             <td class="highlight">${item.gwPoints}</td>
             <td>${item.totalPoints}</td>
           </tr>`;
-
-          tickerString += `[${item.rank}. ${item.teamName} - ${item.totalPoints} Pts]  `;
         });
         document.getElementById("standings-table").innerHTML = standingsHTML;
-        document.getElementById("ticker-text").innerText = tickerString;
-
         let historyHTML = "";
         // Looping dibalik agar GW terbaru muncul di paling atas
         for(let g = 38; g >= 1; g--) {
