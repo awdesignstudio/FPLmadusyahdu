@@ -176,9 +176,7 @@
       <div class="chat-controls">
         <strong>Pilih Gameweek:</strong>
         <select id="gwSelect" onchange="onGwChange(this.value)">
-          <option value="1">GW 1 (Arsip)</option>
-          <option value="2">GW 2 (Arsip)</option>
-          <option value="3" selected>GW 3 (Live)</option>
+          <!-- Dropdown dinamis hanya sampai GW yang aktif saat ini -->
         </select>
       </div>
 
@@ -207,9 +205,7 @@
       <div class="dashboard-controls">
         <strong>Pilih Gameweek Klasemen:</strong>
         <select id="gwDashboardSelect" onchange="onDashboardGwChange(this.value)">
-          <option value="1">GW 1</option>
-          <option value="2">GW 2</option>
-          <option value="3" selected>GW 3 (Live)</option>
+          <!-- Dropdown dinamis hanya sampai GW yang aktif saat ini -->
         </select>
       </div>
 
@@ -259,6 +255,8 @@
   let currentUser = {};
   let currentChatRef = null;
   const MY_LEAGUE_ID = 182620;
+  
+  // CURRENT_LIVE_GW diset manual ke 3 (aktif saat ini), otomatis bertambah ke depan seiring berjalannya waktu
   const CURRENT_LIVE_GW = 3; 
 
   window.onload = function() {
@@ -269,6 +267,19 @@
       }
     }
 
+    // Generate dropdown dinamis hanya dari GW 1 sampai CURRENT_LIVE_GW
+    let gwOptionsHTML = "";
+    for (let i = 1; i <= CURRENT_LIVE_GW; i++) {
+      let label = (i === CURRENT_LIVE_GW) ? " (Live)" : " (Arsip)";
+      let selected = (i === CURRENT_LIVE_GW) ? "selected" : "";
+      gwOptionsHTML += `<option value="${i}" ${selected}>GW ${i}${label}</option>`;
+    }
+
+    const gwSelect = document.getElementById("gwSelect");
+    const gwDashboardSelect = document.getElementById("gwDashboardSelect");
+    if (gwSelect) gwSelect.innerHTML = gwOptionsHTML;
+    if (gwDashboardSelect) gwDashboardSelect.innerHTML = gwOptionsHTML;
+
     const savedUser = localStorage.getItem("fpl_current_user");
     if (savedUser) {
       currentUser = JSON.parse(savedUser);
@@ -278,8 +289,8 @@
       
       setupPresenceSystem();
 
-      const selectedGw = document.getElementById("gwSelect").value;
-      const dashboardGw = document.getElementById("gwDashboardSelect").value;
+      const selectedGw = CURRENT_LIVE_GW;
+      const dashboardGw = CURRENT_LIVE_GW;
       
       loadChat(selectedGw); 
       loadRewardsForChat(MY_LEAGUE_ID, selectedGw);
