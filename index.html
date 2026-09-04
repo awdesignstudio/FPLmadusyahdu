@@ -141,6 +141,13 @@
       .msg.bot { background: #1a1a2e; color: #ffcc00; border-left: 4px solid #ffcc00; align-self: center; width: 90%; font-size: 14px; }
       .bot-header { font-weight: bold; margin-bottom: 6px; border-bottom: 1px dashed rgba(255, 204, 0, 0.3); padding-bottom: 4px; }
       .bot-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        /* === FITUR REAKSI EMOJI === */
+      .msg-reactions-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+      .reaction-badge { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 2px 8px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; color: #fff; }
+      .reaction-badge:hover { background: rgba(0, 255, 133, 0.2); border-color: #00ff85; }
+      .reaction-picker-btn { font-size: 11px; opacity: 0.7; cursor: pointer; text-decoration: underline; margin-top: 4px; display: inline-block; }
+      .reaction-picker-btn:hover { opacity: 1; color: #00ff85; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -815,13 +822,42 @@
       senderNameStyle = `style="color: ${uniqueColor};"`;
     }
 
-    const msgHTML = `<div class="${msgClass}" id="msg-${key}">
+    // Tombol pemicu pemilih emoji & daftar reaksi yang sudah masuk
+    let reactionPickerHtml = !isSystem ? `<span class="reaction-picker-btn" onclick="toggleReactionPicker('${key}')">😊 Reaksi</span>` : "";
+    
+    let reactionsListHtml = "";
+    if (data.reactions) {
+      reactionsListHtml = `<div class="msg-reactions-container" id="reactions-container-${key}">`;
+      for (let emoji in data.reactions) {
+        let senders = data.reactions[emoji];
+        let count = Object.keys(senders).length;
+        let hasReacted = senders[currentUser.managerId] !== undefined;
+        let badgeStyle = hasReacted ? "background: rgba(0,255,133,0.3); border-color: #00ff85;" : "";
+        
+        reactionsListHtml += `<span class="reaction-badge" style="${badgeStyle}" onclick="toggleReaction('${key}', '${emoji}')">${emoji} <span>${count}</span></span>`;
+      }
+      reactionsListHtml += `</div>`;
+    }
+
+    let reactionPopupHtml = `<div id="picker-${key}" style="display:none; position:absolute; background:#37003c; border:1px solid #00ff85; border-radius:15px; padding:4px 8px; gap:6px; z-index:20; bottom:-32px; left:0; box-shadow:0 4px 10px rgba(0,0,0,0.5);">
+      <span style="cursor:pointer;" onclick="addReaction('${key}', '🔥')">🔥</span>
+      <span style="cursor:pointer;" onclick="addReaction('${key}', '🤡')">🤡</span>
+      <span style="cursor:pointer;" onclick="addReaction('${key}', '😭')">😭</span>
+      <span style="cursor:pointer;" onclick="addReaction('${key}', '👍')">👍</span>
+      <span style="cursor:pointer;" onclick="addReaction('${key}', '❤️')">❤️</span>
+    </div>`;
+
+    const msgHTML = `<div class="${msgClass}" id="msg-${key}" style="position: relative;">
       <div class="sender-name" ${senderNameStyle}>${data.senderName}</div>
       ${quotedHtml}
       <div class="msg-text">${formattedMsg}</div>
-      ${actionsHtml}
+      <div style="display: flex; justify-content: space-between; align-items: center; position: relative;">
+        ${reactionPickerHtml}
+        ${actionsHtml}
+      </div>
+      ${reactionsListHtml}
+      ${reactionPopupHtml}
     </div>`;
-
     box.innerHTML += msgHTML;
     box.scrollTop = box.scrollHeight;
     
@@ -1238,6 +1274,33 @@
   callGAS('getCurrentLiveGWData', null, null, function(res) {
     if (res.success) { currentGwDeadline = new Date(res.deadlineTime).getTime(); }
   });
+
+    // --- FITUR REAKSI EMOJI ---
+  function toggleReactionPicker(key) {
+    const picker = document.getElementById(`picker-${key}`);
+    if (picker) {
+      picker.style.display = (picker.style.display === "flex") ? "none" : "flex";
+    }
+  }
+
+  function addReaction(key, emoji) {
+    const gw = parseInt(document.getElementById("gwSelect").value);
+    const ref = db.ref(`chats/gw${gw}/${key}/reactions/${emoji}/${currentUser.managerId}`);
+    
+    ref.once('value', snapshot => {
+      if (snapshot.exists()) {
+        ref.remove();
+      } else {
+        ref.set(currentUser.teamName);
+      }
+    });
+    
+    toggleReactionPicker(key);
+  }
+
+  function toggleReaction(key, emoji) {
+    addReaction(key, emoji);
+  }
 </script>
 
 </body>
