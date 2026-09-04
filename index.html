@@ -517,7 +517,11 @@
     })
     .then(res => res.json())
     .then(data => callback(data))
-    .catch(err => console.error("API Error:", err));
+    .catch(err => {
+      console.error("API Error:", err);
+      // Memaksa bot memunculkan pesan error jika koneksi ke backend gagal
+      callback({ success: false, message: "Koneksi ke server backend gagal atau belum di-deploy versi terbarunya." });
+    });
   }
 
   function login() {
