@@ -259,7 +259,7 @@
   let currentUser = {};
   let currentChatRef = null;
   const MY_LEAGUE_ID = 182620;
-  const CURRENT_LIVE_GW = 3; 
+  let CURRENT_LIVE_GW = 1; // Nilai default awal sebelum disinkronkan ke FPL
 
   window.onload = function() {
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
@@ -278,12 +278,25 @@
       
       setupPresenceSystem();
 
-      const selectedGw = document.getElementById("gwSelect").value;
-      const dashboardGw = document.getElementById("gwDashboardSelect").value;
-      
-      loadChat(selectedGw); 
-      loadRewardsForChat(MY_LEAGUE_ID, selectedGw);
-      buildDashboard(MY_LEAGUE_ID, dashboardGw);
+      // Ambil Gameweek yang sedang Live langsung dari server FPL
+      callGAS('getCurrentLiveGW', null, null, function(res) {
+        if (res.success && res.currentGw) {
+          CURRENT_LIVE_GW = res.currentGw;
+        }
+        
+        // Sesuaikan dropdown agar otomatis mengarah ke GW Live terbaru
+        const gwSelect = document.getElementById("gwSelect");
+        const gwDashboardSelect = document.getElementById("gwDashboardSelect");
+        if (gwSelect) gwSelect.value = CURRENT_LIVE_GW;
+        if (gwDashboardSelect) gwDashboardSelect.value = CURRENT_LIVE_GW;
+
+        const selectedGw = gwSelect ? gwSelect.value : CURRENT_LIVE_GW;
+        const dashboardGw = gwDashboardSelect ? gwDashboardSelect.value : CURRENT_LIVE_GW;
+        
+        loadChat(selectedGw); 
+        loadRewardsForChat(MY_LEAGUE_ID, selectedGw);
+        buildDashboard(MY_LEAGUE_ID, dashboardGw);
+      });
     }
   };
 
