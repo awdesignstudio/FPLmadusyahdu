@@ -175,11 +175,7 @@
     <div id="tab-chat">
       <div class="chat-controls">
         <strong>Pilih Gameweek:</strong>
-        <select id="gwSelect" onchange="onGwChange(this.value)">
-          <option value="1">GW 1 (Arsip)</option>
-          <option value="2">GW 2 (Arsip)</option>
-          <option value="3" selected>GW 3 (Live)</option>
-        </select>
+        <select id="gwSelect" onchange="onGwChange(this.value)"></select>
       </div>
 
       <div class="reward-container" id="rewards-banner">
@@ -206,11 +202,7 @@
       
       <div class="dashboard-controls">
         <strong>Pilih Gameweek Klasemen:</strong>
-        <select id="gwDashboardSelect" onchange="onDashboardGwChange(this.value)">
-          <option value="1">GW 1</option>
-          <option value="2">GW 2</option>
-          <option value="3" selected>GW 3 (Live)</option>
-        </select>
+        <select id="gwDashboardSelect" onchange="onDashboardGwChange(this.value)"></select>
       </div>
 
       <div class="card">
@@ -259,7 +251,7 @@
   let currentUser = {};
   let currentChatRef = null;
   const MY_LEAGUE_ID = 182620;
-  let CURRENT_LIVE_GW = 3; // Nilai default aman
+  let CURRENT_LIVE_GW = 3; // Fallback aman
 
   window.onload = function() {
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
@@ -278,13 +270,13 @@
       
       setupPresenceSystem();
 
-      // Langsung panggil server FPL untuk tentukan GW Live yang akurat
+      // Ambil GW Live dari server FPL terlebih dahulu sebelum merender elemen dropdown & chat
       callGAS('getCurrentLiveGW', null, null, function(res) {
         if (res.success && res.currentGw) {
           CURRENT_LIVE_GW = res.currentGw;
         }
         
-        // Buat opsi pilihan gameweek secara dinamis dari GW 1 sampai CURRENT_LIVE_GW (atau hingga GW 38)
+        // Buat opsi dropdown secara dinamis dari 1 sampai 38
         let gwOptionsHTML = "";
         for (let i = 1; i <= 38; i++) {
           let label = "";
@@ -292,21 +284,22 @@
           else if (i === CURRENT_LIVE_GW) label = " (Live)";
           else label = " (Akan Datang)";
           
-          let selected = (i === CURRENT_LIVE_GW) ? "selected" : "";
-          gwOptionsHTML += `<option value="${i}" ${selected}>GW ${i}${label}</option>`;
+          gwOptionsHTML += `<option value="${i}">GW ${i}${label}</option>`;
         }
 
         const gwSelect = document.getElementById("gwSelect");
         const gwDashboardSelect = document.getElementById("gwDashboardSelect");
         
-        if (gwSelect) gwSelect.innerHTML = gwOptionsHTML;
-        if (gwDashboardSelect) gwDashboardSelect.innerHTML = gwOptionsHTML;
+        if (gwSelect) {
+          gwSelect.innerHTML = gwOptionsHTML;
+          gwSelect.value = CURRENT_LIVE_GW;
+        }
+        if (gwDashboardSelect) {
+          gwDashboardSelect.innerHTML = gwOptionsHTML;
+          gwDashboardSelect.value = CURRENT_LIVE_GW;
+        }
 
-        // Set nilai dropdown sesuai GW Live yang aktif
-        if (gwSelect) gwSelect.value = CURRENT_LIVE_GW;
-        if (gwDashboardSelect) gwDashboardSelect.value = CURRENT_LIVE_GW;
-
-        // Muat data chat dan klasemen berdasarkan GW Live yang benar
+        // Muat data berdasarkan GW Live yang akurat dari FPL
         loadChat(CURRENT_LIVE_GW); 
         loadRewardsForChat(MY_LEAGUE_ID, CURRENT_LIVE_GW);
         buildDashboard(MY_LEAGUE_ID, CURRENT_LIVE_GW);
