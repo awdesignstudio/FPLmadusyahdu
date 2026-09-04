@@ -1309,6 +1309,7 @@ function processSlashCommand(commandText, gw) {
   });
 
     // --- FITUR REAKSI EMOJI ---
+  // --- FITUR REAKSI EMOJI ---
   function toggleReactionPicker(key) {
     const picker = document.getElementById(`picker-${key}`);
     if (picker) {
@@ -1318,14 +1319,15 @@ function processSlashCommand(commandText, gw) {
 
   function addReaction(key, emoji) {
     const gw = parseInt(document.getElementById("gwSelect").value);
+    // Validasi berbasis ID unik user yang sedang login
     const userReactionRef = db.ref(`chats/gw${gw}/${key}/reactions/${emoji}/${currentUser.managerId}`);
     
     userReactionRef.once('value', snapshot => {
       if (snapshot.exists()) {
-        // Jika user sudah pernah memberi reaksi ini, hapus (batal)
+        // Hanya hapus jika ID manajer yang login memang sudah pernah mereaksi emoji ini
         userReactionRef.remove();
       } else {
-        // Jika belum, tambahkan reaksi atas nama tim pengguna
+        // Tambahkan reaksi baru atas nama tim manajer yang sedang login
         userReactionRef.set(currentUser.teamName);
       }
     });
