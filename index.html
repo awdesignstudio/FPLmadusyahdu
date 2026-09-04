@@ -1278,8 +1278,25 @@ function processSlashCommand(commandText, gw) {
       }
     });
   }
+  else if (cmd === "/blunder") {
+    callGAS('getLeagueCaptainBlunders', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let blunderHtml = `<div class='bot-header'>🤡 Papan Korban Kapten / Blunder (GW ${targetGw})</div>`;
+        if (res.blunderList.length === 0) {
+          blunderHtml += "<i style='font-size:12px; color:#aaa;'>Aman jaya! Belum ada kapten manajer yang bernasib tragis (semua di atas 2 poin) di GW ini.</i>";
+        } else {
+          res.blunderList.forEach(b => {
+            blunderHtml += `<div class='bot-row'><span><b>${b.team}</b> <small>(${b.name})</small><br>Kapten: <i>${b.captain}</i></span> <span style="color:#ff4a4a; font-weight:bold;">${b.points} pts</span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: blunderHtml, isBotHtml: true });
+      } else {
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Blunder Error: " + res.message });
+      }
+    });
+  }
   else {
-    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain, /chips, /h2h @Name, /diff, /bonus, /hit" });
+    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain, /chips, /h2h @Name, /diff, /bonus, /hit, /blunder" });
   }
 }  // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
