@@ -922,6 +922,47 @@
     textarea.style.height = "auto";
     cancelReply();
   }
+
+  // --- FITUR AUTO-NUMBERING ALA WHATSAPP (KETIKA ENTER) ---
+  document.addEventListener("DOMContentLoaded", function() {
+    const chatTextarea = document.getElementById("chatMessage");
+    if (chatTextarea) {
+      chatTextarea.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+          const cursorPosition = this.selectionStart;
+          const text = this.value;
+          
+          // Ambil baris tempat kursor berada saat ini
+          const textBeforeCursor = text.substring(0, cursorPosition);
+          const lines = textBeforeCursor.split("\n");
+          const currentLine = lines[lines.length - 1];
+          
+          // Cek apakah baris saat ini diawali dengan pola nomor (contoh: "1. ", "2. ")
+          const match = currentLine.match(/^(\d+)\.\s+/);
+          
+          if (match) {
+            e.preventDefault(); // Cegah enter biasa
+            const currentNum = parseInt(match[1]);
+            const nextNum = currentNum + 1;
+            
+            // Jika baris saat ini kosong (hanya ada nomor), hapus nomornya dan buat baris baru normal
+            if (currentLine.trim() === `${currentNum}.`) {
+              const textAfterCursor = text.substring(cursorPosition);
+              const cleanBefore = textBeforeCursor.substring(0, textBeforeCursor.length - currentLine.length);
+              this.value = cleanBefore + "\n" + textAfterCursor;
+              this.selectionStart = this.selectionName = cleanBefore.length + 1;
+            } else {
+              // Tambahkan baris baru dengan nomor berikutnya secara otomatis
+              const textAfterCursor = text.substring(cursorPosition);
+              this.value = textBeforeCursor + "\n" + nextNum + ". " + textAfterCursor;
+              this.selectionStart = this.selectionEnd = cursorPosition + nextNum.toString().length + 3;
+            }
+            autoResizeTextarea(this);
+          }
+        }
+      });
+    }
+  });
   function editMessage(key, encodedOldText) {
     const oldText = decodeURIComponent(encodedOldText);
     showCustomPrompt("Edit Pesan", "Ubah pesan Anda (Maksimal 10 menit setelah dikirim):", oldText, function(newText) {
@@ -1155,8 +1196,28 @@
         }
       });
     }
+    else if (cmd === "/bonus") {
+      callGAS('getLiveBonusPoints', targetGw, function(res) {
+        if (res.success) {
+          let bonusHtml = `<div class='bot-header'>🏆 Live Bonus Points (GW ${targetGw})</div>`;
+          if (res.matches.length === 0) {
+            bonusHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada pertandingan yang berjalan atau selesai.</i>";
+          } else {
+            res.matches.forEach(m => {
+              bonusHtml += `<div style='margin-top:6px; font-weight:bold; color:#ffcc00;'>${m.match} (${m.status})</div>`;
+              m.top.forEach(t => {
+                bonusHtml += `<div class='bot-row' style='padding-left:10px;'><span>↳ ${t.name}</span> <strong>+${t.pts} pts <small>(BPS: ${t.bps})</small></strong></div>`;
+              });
+            });
+          }
+          db.ref(`chats/gw${gw}/${tempKey}`).update({ message: bonusHtml, isBotHtml: true });
+        } else {
+          db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Bonus Error: " + res.message });
+        }
+      });
+    }
     else {
-      db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain, /chips, /h2h @Name, /diff" });
+      db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain, /chips, /h2h @Name, /diff, /bonus" });
     }
   }
   // ==========================================
