@@ -132,6 +132,15 @@
         color: #37003c; 
         border-color: #37003c;
       }
+
+      /* === FITUR BARU: SPOILER & BOT CARDS === */
+      .spoiler-text { filter: blur(6px); cursor: not-allowed; transition: filter 0.3s ease; user-select: none; }
+      .spoiler-revealed { filter: blur(0); cursor: default; }
+      .spoiler-label { font-size: 10px; background: #ff4a4a; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-bottom: 4px; display: inline-block; }
+      
+      .msg.bot { background: #1a1a2e; color: #ffcc00; border-left: 4px solid #ffcc00; align-self: center; width: 90%; font-size: 14px; }
+      .bot-header { font-weight: bold; margin-bottom: 6px; border-bottom: 1px dashed rgba(255, 204, 0, 0.3); padding-bottom: 4px; }
+      .bot-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -717,7 +726,8 @@
 
   function renderMessage(key, data, box) {
     const isMe = (data.managerId.toString() === currentUser.managerId.toString());
-    const msgClass = isMe ? "msg me" : "msg others";
+    const isSystem = (data.managerId === "SYSTEM");
+    const msgClass = isSystem ? "msg bot" : (isMe ? "msg me" : "msg others");
     
     let actionsHtml = "";
     let formattedMsg = "";
@@ -726,13 +736,12 @@
     // JIKA PESAN TELAH DIHAPUS
     if (data.isDeleted) {
       formattedMsg = `<span style="font-style: italic; opacity: 0.65;">${data.message}</span>`;
-      // Tidak ada tombol aksi (Edit, Hapus, Balas) untuk pesan yang sudah dihapus
     } 
     // JIKA PESAN NORMAL (TIDAK DIHAPUS)
     else {
-      let replyActionHtml = `<span onclick="prepareReply('${data.senderName}', \`${encodeURIComponent(data.message)}\`)">Balas</span>`;
+      let replyActionHtml = !isSystem ? `<span onclick="prepareReply('${data.senderName}', \`${encodeURIComponent(data.message)}\`)">Balas</span>` : "";
       
-      if (isMe) {
+      if (isMe && !isSystem) {
         const now = Date.now();
         const msgTime = data.timestamp || now;
         const diffMinutes = (now - msgTime) / (1000 * 60);
@@ -745,7 +754,7 @@
         } else {
           actionsHtml = `<div class="msg-actions">${replyActionHtml}</div>`;
         }
-      } else {
+      } else if (!isSystem) {
         actionsHtml = `<div class="msg-actions">${replyActionHtml}</div>`;
       }
 
@@ -757,25 +766,42 @@
         </div>`;
       }
 
-      formattedMsg = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+      // FORMAT HTML (Cek apakah pesan dari bot)
+      if (data.isBotHtml) {
+        formattedMsg = data.message;
+      } else {
+        formattedMsg = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+      }
       
-      // MENTION FORMATTER: Ubah @Nama Manajer menjadi badge utuh
-      if (typeof leagueParticipants !== 'undefined' && leagueParticipants.length > 0) {
+      // CEK EFEK SPOILER
+      if (data.isSpoiler) {
+        const now = Date.now();
+        const isPastDeadline = currentGwDeadline && (now > currentGwDeadline);
+        
+        if (isMe) {
+           formattedMsg = `<span class="spoiler-label">#SPOILER (Rahasia)</span><br>${formattedMsg}`;
+        } else if (isPastDeadline || data.isDeleted) {
+           formattedMsg = `<span class="spoiler-label">#SPOILER (Terbuka)</span><br><span class="spoiler-revealed">${formattedMsg}</span>`;
+        } else {
+           formattedMsg = `<span class="spoiler-label">#SPOILER (Terkunci)</span><br><span class="spoiler-text" onclick="showCustomAlert('Informasi', 'Spoiler transfer baru bisa dibuka setelah Deadline GW terlewati!')">${formattedMsg.replace(/[a-zA-Z0-9]/g, 'x')}</span>`;
+        }
+      }
+
+      // MENTION FORMATTER
+      if (typeof leagueParticipants !== 'undefined' && leagueParticipants.length > 0 && !data.isBotHtml) {
         leagueParticipants.forEach(name => {
           let mentionPattern = new RegExp("@" + name + "(?![a-zA-Z0-9])", "g");
           formattedMsg = formattedMsg.replace(mentionPattern, `<span class="mention-badge">@${name}</span>`);
         });
       }
       
-      // Tambahkan label kecil jika pesan pernah diedit
       if (data.isEdited) {
         formattedMsg += `<span style="font-size:11px; opacity:0.55; margin-left:6px; font-style:italic;">(diedit)</span>`;
       }
     }
 
-    // Pesan sendiri tetap menggunakan warna standar, pesan orang lain diberi warna unik
     let senderNameStyle = "";
-    if (!isMe && data.managerId) {
+    if (!isMe && !isSystem && data.managerId) {
       const uniqueColor = getSenderColor(data.managerId);
       senderNameStyle = `style="color: ${uniqueColor};"`;
     }
@@ -790,18 +816,15 @@
     box.innerHTML += msgHTML;
     box.scrollTop = box.scrollHeight;
     
-    // CEK JIKA ADA MENTION UNTUK SAYA DARI ORANG LAIN
-    if (!isMe && !data.isDeleted && data.message && data.message.includes("@" + currentUser.managerName)) {
+    if (!isMe && !data.isDeleted && data.message && data.message.includes("@" + currentUser.managerName) && !isSystem) {
       const toast = document.getElementById("mention-toast");
       if (toast) {
-        // Ambil nama depan pengirim agar notif tidak terlalu panjang
         document.getElementById("mention-toast-sender").innerText = data.senderName.split(" ")[0]; 
         toast.style.display = "block";
-        toast.dataset.key = key; // Simpan ID pesan ke dalam tombol
+        toast.dataset.key = key; 
       }
     }
   }
-
   function updateMessage(key, data) {
     const el = document.getElementById(`msg-${key}`);
     if (el) {
@@ -855,11 +878,28 @@
     const text = textarea.value.trim();
     if(!text) return;
 
+    // --- FITUR 1: CEK SLASH COMMANDS ---
+    if (text.startsWith("/")) {
+      processSlashCommand(text, gw);
+      textarea.value = "";
+      textarea.style.height = "auto";
+      return;
+    }
+
+    // --- FITUR 2: CEK SPOILER TAG ---
+    let isSpoiler = false;
+    let finalText = text;
+    if (text.toLowerCase().startsWith("#spoiler")) {
+      isSpoiler = true;
+      finalText = text.substring(8).trim(); // Buang teks "#spoiler"-nya
+    }
+
     let messageData = {
       managerId: currentUser.managerId,
       senderName: currentUser.teamName + " (" + currentUser.managerName + ")",
-      message: text,
-      timestamp: firebase.database.ServerValue.TIMESTAMP
+      message: finalText,
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+      isSpoiler: isSpoiler
     };
 
     if (activeReplyData) {
@@ -872,7 +912,6 @@
     textarea.style.height = "auto";
     cancelReply();
   }
-
   function editMessage(key, encodedOldText) {
     const oldText = decodeURIComponent(encodedOldText);
     showCustomPrompt("Edit Pesan", "Ubah pesan Anda (Maksimal 10 menit setelah dikirim):", oldText, function(newText) {
@@ -1011,6 +1050,55 @@
       scrollToMessage(targetKey);
     }
   }
+
+  // ==========================================
+  // LOGIKA SLASH COMMANDS & BOT VAR
+  // ==========================================
+  function processSlashCommand(commandText, gw) {
+    const args = commandText.split(" ");
+    const cmd = args[0].toLowerCase();
+
+    // Munculkan indikator "VAR sedang berpikir..." sementara kita panggil API
+    const tempKey = db.ref("chats/gw" + gw).push({
+      managerId: "SYSTEM", senderName: "🤖 FPL VAR", 
+      message: "Mengecek data untuk " + cmd + "...", timestamp: firebase.database.ServerValue.TIMESTAMP
+    }).key;
+
+    if (cmd === "/captain" || cmd === "/chips") {
+      callGAS('getLeagueCaptains', MY_LEAGUE_ID, gw, function(res) {
+        if (res.success) {
+          let botText = "";
+          if (cmd === "/captain") {
+            botText = "<div class='bot-header'>👑 Pilihan Kapten GW " + gw + "</div>";
+            for (let cap in res.captains) {
+              botText += `<div class='bot-row'><span>${cap}</span> <strong>${res.captains[cap]} tim</strong></div>`;
+            }
+          } else {
+            botText = "<div class='bot-header'>🃏 Chip Aktif GW " + gw + "</div>";
+            if (res.chips.length === 0) botText += "<i style='font-size:12px; color:#aaa;'>Tidak ada manajer yang menggunakan chip.</i>";
+            res.chips.forEach(c => {
+              botText += `<div class='bot-row'><span>${c.team}</span> <strong>${c.chip.toUpperCase()}</strong></div>`;
+            });
+          }
+          db.ref(`chats/gw${gw}/${tempKey}`).update({ message: botText, isBotHtml: true });
+        } else {
+          db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Gagal mengambil data dari FPL." });
+        }
+      });
+    } else {
+      db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Command tidak dikenali. Coba ketik: /captain, /chips" });
+    }
+  }
+
+  // ==========================================
+  // VARIABEL GLOBAL UNTUK DEADLINE
+  // ==========================================
+  let currentGwDeadline = null;
+  
+  // Ambil jam deadline FPL asli saat aplikasi pertama dimuat
+  callGAS('getCurrentLiveGWData', null, null, function(res) {
+    if (res.success) { currentGwDeadline = new Date(res.deadlineTime).getTime(); }
+  });
 </script>
 
 </body>
