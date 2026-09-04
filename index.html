@@ -186,7 +186,7 @@
       <div class="chat-controls">
         <strong>Pilih Gameweek:</strong>
         <select id="gwSelect" onchange="onGwChange(this.value)">
-          <!-- Dropdown dinamis hanya sampai GW yang aktif saat ini -->
+          <!-- Dropdown dinamis -->
         </select>
       </div>
 
@@ -222,7 +222,7 @@
       <div class="dashboard-controls">
         <strong>Pilih Gameweek Klasemen:</strong>
         <select id="gwDashboardSelect" onchange="onDashboardGwChange(this.value)">
-          <!-- Dropdown dinamis hanya sampai GW yang aktif saat ini -->
+          <!-- Dropdown dinamis -->
         </select>
       </div>
 
@@ -272,8 +272,24 @@
   let currentUser = {};
   let currentChatRef = null;
   const MY_LEAGUE_ID = 182620;
-  const CURRENT_LIVE_GW = 3; 
 
+  // FUNGSI OTOMATIS HITUNG GAMEEWEEK BERDASARKAN KAMIS 3 SEPTEMBER 2026 SEBAGAI AWAL GW 3
+  function calculateCurrentLiveGW() {
+    const baseDate = new Date("2026-09-03T00:00:00"); // Kamis, 3 September 2026 (Mulai GW 3)
+    const baseGw = 3;
+    const now = new Date();
+    
+    const diffTime = now - baseDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) return baseGw;
+    const weeksPassed = Math.floor(diffDays / 7);
+    let calculatedGw = baseGw + weeksPassed;
+    
+    return Math.min(calculatedGw, 38); // Batas maksimal 38 GW
+  }
+
+  const CURRENT_LIVE_GW = calculateCurrentLiveGW();
   let activeReplyData = null;
 
   window.onload = function() {
