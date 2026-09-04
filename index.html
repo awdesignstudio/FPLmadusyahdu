@@ -147,10 +147,12 @@
       .mention-item { padding: 8px 12px; color: #fff; font-size: 14px; cursor: pointer; border-bottom: 1px solid rgba(0,255,133,0.2); }
       .mention-item:hover { background: rgba(0,255,133,0.2); color: #00ff85; font-weight: bold; }
       
-      /* BADGE MENTION DI DALAM CHAT */
-      .mention-badge { background: rgba(0,255,133,0.2); color: #00ff85; font-weight: bold; padding: 2px 6px; border-radius: 4px; border: 1px dashed #00ff85; font-size: 0.95em; cursor: pointer; }
-      /* Warna badge mention di gelembung sendiri diubah jadi putih terang */
-      .msg.me .mention-badge { background: rgba(255, 255, 255, 0.15); color: #ffffff; border-color: #ffffff; }
+      /* === BADGE MENTION DI DALAM CHAT === */
+      /* Di gelembung orang lain: Hijau Terang + Kotak Putus-putus */
+      .mention-badge { background: rgba(0, 255, 133, 0.15); color: #00ff85; font-weight: bold; padding: 2px 6px; border-radius: 4px; border: 1px dashed #00ff85; font-size: 0.95em; cursor: pointer; }
+      
+      /* Di gelembung sendiri: Orange Terang + Kotak Putus-putus */
+      .msg.me .mention-badge { background: rgba(255, 153, 51, 0.15); color: #ff9933; border: 1px dashed #ff9933; }
 
       /* === FITUR BARU: SPOILER & BOT CARDS === */
       .spoiler-text { filter: blur(6px); cursor: not-allowed; transition: filter 0.3s ease; user-select: none; }
