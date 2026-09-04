@@ -853,6 +853,15 @@
       senderNameStyle = `style="color: ${uniqueColor};"`;
     }
 
+    // --- MENGAMBIL DAN MEMFORMAT WAKTU CHAT ---
+    let timeString = "";
+    if (data.timestamp) {
+      const date = new Date(data.timestamp);
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      timeString = `${hours}:${minutes}`;
+    }
+
     // Tombol pemicu pemilih emoji & daftar reaksi yang sudah masuk (termasuk untuk pesan bot)
     let reactionPickerHtml = `<span class="reaction-picker-btn" onclick="toggleReactionPicker('${key}')">😊 Reaksi</span>`;
     
@@ -882,7 +891,10 @@
     </div>`;
 
     const msgHTML = `<div class="${msgClass}" id="msg-${key}" style="position: relative;">
-      <div class="sender-name" ${senderNameStyle}>${data.senderName}</div>
+      <div class="sender-name" ${senderNameStyle}>
+        ${data.senderName}
+        <span style="float: right; font-size: 10.5px; opacity: 0.6; font-weight: normal; margin-top: 2px;">${timeString}</span>
+      </div>
       ${quotedHtml}
       <div class="msg-text">${formattedMsg}</div>
       <div style="display: flex; justify-content: space-between; align-items: center; position: relative; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 4px;">
@@ -1371,7 +1383,7 @@ function processSlashCommand(commandText, gw) {
       }
     });
   }
-  else if (cmd === "/blunder") {
+ else if (cmd === "/blunder") {
     callGAS('getLeagueCaptainBlunders', MY_LEAGUE_ID, targetGw, function(res) {
       if (res.success) {
         let blunderHtml = `<div class='bot-header'>🤡 Papan Korban Kapten / Blunder (GW ${targetGw})</div>`;
@@ -1388,8 +1400,31 @@ function processSlashCommand(commandText, gw) {
       }
     });
   }
+  else if (cmd === "/hasil" || cmd === "/skor") {
+    callGAS('getLiveMatchResults', targetGw, null, function(res) {
+      if (res.success) {
+        let hasilHtml = `<div class='bot-header'>🏟️ Hasil Pertandingan (GW ${targetGw})</div>`;
+        if (res.matches.length === 0) {
+          hasilHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada pertandingan yang dimulai.</i>";
+        } else {
+          res.matches.forEach(m => {
+            hasilHtml += `<div style='margin-top:8px; font-weight:bold; color:#fff; background:rgba(255,255,255,0.1); padding:4px 6px; border-radius:4px;'>${m.title} (${m.status})</div>`;
+            if (m.goals.length > 0) hasilHtml += `<div class='bot-row' style='color:#00ff85; font-size:13px;'>⚽ ${m.goals.join(", ")}</div>`;
+            if (m.assists.length > 0) hasilHtml += `<div class='bot-row' style='color:#33ccff; font-size:13px;'>👟 ${m.assists.join(", ")}</div>`;
+            if (m.bonus.length > 0) {
+              let bnsStr = m.bonus.map(b => `${b.name} (+${b.pts})`).join(", ");
+              hasilHtml += `<div class='bot-row' style='color:#ffcc00; font-size:13px;'>🏆 ${bnsStr}</div>`;
+            }
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: hasilHtml, isBotHtml: true });
+      } else {
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Hasil Error: " + res.message });
+      }
+    });
+  }
   else {
-    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain, /chips, /h2h @Name, /diff, /bonus, /hit, /blunder" });
+    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain, /chips, /h2h @Name, /diff, /bonus, /hit, /blunder, /hasil" });
   }
 }  // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
