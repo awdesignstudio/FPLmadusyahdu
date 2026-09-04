@@ -637,47 +637,46 @@
 
     callGAS('getManagerTeam', managerId, gw, function(res) {
       if(res.success) {
-        let html = `<div style="color:#00ff85; font-weight:bold; margin-bottom:6px; font-size:13px;">PEMAIN INTI (STARTING XI):</div>`;
-        html += `<ul class="player-list">`;
+        // Kita buat gaya tabel kompak agar hemat space dan tidak banyak scroll
+        let html = `<div style="color:#00ff85; font-weight:bold; margin-bottom:4px; font-size:12px;">PEMAIN INTI (STARTING XI):</div>`;
+        html += `<table style="width:100%; font-size:13px; border-collapse:collapse; margin-bottom:10px;">`;
+        html += `<thead><tr style="color:#a375aa; border-bottom:1px solid #4b0053;"><th style="text-align:left; padding:4px;">Pemain</th><th style="text-align:center; padding:4px;">Pos/Tim</th><th style="text-align:center; padding:4px;">GW Pts</th><th style="text-align:right; padding:4px;">Total</th></tr></thead>`;
+        html += `<tbody>`;
+        
         res.starting.forEach(p => {
-          let badge = p.isCaptain ? `<span class="badge cap">C</span>` : (p.isVice ? `<span class="badge cap">V</span>` : "");
-          // Menangkap poin dari backend, gunakan "-" jika backend belum siap
+          let badge = p.isCaptain ? " (C)" : (p.isVice ? " (V)" : "");
           let gwPts = p.gwPoints !== undefined ? p.gwPoints : "-";
           let totPts = p.totalPoints !== undefined ? p.totalPoints : "-";
           
-          html += `<li>
-            <div class="player-info">
-              <strong style="font-size:15px;">${p.name}</strong>
-              <span class="player-meta">${p.pos} • ${p.team}</span>
-              <span class="player-meta" style="color:#00ff85; font-size:12px; margin-top:2px;">
-                GW: <strong>${gwPts}</strong> pts | Total: <strong>${totPts}</strong> pts
-              </span>
-            </div>
-            <div>${badge}</div>
-          </li>`;
+          html += `<tr style="border-bottom:1px dashed rgba(75,0,83,0.5);">
+            <td style="padding:6px 4px;"><strong>${p.name}</strong><span style="color:#00ff85; font-weight:bold;">${badge}</span></td>
+            <td style="text-align:center; padding:6px 4px; color:#a375aa; font-size:11px;">${p.pos}<br>${p.team}</td>
+            <td style="text-align:center; padding:6px 4px; color:#00ff85; font-weight:bold;">${gwPts}</td>
+            <td style="text-align:right; padding:6px 4px;">${totPts}</td>
+          </tr>`;
         });
-        html += `</ul>`;
+        html += `</tbody></table>`;
         
-        html += `<div style="color:#a375aa; font-weight:bold; margin-top:18px; margin-bottom:6px; font-size:13px;">CADANGAN (BENCH):</div>`;
-        html += `<ul class="player-list" style="opacity:0.9;">`;
+        html += `<div style="color:#a375aa; font-weight:bold; margin-top:12px; margin-bottom:4px; font-size:12px;">CADANGAN (BENCH):</div>`;
+        html += `<table style="width:100%; font-size:13px; border-collapse:collapse; opacity:0.85;">`;
+        html += `<thead><tr style="color:#a375aa; border-bottom:1px solid #4b0053;"><th style="text-align:left; padding:4px;">Pemain</th><th style="text-align:center; padding:4px;">Pos/Tim</th><th style="text-align:center; padding:4px;">GW Pts</th><th style="text-align:right; padding:4px;">Total</th></tr></thead>`;
+        html += `<tbody>`;
+
         res.bench.forEach(p => {
           let gwPts = p.gwPoints !== undefined ? p.gwPoints : "-";
           let totPts = p.totalPoints !== undefined ? p.totalPoints : "-";
 
-          html += `<li>
-            <div class="player-info">
-              <strong style="font-size:15px;">${p.name}</strong>
-              <span class="player-meta">${p.pos} • ${p.team}</span>
-              <span class="player-meta" style="color:#a375aa; font-size:12px; margin-top:2px;">
-                GW: <strong>${gwPts}</strong> pts | Total: <strong>${totPts}</strong> pts
-              </span>
-            </div>
-          </li>`;
+          html += `<tr style="border-bottom:1px dashed rgba(75,0,83,0.5);">
+            <td style="padding:6px 4px;"><strong>${p.name}</strong></td>
+            <td style="text-align:center; padding:6px 4px; color:#a375aa; font-size:11px;">${p.pos}<br>${p.team}</td>
+            <td style="text-align:center; padding:6px 4px;">${gwPts}</td>
+            <td style="text-align:right; padding:6px 4px;">${totPts}</td>
+          </tr>`;
         });
-        html += `</ul>`;
+        html += `</tbody></table>`;
         
         if (res.activeChip) {
-          html += `<div style="margin-top:18px; color:#00ff85; font-weight:bold; text-align:center; font-size:15px;">Chip Aktif: ${res.activeChip.toUpperCase()}</div>`;
+          html += `<div style="margin-top:12px; color:#00ff85; font-weight:bold; text-align:center; font-size:14px;">Chip Aktif: ${res.activeChip.toUpperCase()}</div>`;
         }
         
         document.getElementById("modal-body").innerHTML = html;
