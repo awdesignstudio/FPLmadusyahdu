@@ -14,9 +14,15 @@
     <title>FPL Chat</title>
     
    <style>
-      /* TEMA DASAR FPL */
-      body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #24002e; color: #ffffff; margin: 0; padding: 15px; font-size: 17px; }
-      .container { max-width: 600px; margin: 0 auto; background: #37003c; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); padding: 18px; border: 1px solid #4b0053; position: relative; }
+      /* TEMA DASAR FPL (FLEXBOX LAYER 1) */
+      body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #24002e; color: #ffffff; margin: 0; padding: 15px; font-size: 17px; min-height: 100vh; box-sizing: border-box; display: flex; flex-direction: column; }
+      .container { flex: 1; width: 100%; max-width: 600px; margin: 0 auto; background: #37003c; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); padding: 18px; border: 1px solid #4b0053; position: relative; display: flex; flex-direction: column; box-sizing: border-box; }
+      
+      /* HACK FLEXBOX AGAR RUANG CHAT MENGISI SISA LAYAR PENUH TANPA MENGGANTUNG */
+      #main-section { flex: 1; display: flex !important; flex-direction: column; }
+      #main-section[style*="none"] { display: none !important; }
+      #tab-chat { flex: 1; display: flex !important; flex-direction: column; }
+      #tab-chat[style*="none"] { display: none !important; }
       
       /* HEADER LOGIN & LEAGUE TITLE */
       .login-header { text-align: center; border-bottom: 2px solid #00c774; padding-bottom: 14px; margin-bottom: 18px; }
@@ -27,13 +33,20 @@
       .app-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00c774; padding-bottom: 12px; margin-bottom: 15px; }
       .header-titles { text-align: center; flex: 1; line-height: 1.2; padding: 0 5px; }
       .header-titles h2 { margin: 0; color: #ffffff; font-size: 18px; white-space: nowrap; }
+
+      /* TOMBOL NAVIGASI HEADER KIRI-KANAN (PENGGANTI TAB) */
+      .nav-btn { background: rgba(255,255,255,0.05); color: #a375aa; border: 1px solid #4b0053; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; transition: all 0.2s; position: relative; white-space: nowrap; }
+      .nav-btn.active { background: #00c774; color: #ffffff; border-color: #00c774; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+      .nav-btn:hover:not(.active) { background: rgba(0, 199, 116, 0.2); color: #00c774; }
+
+      .unread-badge { display: none; position: absolute; top: -4px; right: -4px; background: #ff4a4a; color: white; border-radius: 50%; width: 12px; height: 12px; border: 2px solid #37003c; }
       
-      /* PANEL BAWAH: LOGOUT KECIL, RUNNING TEXT & SUPPORTED BY */
-      .bottom-panel { display: flex; align-items: center; gap: 10px; margin-top: 15px; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 8px; border: 1px solid #4b0053; }
+      /* PANEL BAWAH DITEKAN KE BAWAH OTOMATIS (margin-top: auto) */
+      .bottom-panel { display: flex; align-items: center; gap: 10px; margin-top: auto; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 8px; border: 1px solid #4b0053; }
       .logout-btn-small { background: #ff4a4a; color: white; border: none; padding: 6px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; white-space: nowrap; flex-shrink: 0; }
       .logout-btn-small:hover { background: #e03838; }
       
-      /* RUNNING TEXT DIPELANGAIKAN JADI 65s */
+      /* RUNNING TEXT */
       .running-ticker { flex: 1; overflow: hidden; white-space: nowrap; font-size: 13px; color: #00ff85; background: rgba(255,255,255,0.03); padding: 5px 8px; border-radius: 4px; }
       .running-ticker span { display: inline-block; animation: marquee 65s linear infinite; }
       @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
@@ -42,7 +55,7 @@
 
       input[type="number"] { width: 85%; padding: 14px; margin: 12px 0; border: 1px solid #4b0053; border-radius: 8px; background: #ffffff; color: #000; font-size: 17px; }
       
-      /* Tombol dengan hijau FPL yang lebih gelap agar tidak silau */
+      /* Tombol dengan hijau FPL gelap */
       button { background: #00c774; color: #ffffff; border: none; padding: 14px 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
       button:hover { background: #00a660; }
       button:disabled { background: #555; color: #888; cursor: not-allowed; }
@@ -51,14 +64,7 @@
       #install-container { display: block; text-align: center; margin-bottom: 18px; background: rgba(0, 199, 116, 0.1); border: 1px dashed #00c774; padding: 14px; border-radius: 8px; }
       .install-btn { background: #00c774; color: #ffffff; width: 100%; padding: 15px; font-size: 17px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-weight: bold; }
 
-     /* TOMBOL NAVIGASI HEADER KIRI-KANAN (PENGGANTI TAB) */
-      .nav-btn { background: rgba(255,255,255,0.05); color: #a375aa; border: 1px solid #4b0053; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; transition: all 0.2s; position: relative; white-space: nowrap; }
-      .nav-btn.active { background: #00c774; color: #ffffff; border-color: #00c774; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-      .nav-btn:hover:not(.active) { background: rgba(0, 199, 116, 0.2); color: #00c774; }
-
-      .unread-badge { display: none; position: absolute; top: -4px; right: -4px; background: #ff4a4a; color: white; border-radius: 50%; width: 12px; height: 12px; border: 2px solid #37003c; }
-      
-      /* HALL OF FAME 3 BARIS */
+      /* HALL OF FAME */
       .reward-container { background: rgba(0,255,133,0.08); border: 1px solid #00ff85; border-radius: 8px; padding: 6px 8px; margin-bottom: 8px; font-size: 11px; text-align: center; }
       .reward-title { color: #00ff85; font-weight: bold; margin-bottom: 2px; border-bottom: 1px solid rgba(0,255,133,0.2); padding-bottom: 2px; font-size: 12px; }
       .reward-item { margin: 1px 0; color: #ffffff; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -68,11 +74,11 @@
       .online-dot { width: 7px; height: 7px; background-color: #00ff85; border-radius: 50%; box-shadow: 0 0 5px #00ff85; display: inline-block; }
       .online-list { color: #a375aa; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1; }
 
-      /* CHAT CONTROLS DIBUAT LEBIH TIPIS & RAPAT */
+      /* CHAT CONTROLS */
       .chat-controls, .dashboard-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 6px; font-size: 13px; }
       
-      /* === RUANG CHAT DINAMIS (OTOMATIS PENUH KE BAWAH) === */
-      #chat-box { height: calc(100vh - 350px); min-height: 380px; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: scroll; display: flex; flex-direction: column; gap: 14px; }
+      /* === KOTAK CHAT FLEX (OTOMATIS PENUH MENGIKUTI RUANG SISA) === */
+      #chat-box { flex: 1; min-height: 0; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; margin-bottom: 6px; }
       
       /* === GELEMBUNG CHAT (GELAP ALA WHATSAPP) === */
       .msg { max-width: 82%; padding: 10px 14px; border-radius: 12px; font-size: 15.5px; line-height: 1.4; word-wrap: break-word; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.2); }
@@ -84,8 +90,8 @@
       .msg-actions span { cursor: pointer; text-decoration: none; }
       .msg-actions span:hover { font-weight: bold; color: #00ff85; text-decoration: underline; }
 
-      /* INPUT AREA & REPLY PREVIEW STYLING */
-      .input-area { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+      /* INPUT AREA & REPLY PREVIEW */
+      .input-area { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; }
       .input-row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
       .input-area textarea { flex: 1; margin: 0; font-size: 16px; padding: 12px; border: 1px solid #4b0053; border-radius: 10px; background: #2a0030; color: #fff; resize: none; min-height: 24px; max-height: 120px; line-height: 1.4; overflow-y: auto; }
       .input-area textarea::placeholder { color: #aaa; }
@@ -98,6 +104,7 @@
       .quoted-msg { background: rgba(0, 0, 0, 0.25); border-left: 4px solid #00ff85; padding: 6px 10px; border-radius: 6px; font-size: 13px; margin-bottom: 8px; opacity: 0.9; }
       .quoted-sender { font-weight: bold; color: #00ff85; margin-bottom: 2px; }
 
+      /* DASHBOARD KLASEMEN */
       .card { background: rgba(255,255,255,0.05); padding: 18px; border-radius: 8px; margin-bottom: 18px; border: 1px solid #4b0053; }
       .card h3 { margin-top: 0; color: #00ff85; font-size: 19px; border-bottom: 1px solid #4b0053; padding-bottom: 10px; }
       table { width: 100%; border-collapse: collapse; font-size: 15px; }
@@ -109,6 +116,7 @@
       .team-link { color: #ffffff; text-decoration: none; cursor: pointer; transition: color 0.2s; font-size: 17px; font-weight: bold; }
       .team-link:hover { color: #00ff85; text-decoration: underline; }
 
+      /* MODALS */
       .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
       .modal-content { background: #37003c; border: 1px solid #00ff85; padding: 22px; border-radius: 10px; width: 88%; max-height: 82%; overflow-y: auto; text-align: center; }
       .modal-content h3 { color: #00ff85; margin-top: 0; border-bottom: 1px solid #4b0053; padding-bottom: 12px; font-size: 19px; }
@@ -120,6 +128,7 @@
       .btn-cancel { background: #555; color: #fff; }
       .btn-cancel:hover { background: #666; }
 
+      /* PLAYER LIST MODAL */
       .player-list { list-style: none; padding: 0; margin: 0; text-align: left; font-size: 15px; }
       .player-list li { padding: 10px 0; border-bottom: 1px dashed #4b0053; display: flex; justify-content: space-between; align-items: center; }
       .player-info { display: flex; flex-direction: column; }
@@ -152,13 +161,12 @@
       .reaction-badge { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 3px 9px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; color: #ccc; transition: all 0.2s; }
       .reaction-badge:hover { background: rgba(255, 255, 255, 0.15); border-color: #ffffff; color: #fff; }
       
-      /* Gaya khusus untuk badge emoji yang ANDA TEKAN sendiri (Ring Putih Terang) */
+      /* Gaya khusus untuk badge emoji yang ANDA TEKAN sendiri */
       .reaction-badge.my-reaction { background: rgba(255, 255, 255, 0.25) !important; border: 1px solid #ffffff !important; color: #ffffff !important; font-weight: bold; box-shadow: 0 0 6px rgba(255,255,255,0.4); }
 
       .reaction-picker-btn { font-size: 11px; opacity: 0.7; cursor: pointer; text-decoration: underline; margin-top: 4px; display: inline-block; color: #d1b3d6; }
       .reaction-picker-btn:hover { opacity: 1; color: #ffffff; }
     </style>
-
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
