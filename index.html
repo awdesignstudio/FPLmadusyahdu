@@ -830,13 +830,23 @@
     if (el) {
       const textDiv = el.querySelector('.msg-text');
       if (textDiv) {
-        let updatedText = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
-        if (typeof leagueParticipants !== 'undefined' && leagueParticipants.length > 0) {
+        let updatedText = "";
+        
+        // Cek jika yang diupdate adalah pesan bot HTML
+        if (data.isBotHtml) {
+          updatedText = data.message;
+        } else {
+          updatedText = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+        }
+
+        // Jalankan formatter mention hanya jika bukan HTML bot
+        if (typeof leagueParticipants !== 'undefined' && leagueParticipants.length > 0 && !data.isBotHtml) {
           leagueParticipants.forEach(name => {
             let mentionPattern = new RegExp("@" + name + "(?![a-zA-Z0-9])", "g");
             updatedText = updatedText.replace(mentionPattern, `<span class="mention-badge">@${name}</span>`);
           });
         }
+        
         if (data.isEdited) {
           updatedText += `<span style="font-size:11px; opacity:0.55; margin-left:6px; font-style:italic;">(diedit)</span>`;
         }
@@ -1051,17 +1061,16 @@
     }
   }
 
-  // ==========================================
+ // ==========================================
   // LOGIKA SLASH COMMANDS & BOT VAR
   // ==========================================
   function processSlashCommand(commandText, gw) {
     const args = commandText.split(" ");
     const cmd = args[0].toLowerCase();
 
-    // Munculkan indikator "VAR sedang berpikir..." sementara kita panggil API
     const tempKey = db.ref("chats/gw" + gw).push({
       managerId: "SYSTEM", senderName: "🤖 FPL VAR", 
-      message: "Mengecek data untuk " + cmd + "...", timestamp: firebase.database.ServerValue.TIMESTAMP
+      message: "Fetching live data from FPL API for " + cmd + "...", timestamp: firebase.database.ServerValue.TIMESTAMP
     }).key;
 
     if (cmd === "/captain" || cmd === "/chips") {
@@ -1069,27 +1078,29 @@
         if (res.success) {
           let botText = "";
           if (cmd === "/captain") {
-            botText = "<div class='bot-header'>👑 Pilihan Kapten GW " + gw + "</div>";
+            botText = "<div class='bot-header'>👑 Captaincy Stats (GW " + gw + ")</div>";
+            if (Object.keys(res.captains).length === 0) {
+              botText += "<i style='font-size:12px; color:#aaa;'>[API Restricted] Data unavailable. Picks are hidden until the Gameweek deadline passes.</i>";
+            }
             for (let cap in res.captains) {
-              botText += `<div class='bot-row'><span>${cap}</span> <strong>${res.captains[cap]} tim</strong></div>`;
+              botText += `<div class='bot-row'><span>${cap}</span> <strong>${res.captains[cap]} managers</strong></div>`;
             }
           } else {
-            botText = "<div class='bot-header'>🃏 Chip Aktif GW " + gw + "</div>";
-            if (res.chips.length === 0) botText += "<i style='font-size:12px; color:#aaa;'>Tidak ada manajer yang menggunakan chip.</i>";
+            botText = "<div class='bot-header'>🃏 Active Chips Played (GW " + gw + ")</div>";
+            if (res.chips.length === 0) botText += "<i style='font-size:12px; color:#aaa;'>No chips played by any manager this Gameweek.</i>";
             res.chips.forEach(c => {
               botText += `<div class='bot-row'><span>${c.team}</span> <strong>${c.chip.toUpperCase()}</strong></div>`;
             });
           }
           db.ref(`chats/gw${gw}/${tempKey}`).update({ message: botText, isBotHtml: true });
         } else {
-          db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Gagal mengambil data dari FPL." });
+          db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "API Request Failed. Report: " + (res.message || "Unknown Error") });
         }
       });
     } else {
-      db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Command tidak dikenali. Coba ketik: /captain, /chips" });
+      db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain or /chips" });
     }
   }
-
   // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
   // ==========================================
