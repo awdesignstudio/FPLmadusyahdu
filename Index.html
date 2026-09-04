@@ -1,0 +1,501 @@
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Pengaturan PWA agar bisa diinstal di Android -->
+    <meta name="theme-color" content="#37003c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://resources.premierleague.com/premierleague/photo/2021/03/16/e7890bc4-332d-4786-acaf-2a3b90a59960/icon-app.png">
+    
+    <title>FPL Mini Liga Chat</title>
+    
+    <style>
+      /* TEMA DASAR FPL (Diperbesar menyesuaikan ukuran font WhatsApp HP) */
+      body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #24002e; color: #ffffff; margin: 0; padding: 15px; font-size: 17px; }
+      .container { max-width: 600px; margin: 0 auto; background: #37003c; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); padding: 18px; border: 1px solid #4b0053; position: relative; }
+      .header { text-align: center; border-bottom: 2px solid #00ff85; padding-bottom: 14px; margin-bottom: 18px; position: relative; }
+      .header h2 { margin: 0; color: #ffffff; font-size: 26px; }
+      .league-title { color: #00ff85; font-size: 16px; display: block; margin-top: 6px; font-weight: bold; }
+      
+      /* Tombol Logout di Pojok Header */
+      .logout-btn { position: absolute; top: 0; right: 0; background: #ff4a4a; color: white; border: none; padding: 8px 14px; font-size: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+      .logout-btn:hover { background: #e03838; }
+
+      input[type="number"], input[type="text"] { width: 85%; padding: 14px; margin: 12px 0; border: 1px solid #4b0053; border-radius: 8px; background: #ffffff; color: #000; font-size: 17px; }
+      button { background: #00ff85; color: #37003c; border: none; padding: 14px 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; }
+      button:hover { background: #00cc6a; }
+      button:disabled { background: #555; color: #888; cursor: not-allowed; }
+      select { padding: 10px; border-radius: 8px; background: #ffffff; color: #000; border: 1px solid #4b0053; font-size: 16px; font-weight: bold; }
+      
+      /* Tombol Install PWA */
+      #install-container { display: block; text-align: center; margin-bottom: 18px; background: rgba(0,255,133,0.1); border: 1px dashed #00ff85; padding: 14px; border-radius: 8px; }
+      .install-btn { background: #00ff85; color: #37003c; width: 100%; padding: 15px; font-size: 17px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-weight: bold; }
+
+      .tabs { display: flex; margin-bottom: 18px; border-bottom: 2px solid #4b0053; }
+      .tab { flex: 1; text-align: center; padding: 14px; cursor: pointer; font-weight: bold; color: #a375aa; position: relative; font-size: 17px; }
+      .tab.active { color: #00ff85; border-bottom: 3px solid #00ff85; font-size: 18px; }
+      
+      /* Badge Titik Merah Notifikasi ala WhatsApp di Tab Chat */
+      .unread-badge { display: none; position: absolute; top: 12px; right: 20%; background: #ff4a4a; color: white; border-radius: 50%; width: 13px; height: 13px; border: 2px solid #37003c; }
+      
+      /* CHAT AREA & REWARD BANNER */
+      .reward-container { background: rgba(0,255,133,0.08); border: 1px solid #00ff85; border-radius: 8px; padding: 14px; margin-bottom: 18px; font-size: 15px; text-align: center; }
+      .reward-title { color: #00ff85; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid rgba(0,255,133,0.2); padding-bottom: 6px; font-size: 17px; }
+      .reward-item { margin: 8px 0; color: #ffffff; font-size: 15px; }
+      
+      .chat-controls, .dashboard-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; font-size: 16px; }
+      #chat-box { height: 380px; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: scroll; display: flex; flex-direction: column; gap: 14px; }
+      
+      /* Gelembung Chat ala WhatsApp */
+      .msg { max-width: 82%; padding: 12px 16px; border-radius: 16px; font-size: 16px; line-height: 1.5; word-wrap: break-word; }
+      .msg.me { background: #00ff85; color: #37003c; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500; }
+      .msg.others { background: #4b0053; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
+      .sender-name { font-size: 13px; font-weight: bold; opacity: 0.85; margin-bottom: 5px; }
+      
+      .input-area { display: flex; gap: 10px; margin-top: 18px; }
+      .input-area input { flex: 1; margin: 0; font-size: 16px; padding: 14px; }
+
+      /* DASHBOARD & KLASEMEN */
+      .card { background: rgba(255,255,255,0.05); padding: 18px; border-radius: 8px; margin-bottom: 18px; border: 1px solid #4b0053; }
+      .card h3 { margin-top: 0; color: #00ff85; font-size: 19px; border-bottom: 1px solid #4b0053; padding-bottom: 10px; }
+      table { width: 100%; border-collapse: collapse; font-size: 15px; }
+      th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #4b0053; }
+      th { color: #a375aa; font-weight: normal; font-size: 15px; }
+      td.highlight { color: #00ff85; font-weight: bold; font-size: 17px; }
+      
+      .my-row { background: rgba(0, 255, 133, 0.15); border-left: 4px solid #00ff85; }
+      .team-link { color: #ffffff; text-decoration: none; cursor: pointer; transition: color 0.2s; font-size: 17px; font-weight: bold; }
+      .team-link:hover { color: #00ff85; text-decoration: underline; }
+
+      /* POP-UP MODAL */
+      .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+      .modal-content { background: #37003c; border: 1px solid #00ff85; padding: 22px; border-radius: 10px; width: 88%; max-height: 82%; overflow-y: auto; text-align: center; }
+      .modal-content h3 { color: #00ff85; margin-top: 0; border-bottom: 1px solid #4b0053; padding-bottom: 12px; font-size: 19px; }
+      .player-list { list-style: none; padding: 0; margin: 0; text-align: left; font-size: 15px; }
+      .player-list li { padding: 10px 0; border-bottom: 1px dashed #4b0053; display: flex; justify-content: space-between; align-items: center; }
+      .player-info { display: flex; flex-direction: column; }
+      .player-meta { font-size: 13px; color: #a375aa; margin-top: 3px; }
+      .player-list li span.badge { font-size: 12px; background: #a375aa; color: white; padding: 3px 8px; border-radius: 4px; }
+      .player-list li span.cap { background: #00ff85; color: #37003c; font-weight: bold; }
+      .close-btn { background: transparent; color: #ccc; border: 1px solid #ccc; margin-top: 18px; width: 100%; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; }
+      .close-btn:hover { background: #ccc; color: #37003c; }
+    </style>
+
+    <!-- Firebase SDK V8 -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  </head>
+  <body>
+
+  <div class="container" id="app-container">
+    
+    <!-- MODAL POP-UP TIM -->
+    <div class="modal-overlay" id="team-modal">
+      <div class="modal-content">
+        <h3 id="modal-title">Memuat Tim...</h3>
+        <div id="modal-body" style="text-align: left;">Silakan tunggu...</div>
+        <button class="close-btn" onclick="closeModal()">Tutup</button>
+      </div>
+    </div>
+
+    <div class="header">
+      <h2>🏆 FPL Live Chat</h2>
+      <span id="display-league-name" class="league-title"></span> 
+      <button class="logout-btn" id="btn-logout" onclick="logout()" style="display: none;">Logout</button>
+    </div>
+
+    <div id="login-section" style="text-align: center;">
+      <p style="color: #ccc; font-size: 16px;">Masukkan ID Manajer FPL Anda:</p>
+      <input type="number" id="inputManagerId" placeholder="Contoh: 1234567">
+      <br>
+      <button onclick="login()">Masuk</button>
+      <p id="login-status" style="color: #ff4a4a; font-size: 14px;"></p>
+    </div>
+
+    <div id="main-section" style="display: none;">
+      
+      <!-- TOMBOL INSTAL APLIKASI PWA -->
+      <div id="install-container">
+        <p style="margin: 0 0 8px 0; font-size: 13px; color: #00ff85;">Ingin akses lebih cepat seperti aplikasi Android?</p>
+        <button class="install-btn" id="btn-install" onclick="installPWA()">📱 Install Aplikasi ke Layar HP</button>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" id="btn-tab-chat" onclick="switchTab('chat')">
+          💬 Obrolan GW <span class="unread-badge" id="chat-badge"></span>
+        </div>
+        <div class="tab" id="btn-tab-dashboard" onclick="switchTab('dashboard')">📊 Klasemen</div>
+      </div>
+
+      <!-- TAB 1: OBROLAN -->
+      <div id="tab-chat">
+        <div class="chat-controls">
+          <strong>Pilih Gameweek:</strong>
+          <select id="gwSelect" onchange="onGwChange(this.value)">
+            <option value="1">GW 1 (Arsip)</option>
+            <option value="2">GW 2 (Arsip)</option>
+            <option value="3" selected>GW 3 (Live)</option>
+          </select>
+        </div>
+
+        <!-- BANNER HALL OF FAME REAL-TIME DINAMIS -->
+        <div class="reward-container" id="rewards-banner">
+          <div class="reward-title" id="reward-heading-title">⭐ Hall of Fame GW 3 (Real-Time Live) ⭐</div>
+          <div class="reward-item" id="reward-motw">👑 Manager Of The Week : Memuat...</div>
+          <div class="reward-item" id="reward-topscorer">🔥 Most Points : Memuat...</div>
+        </div>
+
+        <div id="chat-box"></div>
+        
+        <div class="input-area" id="chat-input-area">
+          <input type="text" id="chatMessage" placeholder="Ketik pesan... 😊" onkeypress="handleKeyPress(event)">
+          <button id="send-btn" onclick="sendMessage()">Kirim</button>
+        </div>
+      </div>
+
+      <!-- TAB 2: DASHBOARD / KLASEMEN -->
+      <div id="tab-dashboard" style="display: none;">
+        
+        <!-- DROPDOWN PILIHAN KLASEMEN PER GAMEWEEK -->
+        <div class="dashboard-controls">
+          <strong>Pilih Gameweek Klasemen:</strong>
+          <select id="gwDashboardSelect" onchange="onDashboardGwChange(this.value)">
+            <option value="1">GW 1</option>
+            <option value="2">GW 2</option>
+            <option value="3" selected>GW 3 (Live)</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <h3 id="standings-card-title">Klasemen Liga (GW 3 Live)</h3>
+          <table>
+            <thead><tr><th>Rank</th><th>Tim</th><th>GW Pts</th><th>Total</th></tr></thead>
+            <tbody id="standings-table"><tr><td colspan="4" style="text-align:center;">Memuat...</td></tr></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>⭐ History Rekam Jejak Manager Of The Week</h3>
+          <table>
+            <thead><tr><th>GW</th><th>Tim</th><th>Poin</th></tr></thead>
+            <tbody id="history-motw-table"><tr><td colspan="3" style="text-align:center;">Belum ada data.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // URL BACKEND GOOGLE APPS SCRIPT ANDA
+    // ==========================================
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNOARLVkXFnVwiJESkv3H3zBzqS3j9w3W99h78vrvx16B-3b443VZg5ZP7vQHCr2iC/exec";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDdJPT545c5itfAYNM8-8N017p4QLzUNU",
+      authDomain: "fpl-chat-11494.firebaseapp.com",
+      projectId: "fpl-chat-11494",
+      storageBucket: "fpl-chat-11494.firebasestorage.app",
+      messagingSenderId: "672234993639",
+      appId: "1:672234993639:web:6e346a7e9b89f8ed3a2f42",
+      measurementId: "G-QWHCN08BDZ",
+      databaseURL: "https://fpl-chat-11494-default-rtdb.asia-southeast1.firebasedatabase.app" 
+    };
+    
+    firebase.initializeApp(firebaseConfig); 
+    const db = firebase.database();
+    let currentUser = {};
+    let currentChatRef = null;
+    const MY_LEAGUE_ID = 182620;
+    const CURRENT_LIVE_GW = 3; 
+
+    window.onload = function() {
+      const savedUser = localStorage.getItem("fpl_current_user");
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        document.getElementById("login-section").style.display = "none";
+        document.getElementById("main-section").style.display = "block";
+        document.getElementById("btn-logout").style.display = "block";
+        
+        const selectedGw = document.getElementById("gwSelect").value;
+        const dashboardGw = document.getElementById("gwDashboardSelect").value;
+        
+        loadChat(selectedGw); 
+        loadRewardsForChat(MY_LEAGUE_ID, selectedGw);
+        buildDashboard(MY_LEAGUE_ID, dashboardGw);
+      }
+    };
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        alert("Pintasan Otomatis:\nJika jendela instalasi tidak muncul otomatis, perangkat Anda memerlukan konfirmasi manual melalui menu titik tiga (⋮) di pojok kanan atas browser, lalu pilih 'Instal aplikasi'.");
+      }
+    }
+
+    const manifestData = {
+      "name": "FPL Mini Liga Chat",
+      "short_name": "FPL Chat",
+      "start_url": window.location.href,
+      "display": "standalone",
+      "background_color": "#24002e",
+      "theme_color": "#37003c",
+      "icons": [{"src": "https://resources.premierleague.com/premierleague/photo/2021/03/16/e7890bc4-332d-4786-acaf-2a3b90a59960/icon-app.png", "sizes": "192x192", "type": "image/png"}]
+    };
+    const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = URL.createObjectURL(blob);
+    document.head.appendChild(link);
+
+    function switchTab(tabName) {
+      document.getElementById('tab-chat').style.display = (tabName === 'chat') ? 'block' : 'none';
+      document.getElementById('tab-dashboard').style.display = (tabName === 'dashboard') ? 'block' : 'none';
+      document.getElementById('btn-tab-chat').className = (tabName === 'chat') ? 'tab active' : 'tab';
+      document.getElementById('btn-tab-dashboard').className = (tabName === 'dashboard') ? 'tab active' : 'tab';
+
+      if (tabName === 'chat') {
+        document.getElementById('chat-badge').style.display = 'none';
+      }
+    }
+
+    // JEMBATAN API FETCH KE GOOGLE APPS SCRIPT
+    function callGAS(funcName, param1, param2, callback) {
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ func: funcName, p1: param1, p2: param2 })
+      })
+      .then(res => res.json())
+      .then(data => callback(data))
+      .catch(err => console.error("API Error:", err));
+    }
+
+    function login() {
+      const managerId = document.getElementById("inputManagerId").value;
+      if(!managerId) return;
+      document.getElementById("login-status").innerText = "Mengecek ke server FPL...";
+      
+      callGAS('verifyFPLManager', managerId, null, function(res) {
+        if (res.success) {
+          currentUser = res;
+          localStorage.setItem("fpl_current_user", JSON.stringify(res));
+
+          document.getElementById("login-section").style.display = "none";
+          document.getElementById("main-section").style.display = "block";
+          document.getElementById("btn-logout").style.display = "block";
+          
+          const selectedGw = document.getElementById("gwSelect").value;
+          const dashboardGw = document.getElementById("gwDashboardSelect").value;
+          
+          loadChat(selectedGw); 
+          loadRewardsForChat(MY_LEAGUE_ID, selectedGw);
+          buildDashboard(MY_LEAGUE_ID, dashboardGw);
+        } else {
+          document.getElementById("login-status").innerText = res.message;
+        }
+      });
+    }
+
+    function logout() {
+      localStorage.removeItem("fpl_current_user");
+      location.reload();
+    }
+
+    function onGwChange(gw) {
+      loadChat(gw);
+      loadRewardsForChat(MY_LEAGUE_ID, gw);
+    }
+
+    function onDashboardGwChange(gw) {
+      buildDashboard(MY_LEAGUE_ID, gw);
+    }
+
+    function loadRewardsForChat(leagueId, selectedGw) {
+      let targetGw = parseInt(selectedGw);
+      let isLive = (targetGw === CURRENT_LIVE_GW);
+
+      const chatInput = document.getElementById("chatMessage");
+      const sendBtn = document.getElementById("send-btn");
+      
+      if (isLive) {
+        document.getElementById("reward-heading-title").innerText = `⭐ Hall of Fame GW ${targetGw} (Real-Time Live) ⭐`;
+        chatInput.disabled = false;
+        chatInput.placeholder = "Ketik pesan... 😊";
+        sendBtn.disabled = false;
+        sendBtn.innerText = "Kirim";
+      } else {
+        document.getElementById("reward-heading-title").innerText = `⭐ Hall of Fame GW ${targetGw} (Arsip Final) ⭐`;
+        chatInput.disabled = true;
+        chatInput.placeholder = "🔒 Arsip (Chat terkunci untuk GW yang telah lewat)";
+        sendBtn.disabled = true;
+        sendBtn.innerText = "Arsip";
+      }
+
+      document.getElementById("reward-motw").innerText = `👑 Manager Of The Week : Memuat...`;
+      document.getElementById("reward-topscorer").innerText = `🔥 Most Points : Memuat...`;
+
+      callGAS('getWeeklyRewards', leagueId, targetGw, function(res) {
+        if (res.success) {
+          document.getElementById("reward-motw").innerText = `👑 Manager Of The Week: ${res.motw.teamName} (${res.motw.points} Pts)`;
+          document.getElementById("reward-topscorer").innerText = `🔥 Most Points : ${res.topScorer.teamName} (${res.topScorer.points} Pts)`;
+        } else {
+          document.getElementById("reward-motw").innerText = `👑 Manager Of The Week : Belum tersedia`;
+          document.getElementById("reward-topscorer").innerText = `🔥 Most Points : Belum tersedia`;
+        }
+      });
+    }
+
+    function buildDashboard(leagueId, gw) {
+      document.getElementById("standings-card-title").innerText = `Klasemen Liga (GW ${gw})`;
+      document.getElementById("standings-table").innerHTML = `<tr><td colspan="4" style="text-align:center;">Memuat klasemen GW ${gw}...</td></tr>`;
+
+      callGAS('getDashboardData', leagueId, gw, function(res) {
+        if (res.success) {
+          document.getElementById("display-league-name").innerText = res.leagueName;
+          
+          let standingsHTML = "";
+          res.leaderboard.forEach(item => {
+            const isMe = (item.id.toString() === currentUser.managerId.toString());
+            const rowClass = isMe ? "my-row" : "";
+            
+            standingsHTML += `<tr class="${rowClass}">
+              <td>${item.rank}</td>
+              <td>
+                <a class="team-link" onclick="openTeamModal(${item.id}, '${item.teamName}', ${gw})"><strong>${item.teamName}</strong></a><br>
+                <span style="font-size:11px; color:#a375aa;">${item.managerName}</span>
+              </td>
+              <td class="highlight">${item.gwPoints}</td>
+              <td>${item.totalPoints}</td>
+            </tr>`;
+          });
+          document.getElementById("standings-table").innerHTML = standingsHTML;
+
+          let historyHTML = "";
+          for(let g = 1; g <= 38; g++) {
+            if(res.motwHistory[g]) {
+              historyHTML += `<tr><td>GW ${g}</td><td>${res.motwHistory[g].teamName}</td><td class="highlight">${res.motwHistory[g].points}</td></tr>`;
+            }
+          }
+          if(historyHTML === "") historyHTML = "<tr><td colspan='3' style='text-align:center;'>Belum ada data.</td></tr>";
+          document.getElementById("history-motw-table").innerHTML = historyHTML;
+        }
+      });
+    }
+
+    function openTeamModal(managerId, teamName, gw) {
+      document.getElementById("team-modal").style.display = "flex";
+      document.getElementById("modal-title").innerText = `Tim: ${teamName} (GW ${gw})`;
+      document.getElementById("modal-body").innerHTML = "Menarik data pemain dari FPL...";
+
+      callGAS('getManagerTeam', managerId, gw, function(res) {
+        if(res.success) {
+          let html = `<div style="color:#00ff85; font-weight:bold; margin-bottom:6px; font-size:13px;">PEMAIN INTI (STARTING XI):</div>`;
+          html += `<ul class="player-list">`;
+          res.starting.forEach(p => {
+            let badge = p.isCaptain ? `<span class="badge cap">C</span>` : (p.isVice ? `<span class="badge cap">V</span>` : "");
+            html += `<li>
+              <div class="player-info">
+                <strong style="font-size:15px;">${p.name}</strong>
+                <span class="player-meta">${p.pos} • ${p.team}</span>
+              </div>
+              <div>${badge}</div>
+            </li>`;
+          });
+          html += `</ul>`;
+          
+          html += `<div style="color:#a375aa; font-weight:bold; margin-top:18px; margin-bottom:6px; font-size:13px;">CADANGAN (BENCH):</div>`;
+          html += `<ul class="player-list" style="opacity:0.9;">`;
+          res.bench.forEach(p => {
+            html += `<li>
+              <div class="player-info">
+                <strong style="font-size:15px;">${p.name}</strong>
+                <span class="player-meta">${p.pos} • ${p.team}</span>
+              </div>
+            </li>`;
+          });
+          html += `</ul>`;
+          
+          if (res.activeChip) {
+            html += `<div style="margin-top:18px; color:#00ff85; font-weight:bold; text-align:center; font-size:15px;">Chip Aktif: ${res.activeChip.toUpperCase()}</div>`;
+          }
+          
+          document.getElementById("modal-body").innerHTML = html;
+        } else {
+          document.getElementById("modal-body").innerHTML = `<span style="color:red;">${res.message}</span>`;
+        }
+      });
+    }
+
+    function closeModal() {
+      document.getElementById("team-modal").style.display = "none";
+    }
+
+    function loadChat(gw) {
+      const box = document.getElementById("chat-box");
+      box.innerHTML = ""; 
+      if (currentChatRef) currentChatRef.off();
+      currentChatRef = db.ref("chats/gw" + gw);
+      
+      let isInitialLoad = true;
+      setTimeout(() => { isInitialLoad = false; }, 1000);
+
+      currentChatRef.on("child_added", function(snapshot) {
+        const data = snapshot.val();
+        const msgClass = (data.managerId.toString() === currentUser.managerId.toString()) ? "msg me" : "msg others";
+        box.innerHTML += `<div class="${msgClass}"><div class="sender-name">${data.senderName}</div>${data.message}</div>`;
+        box.scrollTop = box.scrollHeight; 
+
+        if (!isInitialLoad && data.managerId.toString() !== currentUser.managerId.toString()) {
+          const chatTabDisplay = document.getElementById('tab-chat').style.display;
+          if (chatTabDisplay === 'none' || chatTabDisplay === '') {
+            document.getElementById('chat-badge').style.display = 'block';
+          }
+        }
+      });
+    }
+
+    function sendMessage() {
+      const gw = parseInt(document.getElementById("gwSelect").value);
+      
+      if (gw !== CURRENT_LIVE_GW) {
+        alert("Obrolan ini adalah arsip. Anda hanya dapat mengirim pesan di Gameweek yang sedang berjalan (GW " + CURRENT_LIVE_GW + ").");
+        return;
+      }
+
+      const text = document.getElementById("chatMessage").value;
+      if(!text) return;
+
+      db.ref("chats/gw" + gw).push({
+        managerId: currentUser.managerId,
+        senderName: currentUser.teamName + " (" + currentUser.managerName + ")",
+        message: text,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      });
+      document.getElementById("chatMessage").value = "";
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    }
+  </script>
+
+  </body>
+  </html>
