@@ -50,16 +50,7 @@
       .tab { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-weight: bold; color: #a375aa; position: relative; font-size: 15px; }
       .tab.active { color: #00ff85; border-bottom: 3px solid #00ff85; font-size: 15px; }
 
-      /* === FITUR REAKSI EMOJI (WARNA HIJAU LEMBUT ALA FPL) === */
-      .msg-reactions-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-      .reaction-badge { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 3px 9px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; color: #e0d0e5; transition: all 0.2s; }
-      .reaction-badge:hover { background: rgba(0, 255, 133, 0.12); border-color: rgba(0, 255, 133, 0.4); color: #fff; }
-      
-      /* Gaya badge reaksi Anda (hijau lembut transparan senada dengan badge pemain di web FPL) */
-      .reaction-badge.my-reaction { background: rgba(0, 255, 133, 0.15) !important; border: 1px solid rgba(0, 255, 133, 0.5) !important; color: #00ff85 !important; font-weight: 600; }
-
-      .reaction-picker-btn { font-size: 11px; opacity: 0.7; cursor: pointer; text-decoration: underline; margin-top: 4px; display: inline-block; color: #d1b3d6; }
-      .reaction-picker-btn:hover { opacity: 1; color: #00ff85; }      
+      .msg-reactions-container { display: flex; flex
       .unread-badge { display: none; position: absolute; top: 8px; right: 20%; background: #ff4a4a; color: white; border-radius: 50%; width: 11px; height: 11px; border: 2px solid #37003c; }
       
       /* HALL OF FAME 3 BARIS */
@@ -77,7 +68,7 @@
       
       #chat-box { height: 420px; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: scroll; display: flex; flex-direction: column; gap: 14px; }
       
-      /* === GELEMBUNG CHAT (HIJAU NEON DIGANTI JADI HIJAU MINT FPL YANG LEBIH KALEM) === */
+      /* === GELEMBUNG CHAT (HIJAU MINT FPL KALEM) === */
       .msg { max-width: 82%; padding: 12px 16px; border-radius: 16px; font-size: 16px; line-height: 1.5; word-wrap: break-word; position: relative; }
       .msg.me { background: #00c774; color: #ffffff; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500; }
       .msg.others { background: #4b0053; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
@@ -851,9 +842,9 @@
         let count = Object.keys(senders).length;
         let hasReacted = senders[currentUser.managerId] !== undefined;
         
-        // Tambahkan kelas khusus 'my-reaction' jika user yang login pernah menekan emoji ini
         let badgeClass = hasReacted ? "reaction-badge my-reaction" : "reaction-badge";
         
+        // Memastikan angka count selalu ditampilkan di samping emoji
         reactionsListHtml += `<span class="${badgeClass}" onclick="toggleReaction('${key}', '${emoji}')">${emoji} <span>${count}</span></span>`;
       }
       reactionsListHtml += `</div>`;
@@ -890,21 +881,19 @@
       }
     }
   }
-  function updateMessage(key, data) {
+ function updateMessage(key, data) {
     const el = document.getElementById(`msg-${key}`);
     if (el) {
       const textDiv = el.querySelector('.msg-text');
       if (textDiv) {
         let updatedText = "";
         
-        // Cek jika yang diupdate adalah pesan bot HTML
         if (data.isBotHtml) {
           updatedText = data.message;
         } else {
           updatedText = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
         }
 
-        // Jalankan formatter mention hanya jika bukan HTML bot
         if (typeof leagueParticipants !== 'undefined' && leagueParticipants.length > 0 && !data.isBotHtml) {
           leagueParticipants.forEach(name => {
             let mentionPattern = new RegExp("@" + name + "(?![a-zA-Z0-9])", "g");
@@ -918,7 +907,7 @@
         textDiv.innerHTML = updatedText;
       }
 
-      // --- PEMBARUAN REAL-TIME UNTUK REAKSI EMOJI ---
+      // --- PEMBARUAN REAL-TIME UNTUK REAKSI EMOJI & ANGKA COUNT ---
       let existingReactionsContainer = el.querySelector('.msg-reactions-container');
       
       if (data.reactions) {
@@ -935,7 +924,6 @@
         if (existingReactionsContainer) {
           existingReactionsContainer.innerHTML = reactionsListHtml;
         } else {
-          // Jika sebelumnya belum ada container reaksi sama sekali, buat baru di bawah elemen teks/aksi
           let newContainer = document.createElement('div');
           newContainer.className = "msg-reactions-container";
           newContainer.id = `reactions-container-${key}`;
@@ -943,14 +931,12 @@
           el.appendChild(newContainer);
         }
       } else {
-        // Jika semua reaksi dihapus, hapus kontainernya
         if (existingReactionsContainer) {
           existingReactionsContainer.remove();
         }
       }
     }
   }
-
   function removeMessage(key) {
     const el = document.getElementById(`msg-${key}`);
     if (el) el.remove();
