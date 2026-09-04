@@ -18,9 +18,15 @@
       body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #24002e; color: #ffffff; margin: 0; padding: 15px; font-size: 17px; }
       .container { max-width: 600px; margin: 0 auto; background: #37003c; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); padding: 18px; border: 1px solid #4b0053; position: relative; }
       
-      .header { text-align: center; border-bottom: 2px solid #00ff85; padding-bottom: 14px; margin-bottom: 18px; position: relative; }
-      .header h2 { margin: 0 0 8px 0; color: #ffffff; font-size: 26px; }
-      .league-title { color: #00ff85; font-size: 16px; display: block; margin-top: 4px; font-weight: bold; }
+      /* HEADER LOGIN & LEAGUE TITLE */
+      .login-header { text-align: center; border-bottom: 2px solid #00c774; padding-bottom: 14px; margin-bottom: 18px; }
+      .login-header h2 { margin: 0 0 8px 0; color: #ffffff; font-size: 26px; }
+      .league-title { color: #00c774; font-size: 12px; display: block; font-weight: bold; margin-top: 2px; }
+      
+      /* APP HEADER BARU (FLEXBOX) */
+      .app-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00c774; padding-bottom: 12px; margin-bottom: 15px; }
+      .header-titles { text-align: center; flex: 1; line-height: 1.2; padding: 0 5px; }
+      .header-titles h2 { margin: 0; color: #ffffff; font-size: 18px; white-space: nowrap; }
       
       /* PANEL BAWAH: LOGOUT KECIL, RUNNING TEXT & SUPPORTED BY */
       .bottom-panel { display: flex; align-items: center; gap: 10px; margin-top: 15px; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 8px; border: 1px solid #4b0053; }
@@ -45,12 +51,12 @@
       #install-container { display: block; text-align: center; margin-bottom: 18px; background: rgba(0, 199, 116, 0.1); border: 1px dashed #00c774; padding: 14px; border-radius: 8px; }
       .install-btn { background: #00c774; color: #ffffff; width: 100%; padding: 15px; font-size: 17px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-weight: bold; }
 
-      /* TAB DIBUAT LEBIH RAPAT & COMPACT */
-      .tabs { display: flex; margin-bottom: 10px; border-bottom: 2px solid #4b0053; }
-      .tab { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-weight: bold; color: #a375aa; position: relative; font-size: 15px; }
-      .tab.active { color: #00ff85; border-bottom: 3px solid #00ff85; font-size: 15px; }
+     /* TOMBOL NAVIGASI HEADER KIRI-KANAN (PENGGANTI TAB) */
+      .nav-btn { background: rgba(255,255,255,0.05); color: #a375aa; border: 1px solid #4b0053; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; transition: all 0.2s; position: relative; white-space: nowrap; }
+      .nav-btn.active { background: #00c774; color: #ffffff; border-color: #00c774; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+      .nav-btn:hover:not(.active) { background: rgba(0, 199, 116, 0.2); color: #00c774; }
 
-      .unread-badge { display: none; position: absolute; top: 8px; right: 20%; background: #ff4a4a; color: white; border-radius: 50%; width: 11px; height: 11px; border: 2px solid #37003c; }
+      .unread-badge { display: none; position: absolute; top: -4px; right: -4px; background: #ff4a4a; color: white; border-radius: 50%; width: 12px; height: 12px; border: 2px solid #37003c; }
       
       /* HALL OF FAME 3 BARIS */
       .reward-container { background: rgba(0,255,133,0.08); border: 1px solid #00ff85; border-radius: 8px; padding: 6px 8px; margin-bottom: 8px; font-size: 11px; text-align: center; }
@@ -188,12 +194,12 @@
     </div>
   </div>
 
-  <div class="header">
-    <h2>🏆 FPL Live Chat</h2>
-    <span id="display-league-name" class="league-title"></span> 
-  </div>
-
   <div id="login-section" style="text-align: center;">
+    <!-- Header Khusus Tampil di Halaman Login -->
+    <div class="login-header">
+      <h2>🏆 FPL Live Chat</h2>
+      <span class="league-title" style="color:#a375aa;">Login Access</span> 
+    </div>
     <p style="color: #ccc; font-size: 16px;">Masukkan ID Manajer FPL Anda:</p>
     <input type="number" id="inputManagerId" placeholder="Contoh: 1234567">
     <br>
@@ -203,16 +209,25 @@
 
   <div id="main-section" style="display: none;">
     
+    <!-- HEADER APP BARU (Tombol Kiri, Judul Tengah, Tombol Kanan) -->
+    <div class="app-header">
+      <button class="nav-btn active" id="btn-tab-chat" onclick="switchTab('chat')">
+        💬 Chat <span class="unread-badge" id="chat-badge"></span>
+      </button>
+      
+      <div class="header-titles">
+        <h2>🏆 FPL Live</h2>
+        <span id="display-league-name" class="league-title"></span>
+      </div>
+      
+      <button class="nav-btn" id="btn-tab-dashboard" onclick="switchTab('dashboard')">
+        📊 Klasemen
+      </button>
+    </div>
+
     <div id="install-container">
       <p style="margin: 0 0 8px 0; font-size: 13px; color: #00ff85;">Ingin akses lebih cepat seperti aplikasi Android?</p>
       <button class="install-btn" id="btn-install" onclick="installPWA()">📱 Install Aplikasi ke Layar HP</button>
-    </div>
-
-    <div class="tabs">
-      <div class="tab active" id="btn-tab-chat" onclick="switchTab('chat')">
-        💬 Obrolan GW <span class="unread-badge" id="chat-badge"></span>
-      </div>
-      <div class="tab" id="btn-tab-dashboard" onclick="switchTab('dashboard')">📊 Klasemen</div>
     </div>
 
     <div id="tab-chat">
@@ -499,11 +514,11 @@
   function closeCustomAlert() {
     document.getElementById("custom-alert-modal").style.display = "none";
   }
-  function switchTab(tabName) {
+ function switchTab(tabName) {
     document.getElementById('tab-chat').style.display = (tabName === 'chat') ? 'block' : 'none';
     document.getElementById('tab-dashboard').style.display = (tabName === 'dashboard') ? 'block' : 'none';
-    document.getElementById('btn-tab-chat').className = (tabName === 'chat') ? 'tab active' : 'tab';
-    document.getElementById('btn-tab-dashboard').className = (tabName === 'dashboard') ? 'tab active' : 'tab';
+    document.getElementById('btn-tab-chat').className = (tabName === 'chat') ? 'nav-btn active' : 'nav-btn';
+    document.getElementById('btn-tab-dashboard').className = (tabName === 'dashboard') ? 'nav-btn active' : 'nav-btn';
 
     if (tabName === 'chat') {
       document.getElementById('chat-badge').style.display = 'none';
