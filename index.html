@@ -681,36 +681,51 @@
     const isMe = (data.managerId.toString() === currentUser.managerId.toString());
     const msgClass = isMe ? "msg me" : "msg others";
     
-    let replyActionHtml = `<span onclick="prepareReply('${data.senderName}', \`${encodeURIComponent(data.message)}\`)">Balas</span>`;
     let actionsHtml = "";
+    let formattedMsg = "";
+    let quotedHtml = "";
 
-    if (isMe) {
-      const now = Date.now();
-      const msgTime = data.timestamp || now;
-      const diffMinutes = (now - msgTime) / (1000 * 60);
-      if (diffMinutes <= 10) {
-        actionsHtml = `<div class="msg-actions" id="actions-${key}">
-          ${replyActionHtml}
-          <span onclick="editMessage('${key}', \`${encodeURIComponent(data.message)}\`)">Edit</span>
-          <span onclick="deleteMessage('${key}')">Hapus</span>
-        </div>`;
+    // JIKA PESAN TELAH DIHAPUS
+    if (data.isDeleted) {
+      formattedMsg = `<span style="font-style: italic; opacity: 0.65;">${data.message}</span>`;
+      // Tidak ada tombol aksi (Edit, Hapus, Balas) untuk pesan yang sudah dihapus
+    } 
+    // JIKA PESAN NORMAL (TIDAK DIHAPUS)
+    else {
+      let replyActionHtml = `<span onclick="prepareReply('${data.senderName}', \`${encodeURIComponent(data.message)}\`)">Balas</span>`;
+      
+      if (isMe) {
+        const now = Date.now();
+        const msgTime = data.timestamp || now;
+        const diffMinutes = (now - msgTime) / (1000 * 60);
+        if (diffMinutes <= 10) {
+          actionsHtml = `<div class="msg-actions" id="actions-${key}">
+            ${replyActionHtml}
+            <span onclick="editMessage('${key}', \`${encodeURIComponent(data.message)}\`)">Edit</span>
+            <span onclick="deleteMessage('${key}')">Hapus</span>
+          </div>`;
+        } else {
+          actionsHtml = `<div class="msg-actions">${replyActionHtml}</div>`;
+        }
       } else {
         actionsHtml = `<div class="msg-actions">${replyActionHtml}</div>`;
       }
-    } else {
-      actionsHtml = `<div class="msg-actions">${replyActionHtml}</div>`;
-    }
 
-    let quotedHtml = "";
-    if (data.replyTo) {
-      const safeQuoteText = (data.replyTo.text || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      quotedHtml = `<div class="quoted-msg">
-        <div class="quoted-sender">${data.replyTo.sender}</div>
-        <div class="quoted-text">${safeQuoteText}</div>
-      </div>`;
-    }
+      if (data.replyTo) {
+        const safeQuoteText = (data.replyTo.text || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        quotedHtml = `<div class="quoted-msg">
+          <div class="quoted-sender">${data.replyTo.sender}</div>
+          <div class="quoted-text">${safeQuoteText}</div>
+        </div>`;
+      }
 
-    const formattedMsg = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+      formattedMsg = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+      
+      // Tambahkan label kecil jika pesan pernah diedit
+      if (data.isEdited) {
+        formattedMsg += `<span style="font-size:11px; opacity:0.55; margin-left:6px; font-style:italic;">(diedit)</span>`;
+      }
+    }
 
     const msgHTML = `<div class="${msgClass}" id="msg-${key}">
       <div class="sender-name">${data.senderName}</div>
@@ -722,7 +737,6 @@
     box.innerHTML += msgHTML;
     box.scrollTop = box.scrollHeight;
   }
-
   function updateMessage(key, data) {
     const el = document.getElementById(`msg-${key}`);
     if (el) {
@@ -790,7 +804,8 @@
       if (newText !== null && newText.trim() !== "") {
         const gw = parseInt(document.getElementById("gwSelect").value);
         db.ref(`chats/gw${gw}/${key}`).update({
-          message: newText.trim()
+          message: newText.trim(),
+          isEdited: true // Menambahkan penanda bahwa pesan ini telah diedit
         });
       }
     });
@@ -799,7 +814,11 @@
   function deleteMessage(key) {
     showCustomConfirm("Hapus Pesan", "Apakah Anda yakin ingin menghapus pesan ini?", function() {
       const gw = parseInt(document.getElementById("gwSelect").value);
-      db.ref(`chats/gw${gw}/${key}`).remove();
+      // Alih-alih menghapus data sepenuhnya (.remove()), kita menimpa isi pesannya
+      db.ref(`chats/gw${gw}/${key}`).update({
+        message: "🚫 Pesan ini telah dihapus",
+        isDeleted: true
+      });
     });
   }
 </script>
