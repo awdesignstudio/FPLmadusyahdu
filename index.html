@@ -397,25 +397,38 @@
     document.getElementById("custom-alert-modal").style.display = "flex";
   }
 
+  let currentConfirmCallback = null;
+  let currentPromptCallback = null;
+
   function showCustomConfirm(title, message, onYes) {
+    currentConfirmCallback = onYes;
     document.getElementById("custom-alert-title").innerText = title;
     document.getElementById("custom-alert-msg").innerText = message;
     document.getElementById("custom-modal-input-wrapper").innerHTML = "";
     document.getElementById("custom-alert-buttons").innerHTML = `
       <button class="btn-cancel" onclick="closeCustomAlert()">Batal</button>
-      <button onclick="closeCustomAlert(); (${onYes.toString()})();">Ya</button>
+      <button onclick="submitCustomConfirm()">Ya</button>
     `;
     document.getElementById("custom-alert-modal").style.display = "flex";
   }
 
+  function submitCustomConfirm() {
+    closeCustomAlert();
+    if (currentConfirmCallback) {
+      currentConfirmCallback();
+      currentConfirmCallback = null;
+    }
+  }
+
   function showCustomPrompt(title, message, defaultValue, onSubmitted) {
+    currentPromptCallback = onSubmitted;
     document.getElementById("custom-alert-title").innerText = title;
     document.getElementById("custom-alert-msg").innerText = message;
     // Menggunakan textarea agar bisa multi-line, auto-wrap, dan tidak perlu digeser-geser ke samping
     document.getElementById("custom-modal-input-wrapper").innerHTML = `<textarea id="custom-prompt-input" class="custom-modal-input" oninput="autoResizeTextarea(this)">${defaultValue || ''}</textarea>`;
     document.getElementById("custom-alert-buttons").innerHTML = `
       <button class="btn-cancel" onclick="closeCustomAlert()">Batal</button>
-      <button onclick="submitCustomPrompt(${onSubmitted.toString()})">Simpan</button>
+      <button onclick="submitCustomPrompt()">Simpan</button>
     `;
     document.getElementById("custom-alert-modal").style.display = "flex";
     setTimeout(() => {
@@ -428,12 +441,14 @@
     }, 100);
   }
 
-  function submitCustomPrompt(callback) {
+  function submitCustomPrompt() {
     const val = document.getElementById("custom-prompt-input").value;
     closeCustomAlert();
-    callback(val);
+    if (currentPromptCallback) {
+      currentPromptCallback(val);
+      currentPromptCallback = null;
+    }
   }
-
   function closeCustomAlert() {
     document.getElementById("custom-alert-modal").style.display = "none";
   }
