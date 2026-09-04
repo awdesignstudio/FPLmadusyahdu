@@ -1068,17 +1068,28 @@
     const args = commandText.split(" ");
     const cmd = args[0].toLowerCase();
 
+    // Deteksi jika user mengetik argumen GW (contoh: /captain 1 atau /captain gw1)
+    let targetGw = gw; 
+    if (args.length > 1) {
+      // Hapus semua huruf, sisakan angkanya saja (jadi "gw1" atau "1" sama-sama jadi 1)
+      const parsedGw = parseInt(args[1].replace(/\D/g, ''));
+      if (!isNaN(parsedGw) && parsedGw >= 1 && parsedGw <= 38) {
+        targetGw = parsedGw;
+      }
+    }
+
     const tempKey = db.ref("chats/gw" + gw).push({
       managerId: "SYSTEM", senderName: "🤖 FPL VAR", 
-      message: "Fetching live data from FPL API for " + cmd + "...", timestamp: firebase.database.ServerValue.TIMESTAMP
+      message: "Fetching live data from FPL API for " + cmd + " (GW " + targetGw + ")...", timestamp: firebase.database.ServerValue.TIMESTAMP
     }).key;
 
     if (cmd === "/captain" || cmd === "/chips") {
-      callGAS('getLeagueCaptains', MY_LEAGUE_ID, gw, function(res) {
+      // Perhatikan parameter gw diganti menjadi targetGw untuk pemanggilan data
+      callGAS('getLeagueCaptains', MY_LEAGUE_ID, targetGw, function(res) {
         if (res.success) {
           let botText = "";
           if (cmd === "/captain") {
-            botText = "<div class='bot-header'>👑 Captaincy Stats (GW " + gw + ")</div>";
+            botText = "<div class='bot-header'>👑 Captaincy Stats (GW " + targetGw + ")</div>";
             if (Object.keys(res.captains).length === 0) {
               botText += "<i style='font-size:12px; color:#aaa;'>[API Restricted] Data unavailable. Picks are hidden until the Gameweek deadline passes.</i>";
             }
@@ -1086,19 +1097,20 @@
               botText += `<div class='bot-row'><span>${cap}</span> <strong>${res.captains[cap]} managers</strong></div>`;
             }
           } else {
-            botText = "<div class='bot-header'>🃏 Active Chips Played (GW " + gw + ")</div>";
+            botText = "<div class='bot-header'>🃏 Active Chips Played (GW " + targetGw + ")</div>";
             if (res.chips.length === 0) botText += "<i style='font-size:12px; color:#aaa;'>No chips played by any manager this Gameweek.</i>";
             res.chips.forEach(c => {
               botText += `<div class='bot-row'><span>${c.team}</span> <strong>${c.chip.toUpperCase()}</strong></div>`;
             });
           }
+          // Pesan tetap diposting ke gw saat ini (gw live), bukan ke arsip
           db.ref(`chats/gw${gw}/${tempKey}`).update({ message: botText, isBotHtml: true });
         } else {
           db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "API Request Failed. Report: " + (res.message || "Unknown Error") });
         }
       });
     } else {
-      db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain or /chips" });
+      db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain, /chips, or /captain gw1" });
     }
   }
   // ==========================================
