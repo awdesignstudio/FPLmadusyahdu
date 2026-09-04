@@ -117,6 +117,13 @@
       .player-list li span.cap { background: #00ff85; color: #37003c; font-weight: bold; }
       .close-btn { background: transparent; color: #ccc; border: 1px solid #ccc; margin-top: 18px; width: 100%; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; }
       .close-btn:hover { background: #ccc; color: #37003c; }
+        /* DROPDOWN MENTION LIST */
+      .mention-dropdown { position: absolute; bottom: 100%; left: 0; background: #37003c; border: 1px solid #00ff85; border-radius: 8px; max-height: 150px; overflow-y: auto; z-index: 100; display: none; width: 250px; box-shadow: 0 -4px 10px rgba(0,0,0,0.5); }
+      .mention-item { padding: 8px 12px; color: #fff; font-size: 14px; cursor: pointer; border-bottom: 1px solid rgba(0,255,133,0.2); }
+      .mention-item:hover { background: rgba(0,255,133,0.2); color: #00ff85; font-weight: bold; }
+      
+      /* BADGE MENTION DI DALAM CHAT */
+      .mention-badge { background: rgba(0,255,133,0.2); color: #00ff85; font-weight: bold; padding: 2px 6px; border-radius: 4px; border: 1px dashed #00ff85; font-size: 0.95em; cursor: pointer; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -204,14 +211,17 @@
 
       <div id="chat-box"></div>
       
-      <div class="input-area" id="chat-input-area">
+      <div class="input-area" id="chat-input-area" style="position: relative;">
+        <!-- DROPDOWN MENTION -->
+        <div id="mention-dropdown-box" class="mention-dropdown"></div>
+
         <div class="reply-preview" id="reply-preview-box">
           <div class="reply-preview-title" id="reply-preview-sender">Membalas...</div>
           <div class="reply-preview-text" id="reply-preview-content">...</div>
           <span class="reply-preview-close" onclick="cancelReply()">✕</span>
         </div>
         <div class="input-row">
-          <textarea id="chatMessage" placeholder="Ketik pesan... 😊" rows="1" oninput="autoResizeTextarea(this)"></textarea>
+          <textarea id="chatMessage" placeholder="Ketik pesan... 😊" rows="1" oninput="autoResizeTextarea(this); handleMentionInput(this)"></textarea>
           <button id="send-btn" onclick="sendMessage()">Kirim</button>
         </div>
       </div>
@@ -721,14 +731,26 @@
 
       formattedMsg = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
       
+      // MENTION FORMATTER: Ubah @Nama menjadi badge
+      formattedMsg = formattedMsg.replace(/@([a-zA-Z0-9\s_]+?(?=<br>|\s|$))/g, function(match, nama) {
+        return `<span class="mention-badge">${match}</span>`;
+      });
+      
       // Tambahkan label kecil jika pesan pernah diedit
       if (data.isEdited) {
         formattedMsg += `<span style="font-size:11px; opacity:0.55; margin-left:6px; font-style:italic;">(diedit)</span>`;
       }
     }
 
+    // Pesan sendiri tetap menggunakan warna standar, pesan orang lain diberi warna unik
+    let senderNameStyle = "";
+    if (!isMe && data.managerId) {
+      const uniqueColor = getSenderColor(data.managerId);
+      senderNameStyle = `style="color: ${uniqueColor};"`;
+    }
+
     const msgHTML = `<div class="${msgClass}" id="msg-${key}">
-      <div class="sender-name">${data.senderName}</div>
+      <div class="sender-name" ${senderNameStyle}>${data.senderName}</div>
       ${quotedHtml}
       <div class="msg-text">${formattedMsg}</div>
       ${actionsHtml}
@@ -737,12 +759,20 @@
     box.innerHTML += msgHTML;
     box.scrollTop = box.scrollHeight;
   }
+
   function updateMessage(key, data) {
     const el = document.getElementById(`msg-${key}`);
     if (el) {
       const textDiv = el.querySelector('.msg-text');
       if (textDiv) {
-        textDiv.innerHTML = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+        let updatedText = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+        updatedText = updatedText.replace(/@([a-zA-Z0-9\s_]+?(?=<br>|\s|$))/g, function(match, nama) {
+          return `<span class="mention-badge">${match}</span>`;
+        });
+        if (data.isEdited) {
+          updatedText += `<span style="font-size:11px; opacity:0.55; margin-left:6px; font-style:italic;">(diedit)</span>`;
+        }
+        textDiv.innerHTML = updatedText;
       }
     }
   }
@@ -820,6 +850,107 @@
         isDeleted: true
       });
     });
+  }
+    // --- SISTEM MENTION MANAJER ---
+  let leagueParticipants = [];
+  let isMentioning = false;
+  let mentionSearchTerm = "";
+
+  const originalBuildDashboard = buildDashboard;
+  buildDashboard = function(leagueId, gw) {
+    originalBuildDashboard(leagueId, gw);
+    // Secara diam-diam ambil data leaderboard untuk mengisi array mention
+    callGAS('getDashboardData', leagueId, gw, function(res) {
+      if (res.success && res.leaderboard) {
+        let names = res.leaderboard.map(item => item.managerName);
+        leagueParticipants = [...new Set(names)].filter(Boolean); // Hapus duplikat
+      }
+    });
+  }
+
+  function handleMentionInput(textarea) {
+    const text = textarea.value;
+    const cursorPos = textarea.selectionStart;
+    const textUntilCursor = text.substring(0, cursorPos);
+    
+    // Cek apakah kata terakhir diawali dengan '@'
+    const match = textUntilCursor.match(/(?:^|\s)@([a-zA-Z0-9\s]*)$/);
+
+    if (match) {
+      isMentioning = true;
+      mentionSearchTerm = match[1].toLowerCase();
+      showMentionDropdown(mentionSearchTerm, textUntilCursor.lastIndexOf('@'));
+    } else {
+      hideMentionDropdown();
+    }
+  }
+
+  function showMentionDropdown(searchTerm, atIndex) {
+    const dropdown = document.getElementById("mention-dropdown-box");
+    dropdown.innerHTML = "";
+
+    if (leagueParticipants.length === 0) return;
+
+    const filteredList = leagueParticipants.filter(name => name.toLowerCase().includes(searchTerm));
+    if (filteredList.length === 0) {
+      hideMentionDropdown();
+      return;
+    }
+
+    filteredList.forEach(name => {
+      const item = document.createElement("div");
+      item.className = "mention-item";
+      item.innerText = "@" + name;
+      item.onclick = () => insertMention(name, atIndex);
+      dropdown.appendChild(item);
+    });
+
+    dropdown.style.display = "block";
+  }
+
+  function hideMentionDropdown() {
+    isMentioning = false;
+    document.getElementById("mention-dropdown-box").style.display = "none";
+  }
+
+  function insertMention(selectedName, atIndex) {
+    const textarea = document.getElementById("chatMessage");
+    const text = textarea.value;
+    const cursorPos = textarea.selectionStart;
+
+    const textBeforeMention = text.substring(0, atIndex);
+    const textAfterCursor = text.substring(cursorPos);
+
+    textarea.value = textBeforeMention + "@" + selectedName + " " + textAfterCursor;
+    
+    hideMentionDropdown();
+    textarea.focus();
+    autoResizeTextarea(textarea);
+  }
+
+  document.addEventListener("click", function(e) {
+    if (e.target.id !== "chatMessage" && !e.target.classList.contains("mention-item")) {
+      hideMentionDropdown();
+    }
+  });
+
+    // --- SISTEM WARNA NAMA PENGIRIM ---
+  // Palet warna yang cerah dan cocok dengan background ungu gelap (#4b0053)
+  const senderColors = [
+    '#ff4a4a', '#33ccff', '#ffcc00', '#ff66cc', 
+    '#00ffff', '#ff9933', '#bf80ff', '#ff8c66', 
+    '#99ff66', '#ffb3ff'
+  ];
+
+  function getSenderColor(managerId) {
+    if (!managerId) return '#ffffff'; // Default putih jika tidak ada ID
+    let hash = 0;
+    let idStr = managerId.toString();
+    for (let i = 0; i < idStr.length; i++) {
+      hash = idStr.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    let index = Math.abs(hash) % senderColors.length;
+    return senderColors[index];
   }
 </script>
 
