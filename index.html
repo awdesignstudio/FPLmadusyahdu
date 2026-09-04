@@ -142,10 +142,14 @@
       .bot-header { font-weight: bold; margin-bottom: 6px; border-bottom: 1px dashed rgba(255, 204, 0, 0.3); padding-bottom: 4px; }
       .bot-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        /* === FITUR REAKSI EMOJI === */
+      /* === FITUR REAKSI EMOJI === */
       .msg-reactions-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-      .reaction-badge { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 2px 8px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; color: #fff; }
+      .reaction-badge { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 3px 9px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; color: #fff; transition: all 0.2s; }
       .reaction-badge:hover { background: rgba(0, 255, 133, 0.2); border-color: #00ff85; }
+      
+      /* Gaya khusus untuk badge emoji yang ANDA TEKAN sendiri */
+      .reaction-badge.my-reaction { background: rgba(0, 255, 133, 0.25) !important; border: 1px solid #00ff85 !important; color: #00ff85 !important; font-weight: bold; box-shadow: 0 0 6px rgba(0,255,133,0.4); }
+
       .reaction-picker-btn { font-size: 11px; opacity: 0.7; cursor: pointer; text-decoration: underline; margin-top: 4px; display: inline-block; }
       .reaction-picker-btn:hover { opacity: 1; color: #00ff85; }
     </style>
@@ -832,9 +836,11 @@
         let senders = data.reactions[emoji];
         let count = Object.keys(senders).length;
         let hasReacted = senders[currentUser.managerId] !== undefined;
-        let badgeStyle = hasReacted ? "background: rgba(0,255,133,0.3); border-color: #00ff85;" : "";
         
-        reactionsListHtml += `<span class="reaction-badge" style="${badgeStyle}" onclick="toggleReaction('${key}', '${emoji}')">${emoji} <span>${count}</span></span>`;
+        // Tambahkan kelas khusus 'my-reaction' jika user yang login pernah menekan emoji ini
+        let badgeClass = hasReacted ? "reaction-badge my-reaction" : "reaction-badge";
+        
+        reactionsListHtml += `<span class="${badgeClass}" onclick="toggleReaction('${key}', '${emoji}')">${emoji} <span>${count}</span></span>`;
       }
       reactionsListHtml += `</div>`;
     }
