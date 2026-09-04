@@ -1318,13 +1318,15 @@ function processSlashCommand(commandText, gw) {
 
   function addReaction(key, emoji) {
     const gw = parseInt(document.getElementById("gwSelect").value);
-    const ref = db.ref(`chats/gw${gw}/${key}/reactions/${emoji}/${currentUser.managerId}`);
+    const userReactionRef = db.ref(`chats/gw${gw}/${key}/reactions/${emoji}/${currentUser.managerId}`);
     
-    ref.once('value', snapshot => {
+    userReactionRef.once('value', snapshot => {
       if (snapshot.exists()) {
-        ref.remove();
+        // Jika user sudah pernah memberi reaksi ini, hapus (batal)
+        userReactionRef.remove();
       } else {
-        ref.set(currentUser.teamName);
+        // Jika belum, tambahkan reaksi atas nama tim pengguna
+        userReactionRef.set(currentUser.teamName);
       }
     });
     
@@ -1332,19 +1334,7 @@ function processSlashCommand(commandText, gw) {
   }
 
   function toggleReaction(key, emoji) {
-    const gw = parseInt(document.getElementById("gwSelect").value);
-    const userReactionRef = db.ref(`chats/gw${gw}/${key}/reactions/${emoji}/${currentUser.managerId}`);
-    
-    // Cek apakah user yang sedang login sudah pernah memberikan emoji ini sebelumnya
-    userReactionRef.once('value', snapshot => {
-      if (snapshot.exists()) {
-        // Jika ini adalah reaksi milik user sendiri, klik akan menghapusnya (batal)
-        userReactionRef.remove();
-      } else {
-        // Jika user belum pernah memberikan emoji ini, klik akan menambahkannya atas nama user sendiri
-        userReactionRef.set(currentUser.teamName);
-      }
-    });
+    addReaction(key, emoji);
   }
 </script>
 
