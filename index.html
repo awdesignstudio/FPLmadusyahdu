@@ -77,8 +77,9 @@
       
       #chat-box { height: 420px; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: scroll; display: flex; flex-direction: column; gap: 14px; }
       
+      /* === GELEMBUNG CHAT (HIJAU NEON DIGANTI JADI HIJAU MINT FPL YANG LEBIH KALEM) === */
       .msg { max-width: 82%; padding: 12px 16px; border-radius: 16px; font-size: 16px; line-height: 1.5; word-wrap: break-word; position: relative; }
-      .msg.me { background: #00ff85; color: #37003c; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500; }
+      .msg.me { background: #00c774; color: #ffffff; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500; }
       .msg.others { background: #4b0053; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
       .sender-name { font-size: 13px; font-weight: bold; opacity: 0.85; margin-bottom: 5px; }
       
@@ -155,12 +156,13 @@
       .bot-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
       /* === FITUR REAKSI EMOJI === */
+      /* === FITUR REAKSI EMOJI (DIUBAH JADI BIRU LEMBUT AGAR KELIHATAN) === */
       .msg-reactions-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
       .reaction-badge { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 3px 9px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; color: #fff; transition: all 0.2s; }
-      .reaction-badge:hover { background: rgba(0, 255, 133, 0.2); border-color: #00ff85; }
+      .reaction-badge:hover { background: rgba(51, 204, 255, 0.2); border-color: #33ccff; }
       
-      /* Gaya khusus untuk badge emoji yang ANDA TEKAN sendiri */
-      .reaction-badge.my-reaction { background: rgba(0, 255, 133, 0.25) !important; border: 1px solid #00ff85 !important; color: #00ff85 !important; font-weight: bold; box-shadow: 0 0 6px rgba(0,255,133,0.4); }
+      /* Gaya khusus untuk badge emoji yang ANDA TEKAN sendiri (Menggunakan warna Biru Langit/Cyan lembut) */
+      .reaction-badge.my-reaction { background: rgba(51, 204, 255, 0.25) !important; border: 1px solid #33ccff !important; color: #33ccff !important; font-weight: bold; box-shadow: 0 0 6px rgba(51,204,255,0.4); }
 
       .reaction-picker-btn { font-size: 11px; opacity: 0.7; cursor: pointer; text-decoration: underline; margin-top: 4px; display: inline-block; }
       .reaction-picker-btn:hover { opacity: 1; color: #00ff85; }
