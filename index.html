@@ -103,7 +103,7 @@
       .modal-content h3 { color: #00ff85; margin-top: 0; border-bottom: 1px solid #4b0053; padding-bottom: 12px; font-size: 19px; }
       
       .custom-modal-text { font-size: 16px; margin-bottom: 15px; color: #fff; text-align: left; }
-      .custom-modal-input { width: 90%; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #4b0053; background: #fff; color: #000; margin-bottom: 15px; }
+      .custom-modal-input { width: 90%; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #4b0053; background: #fff; color: #000; margin-bottom: 15px; resize: none; min-height: 60px; max-height: 120px; line-height: 1.4; overflow-y: auto; }
       .custom-modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
       .custom-modal-buttons button { padding: 8px 16px; font-size: 14px; border-radius: 6px; }
       .btn-cancel { background: #555; color: #fff; }
@@ -411,7 +411,8 @@
   function showCustomPrompt(title, message, defaultValue, onSubmitted) {
     document.getElementById("custom-alert-title").innerText = title;
     document.getElementById("custom-alert-msg").innerText = message;
-    document.getElementById("custom-modal-input-wrapper").innerHTML = `<input type="text" id="custom-prompt-input" class="custom-modal-input" value="${defaultValue || ''}">`;
+    // Menggunakan textarea agar bisa multi-line, auto-wrap, dan tidak perlu digeser-geser ke samping
+    document.getElementById("custom-modal-input-wrapper").innerHTML = `<textarea id="custom-prompt-input" class="custom-modal-input" oninput="autoResizeTextarea(this)">${defaultValue || ''}</textarea>`;
     document.getElementById("custom-alert-buttons").innerHTML = `
       <button class="btn-cancel" onclick="closeCustomAlert()">Batal</button>
       <button onclick="submitCustomPrompt(${onSubmitted.toString()})">Simpan</button>
@@ -419,7 +420,11 @@
     document.getElementById("custom-alert-modal").style.display = "flex";
     setTimeout(() => {
       const inp = document.getElementById("custom-prompt-input");
-      if(inp) { inp.focus(); inp.select(); }
+      if(inp) { 
+        inp.focus(); 
+        inp.setSelectionRange(inp.value.length, inp.value.length);
+        autoResizeTextarea(inp);
+      }
     }, 100);
   }
 
