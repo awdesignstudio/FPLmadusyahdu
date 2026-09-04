@@ -903,6 +903,37 @@
         }
         textDiv.innerHTML = updatedText;
       }
+
+      // --- PEMBARUAN REAL-TIME UNTUK REAKSI EMOJI ---
+      let existingReactionsContainer = el.querySelector('.msg-reactions-container');
+      
+      if (data.reactions) {
+        let reactionsListHtml = "";
+        for (let emoji in data.reactions) {
+          let senders = data.reactions[emoji];
+          let count = Object.keys(senders).length;
+          let hasReacted = senders[currentUser.managerId] !== undefined;
+          let badgeClass = hasReacted ? "reaction-badge my-reaction" : "reaction-badge";
+          
+          reactionsListHtml += `<span class="${badgeClass}" onclick="toggleReaction('${key}', '${emoji}')">${emoji} <span>${count}</span></span>`;
+        }
+
+        if (existingReactionsContainer) {
+          existingReactionsContainer.innerHTML = reactionsListHtml;
+        } else {
+          // Jika sebelumnya belum ada container reaksi sama sekali, buat baru di bawah elemen teks/aksi
+          let newContainer = document.createElement('div');
+          newContainer.className = "msg-reactions-container";
+          newContainer.id = `reactions-container-${key}`;
+          newContainer.innerHTML = reactionsListHtml;
+          el.appendChild(newContainer);
+        }
+      } else {
+        // Jika semua reaksi dihapus, hapus kontainernya
+        if (existingReactionsContainer) {
+          existingReactionsContainer.remove();
+        }
+      }
     }
   }
 
