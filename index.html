@@ -11,28 +11,28 @@
     <link rel="apple-touch-icon" href="https://resources.premierleague.com/premierleague/photo/2021/03/16/e7890bc4-332d-4786-acaf-2a3b90a59960/icon-app.png">
     <link rel="manifest" href="./manifest.json">
     
-    <title>FPL Mini Liga Chat</title>
+    <title>FPL Chat</title>
     
     <style>
-      /* TEMA DASAR FPL (Diperbesar menyesuaikan ukuran font WhatsApp HP) */
+      /* TEMA DASAR FPL */
       body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #24002e; color: #ffffff; margin: 0; padding: 15px; font-size: 17px; }
       .container { max-width: 600px; margin: 0 auto; background: #37003c; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); padding: 18px; border: 1px solid #4b0053; position: relative; }
       
-      /* Header & Posisi Tombol Logout Baru di Bawah Judul */
       .header { text-align: center; border-bottom: 2px solid #00ff85; padding-bottom: 14px; margin-bottom: 18px; position: relative; }
       .header h2 { margin: 0 0 8px 0; color: #ffffff; font-size: 26px; }
       .league-title { color: #00ff85; font-size: 16px; display: block; margin-top: 4px; font-weight: bold; }
       
-      .logout-btn { background: #ff4a4a; color: white; border: none; padding: 6px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-block; margin-top: 8px; }
+      .logout-btn { background: #ff4a4a; color: white; border: none; padding: 10px 20px; font-size: 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; }
       .logout-btn:hover { background: #e03838; }
 
-      input[type="number"], input[type="text"] { width: 85%; padding: 14px; margin: 12px 0; border: 1px solid #4b0053; border-radius: 8px; background: #ffffff; color: #000; font-size: 17px; }
+      .footer-brand { text-align: center; font-size: 12px; color: #a375aa; margin-top: 12px; font-style: italic; }
+
+      input[type="number"] { width: 85%; padding: 14px; margin: 12px 0; border: 1px solid #4b0053; border-radius: 8px; background: #ffffff; color: #000; font-size: 17px; }
       button { background: #00ff85; color: #37003c; border: none; padding: 14px 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; }
       button:hover { background: #00cc6a; }
       button:disabled { background: #555; color: #888; cursor: not-allowed; }
       select { padding: 10px; border-radius: 8px; background: #ffffff; color: #000; border: 1px solid #4b0053; font-size: 16px; font-weight: bold; }
       
-      /* Tombol Install PWA (Akan otomatis tersembunyi jika sudah terinstal) */
       #install-container { display: block; text-align: center; margin-bottom: 18px; background: rgba(0,255,133,0.1); border: 1px dashed #00ff85; padding: 14px; border-radius: 8px; }
       .install-btn { background: #00ff85; color: #37003c; width: 100%; padding: 15px; font-size: 17px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-weight: bold; }
 
@@ -40,29 +40,31 @@
       .tab { flex: 1; text-align: center; padding: 14px; cursor: pointer; font-weight: bold; color: #a375aa; position: relative; font-size: 17px; }
       .tab.active { color: #00ff85; border-bottom: 3px solid #00ff85; font-size: 18px; }
       
-      /* Badge Titik Merah Notifikasi ala WhatsApp di Tab Chat */
       .unread-badge { display: none; position: absolute; top: 12px; right: 20%; background: #ff4a4a; color: white; border-radius: 50%; width: 13px; height: 13px; border: 2px solid #37003c; }
       
-      /* CHAT AREA & REWARD BANNER */
-      .reward-container { background: rgba(0,255,133,0.08); border: 1px solid #00ff85; border-radius: 8px; padding: 14px; margin-bottom: 18px; font-size: 15px; text-align: center; }
-      .reward-title { color: #00ff85; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid rgba(0,255,133,0.2); padding-bottom: 6px; font-size: 17px; }
-      .reward-item { margin: 8px 0; color: #ffffff; font-size: 15px; }
+      /* HALL OF FAME DIPERKECIL AGAR 1 BARIS (3 BARIS TOTAL) */
+      .reward-container { background: rgba(0,255,133,0.08); border: 1px solid #00ff85; border-radius: 8px; padding: 8px 10px; margin-bottom: 14px; font-size: 12px; text-align: center; }
+      .reward-title { color: #00ff85; font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid rgba(0,255,133,0.2); padding-bottom: 3px; font-size: 13px; }
+      .reward-item { margin: 2px 0; color: #ffffff; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       
       .chat-controls, .dashboard-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; font-size: 16px; }
       
-      /* Chat box diperluas tinggi areanya karena tombol install hilang */
-      #chat-box { height: 440px; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: scroll; display: flex; flex-direction: column; gap: 14px; }
+      #chat-box { height: 420px; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: scroll; display: flex; flex-direction: column; gap: 14px; }
       
-      /* Gelembung Chat ala WhatsApp */
-      .msg { max-width: 82%; padding: 12px 16px; border-radius: 16px; font-size: 16px; line-height: 1.5; word-wrap: break-word; }
+      .msg { max-width: 82%; padding: 12px 16px; border-radius: 16px; font-size: 16px; line-height: 1.5; word-wrap: break-word; position: relative; }
       .msg.me { background: #00ff85; color: #37003c; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500; }
       .msg.others { background: #4b0053; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
       .sender-name { font-size: 13px; font-weight: bold; opacity: 0.85; margin-bottom: 5px; }
       
-      .input-area { display: flex; gap: 10px; margin-top: 18px; }
-      .input-area input { flex: 1; margin: 0; font-size: 16px; padding: 14px; }
+      /* Tombol Edit/Delete Pesan */
+      .msg-actions { font-size: 11px; margin-top: 6px; display: flex; gap: 8px; opacity: 0.8; justify-content: flex-end; }
+      .msg-actions span { cursor: pointer; text-decoration: underline; }
+      .msg-actions span:hover { font-weight: bold; }
 
-      /* DASHBOARD & KLASEMEN */
+      /* INPUT AREA TEXTAREA WRAP KE BAWAH */
+      .input-area { display: flex; gap: 10px; margin-top: 18px; align-items: flex-end; }
+      .input-area textarea { flex: 1; margin: 0; font-size: 16px; padding: 12px; border: 1px solid #4b0053; border-radius: 8px; background: #ffffff; color: #000; resize: none; max-height: 100px; line-height: 1.4; overflow-y: auto; }
+
       .card { background: rgba(255,255,255,0.05); padding: 18px; border-radius: 8px; margin-bottom: 18px; border: 1px solid #4b0053; }
       .card h3 { margin-top: 0; color: #00ff85; font-size: 19px; border-bottom: 1px solid #4b0053; padding-bottom: 10px; }
       table { width: 100%; border-collapse: collapse; font-size: 15px; }
@@ -74,7 +76,6 @@
       .team-link { color: #ffffff; text-decoration: none; cursor: pointer; transition: color 0.2s; font-size: 17px; font-weight: bold; }
       .team-link:hover { color: #00ff85; text-decoration: underline; }
 
-      /* POP-UP MODAL */
       .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
       .modal-content { background: #37003c; border: 1px solid #00ff85; padding: 22px; border-radius: 10px; width: 88%; max-height: 82%; overflow-y: auto; text-align: center; }
       .modal-content h3 { color: #00ff85; margin-top: 0; border-bottom: 1px solid #4b0053; padding-bottom: 12px; font-size: 19px; }
@@ -116,7 +117,6 @@
   <div class="header">
     <h2>🏆 FPL Live Chat</h2>
     <span id="display-league-name" class="league-title"></span> 
-    <button class="logout-btn" id="btn-logout" onclick="logout()" style="display: none;">Logout</button>
   </div>
 
   <div id="login-section" style="text-align: center;">
@@ -160,7 +160,7 @@
       <div id="chat-box"></div>
       
       <div class="input-area" id="chat-input-area">
-        <input type="text" id="chatMessage" placeholder="Ketik pesan... 😊" onkeypress="handleKeyPress(event)">
+        <textarea id="chatMessage" placeholder="Ketik pesan... 😊" rows="1" oninput="autoResizeTextarea(this)"></textarea>
         <button id="send-btn" onclick="sendMessage()">Kirim</button>
       </div>
     </div>
@@ -191,13 +191,14 @@
         </table>
       </div>
     </div>
+
+    <button class="logout-btn" id="btn-logout" onclick="logout()" style="display: none;">Logout</button>
+    <div class="footer-brand">supported by AW Design</div>
+
   </div>
 </div>
 
 <script>
-  // ==========================================
-  // URL BACKEND GOOGLE APPS SCRIPT ANDA
-  // ==========================================
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNOARLVkXFnVwiJESkv3H3zBzqS3j9w3W99h78vrvx16B-3b443VZg5ZP7vQHCr2iC/exec";
 
   const firebaseConfig = {
@@ -219,11 +220,10 @@
   const CURRENT_LIVE_GW = 3; 
 
   window.onload = function() {
-    // Cek apakah aplikasi sudah dibuka dalam mode Standalone (PWA terinstal)
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
       const installContainer = document.getElementById("install-container");
       if (installContainer) {
-        installContainer.style.display = "none"; // Hapus/Sembunyikan tombol install otomatis jika sudah terinstal
+        installContainer.style.display = "none";
       }
     }
 
@@ -232,7 +232,7 @@
       currentUser = JSON.parse(savedUser);
       document.getElementById("login-section").style.display = "none";
       document.getElementById("main-section").style.display = "block";
-      document.getElementById("btn-logout").style.display = "inline-block";
+      document.getElementById("btn-logout").style.display = "block";
       
       const selectedGw = document.getElementById("gwSelect").value;
       const dashboardGw = document.getElementById("gwDashboardSelect").value;
@@ -254,7 +254,6 @@
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the install prompt');
           document.getElementById("install-container").style.display = "none";
         }
         deferredPrompt = null;
@@ -275,7 +274,6 @@
     }
   }
 
-  // JEMBATAN API FETCH KE GOOGLE APPS SCRIPT
   function callGAS(funcName, param1, param2, callback) {
     fetch(APPS_SCRIPT_URL, {
       method: 'POST',
@@ -298,7 +296,7 @@
 
         document.getElementById("login-section").style.display = "none";
         document.getElementById("main-section").style.display = "block";
-        document.getElementById("btn-logout").style.display = "inline-block";
+        document.getElementById("btn-logout").style.display = "block";
         
         const selectedGw = document.getElementById("gwSelect").value;
         const dashboardGw = document.getElementById("gwDashboardSelect").value;
@@ -446,6 +444,12 @@
     document.getElementById("team-modal").style.display = "none";
   }
 
+  // AUTO RESIZE TEXTAREA (WRAP KE BAWAH)
+  function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = (textarea.scrollHeight - 10) + 'px';
+  }
+
   function loadChat(gw) {
     const box = document.getElementById("chat-box");
     box.innerHTML = ""; 
@@ -456,18 +460,61 @@
     setTimeout(() => { isInitialLoad = false; }, 1000);
 
     currentChatRef.on("child_added", function(snapshot) {
-      const data = snapshot.val();
-      const msgClass = (data.managerId.toString() === currentUser.managerId.toString()) ? "msg me" : "msg others";
-      box.innerHTML += `<div class="${msgClass}"><div class="sender-name">${data.senderName}</div>${data.message}</div>`;
-      box.scrollTop = box.scrollHeight; 
-
-      if (!isInitialLoad && data.managerId.toString() !== currentUser.managerId.toString()) {
-        const chatTabDisplay = document.getElementById('tab-chat').style.display;
-        if (chatTabDisplay === 'none' || chatTabDisplay === '') {
-          document.getElementById('chat-badge').style.display = 'block';
-        }
-      }
+      renderMessage(snapshot.key, snapshot.val(), box);
     });
+
+    currentChatRef.on("child_changed", function(snapshot) {
+      updateMessage(snapshot.key, snapshot.val());
+    });
+
+    currentChatRef.on("child_removed", function(snapshot) {
+      removeMessage(snapshot.key);
+    });
+  }
+
+  function renderMessage(key, data, box) {
+    const isMe = (data.managerId.toString() === currentUser.managerId.toString());
+    const msgClass = isMe ? "msg me" : "msg others";
+    
+    let actionsHtml = "";
+    if (isMe) {
+      const now = Date.now();
+      const msgTime = data.timestamp || now;
+      const diffMinutes = (now - msgTime) / (1000 * 60);
+      if (diffMinutes <= 10) {
+        actionsHtml = `<div class="msg-actions" id="actions-${key}">
+          <span onclick="editMessage('${key}', \`${encodeURIComponent(data.message)}\`)">Edit</span>
+          <span onclick="deleteMessage('${key}')">Hapus</span>
+        </div>`;
+      }
+    }
+
+    // Format teks dengan baris baru (newline) yang aman
+    const formattedMsg = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+
+    const msgHTML = `<div class="${msgClass}" id="msg-${key}">
+      <div class="sender-name">${data.senderName}</div>
+      <div class="msg-text">${formattedMsg}</div>
+      ${actionsHtml}
+    </div>`;
+
+    box.innerHTML += msgHTML;
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function updateMessage(key, data) {
+    const el = document.getElementById(`msg-${key}`);
+    if (el) {
+      const textDiv = el.querySelector('.msg-text');
+      if (textDiv) {
+        textDiv.innerHTML = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+      }
+    }
+  }
+
+  function removeMessage(key) {
+    const el = document.getElementById(`msg-${key}`);
+    if (el) el.remove();
   }
 
   function sendMessage() {
@@ -478,7 +525,8 @@
       return;
     }
 
-    const text = document.getElementById("chatMessage").value;
+    const textarea = document.getElementById("chatMessage");
+    const text = textarea.value.trim();
     if(!text) return;
 
     db.ref("chats/gw" + gw).push({
@@ -487,12 +535,26 @@
       message: text,
       timestamp: firebase.database.ServerValue.TIMESTAMP
     });
-    document.getElementById("chatMessage").value = "";
+
+    textarea.value = "";
+    textarea.style.height = "auto";
   }
 
-  function handleKeyPress(e) {
-    if (e.key === 'Enter') {
-      sendMessage();
+  function editMessage(key, encodedOldText) {
+    const oldText = decodeURIComponent(encodedOldText);
+    const newText = prompt("Edit pesan Anda (Maksimal 10 menit setelah dikirim):", oldText);
+    if (newText !== null && newText.trim() !== "") {
+      const gw = parseInt(document.getElementById("gwSelect").value);
+      db.ref(`chats/gw${gw}/${key}`).update({
+        message: newText.trim()
+      });
+    }
+  }
+
+  function deleteMessage(key) {
+    if (confirm("Apakah Anda yakin ingin menghapus pesan ini?")) {
+      const gw = parseInt(document.getElementById("gwSelect").value);
+      db.ref(`chats/gw${gw}/${key}`).remove();
     }
   }
 </script>
