@@ -1299,7 +1299,19 @@
   }
 
   function toggleReaction(key, emoji) {
-    addReaction(key, emoji);
+    const gw = parseInt(document.getElementById("gwSelect").value);
+    const userReactionRef = db.ref(`chats/gw${gw}/${key}/reactions/${emoji}/${currentUser.managerId}`);
+    
+    // Cek apakah user yang sedang login sudah pernah memberikan emoji ini sebelumnya
+    userReactionRef.once('value', snapshot => {
+      if (snapshot.exists()) {
+        // Jika ini adalah reaksi milik user sendiri, klik akan menghapusnya (batal)
+        userReactionRef.remove();
+      } else {
+        // Jika user belum pernah memberikan emoji ini, klik akan menambahkannya atas nama user sendiri
+        userReactionRef.set(currentUser.teamName);
+      }
+    });
   }
 </script>
 
