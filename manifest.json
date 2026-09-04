@@ -1,0 +1,22 @@
+{
+  "name": "FPL Mini Liga Chat",
+  "short_name": "FPL Chat",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#24002e",
+  "theme_color": "#37003c",
+  "icons": [
+    {
+      "src": "https://resources.premierleague.com/premierleague/photo/2021/03/16/e7890bc4-332d-4786-acaf-2a3b90a59960/icon-app.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://resources.premierleague.com/premierleague/photo/2021/03/16/e7890bc4-332d-4786-acaf-2a3b90a59960/icon-app.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
