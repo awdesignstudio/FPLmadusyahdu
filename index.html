@@ -845,7 +845,7 @@
       // MENTION FORMATTER
       if (typeof leagueParticipants !== 'undefined' && leagueParticipants.length > 0 && !data.isBotHtml) {
         leagueParticipants.forEach(name => {
-          let mentionPattern = new RegExp("@" + name + "(?![a-zA-Z0-9])", "g");
+          let mentionPattern = new RegExp("@" + name + "(?![a-zA-Z0-9])", "gi"); // 'gi' agar huruf besar/kecil terbaca
           formattedMsg = formattedMsg.replace(mentionPattern, `<span class="mention-badge">@${name}</span>`);
         });
       }
@@ -926,7 +926,7 @@
 
         if (typeof leagueParticipants !== 'undefined' && leagueParticipants.length > 0 && !data.isBotHtml) {
           leagueParticipants.forEach(name => {
-            let mentionPattern = new RegExp("@" + name + "(?![a-zA-Z0-9])", "g");
+            let mentionPattern = new RegExp("@" + name + "(?![a-zA-Z0-9])", "gi"); // 'gi' agar huruf besar/kecil terbaca
             updatedText = updatedText.replace(mentionPattern, `<span class="mention-badge">@${name}</span>`);
           });
         }
@@ -1111,6 +1111,23 @@
       if (res.success && res.leaderboard) {
         let names = res.leaderboard.map(item => item.managerName);
         leagueParticipants = [...new Set(names)].filter(Boolean); // Hapus duplikat
+        
+        // HACK: Format ulang pesan chat yang terlanjur di-load sebelum daftar nama ditarik
+        document.querySelectorAll('.msg-text').forEach(el => {
+          let updatedText = el.innerHTML;
+          let isChanged = false;
+          
+          leagueParticipants.forEach(name => {
+            let mentionPattern = new RegExp("@" + name + "(?![a-zA-Z0-9])", "gi");
+            // Cek jika teks mengandung @ dan belum berubah jadi badge
+            if (updatedText.includes("@") && !updatedText.includes('mention-badge')) {
+              updatedText = updatedText.replace(mentionPattern, `<span class="mention-badge">@${name}</span>`);
+              isChanged = true;
+            }
+          });
+          
+          if (isChanged) el.innerHTML = updatedText;
+        });
       }
     });
   }
