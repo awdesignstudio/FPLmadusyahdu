@@ -1368,20 +1368,38 @@ function processSlashCommand(commandText, gw) {
 
   function addReaction(key, emoji) {
     const gw = parseInt(document.getElementById("gwSelect").value);
-    // Validasi berbasis ID unik user yang sedang login
-    const userReactionRef = db.ref(`chats/gw${gw}/${key}/reactions/${emoji}/${currentUser.managerId}`);
+    const msgReactionsRef = db.ref(`chats/gw${gw}/${key}/reactions`);
     
-    userReactionRef.once('value', snapshot => {
+    // 1. Cek seluruh reaksi pada pesan ini untuk menghapus reaksi lama dari user yang sama (Satu user = Satu Reaksi aktif per pesan)
+    msgReactionsRef.once('value', snapshot => {
+      let existingEmoji = null;
+      
       if (snapshot.exists()) {
-        // Hanya hapus jika ID manajer yang login memang sudah pernah mereaksi emoji ini
-        userReactionRef.remove();
-      } else {
-        // Tambahkan reaksi baru atas nama tim manajer yang sedang login
-        userReactionRef.set(currentUser.teamName);
+        const reactionsData = snapshot.val();
+        for (let e in reactionsData) {
+          if (reactionsData[e] && reactionsData[e][currentUser.managerId]) {
+            existingEmoji = e;
+            break;
+          }
+        }
       }
+      
+      // 2. Jika user sudah pernah mereaksi pesan ini sebelumnya
+      if (existingEmoji) {
+        // Hapus reaksi lama user tersebut
+        db.ref(`chats/gw${gw}/${key}/reactions/${existingEmoji}/${currentUser.managerId}`).remove();
+        
+        // Jika emoji yang diklik sama dengan emoji sebelumnya, berarti tujuannya membatalkan (cancel)
+        if (existingEmoji === emoji) {
+          toggleReactionPicker(key);
+          return;
+        }
+      }
+      
+      // 3. Jika belum pernah atau memilih emoji yang berbeda, pasang reaksi baru
+      db.ref(`chats/gw${gw}/${key}/reactions/${emoji}/${currentUser.managerId}`).set(currentUser.teamName);
+      toggleReactionPicker(key);
     });
-    
-    toggleReactionPicker(key);
   }
 
   function toggleReaction(key, emoji) {
