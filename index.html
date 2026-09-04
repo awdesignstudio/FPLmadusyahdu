@@ -793,7 +793,7 @@
     // JIKA PESAN NORMAL (TIDAK DIHAPUS)
     else {
       // Memperbolehkan pesan sistem/bot untuk memiliki tombol Balas
-      let replyActionHtml = `<span onclick="prepareReply('${data.senderName}', \`${encodeURIComponent(data.message.replace(/<[^>]*>?/gm, ''))}\`)">Balas</span>`;
+      let replyActionHtml = `<span onclick="prepareReply('${key}', '${data.senderName}', \`${encodeURIComponent(data.message.replace(/<[^>]*>?/gm, ''))}\`)">Balas</span>`;
       
       if (isMe && !isSystem) {
         const now = Date.now();
@@ -815,7 +815,7 @@
 
       if (data.replyTo) {
         const safeQuoteText = (data.replyTo.text || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        quotedHtml = `<div class="quoted-msg">
+        quotedHtml = `<div class="quoted-msg" onclick="scrollToMessage('${data.replyTo.key}')" style="cursor:pointer;" title="Klik untuk menuju pesan asli">
           <div class="quoted-sender">${data.replyTo.sender}</div>
           <div class="quoted-text">${safeQuoteText}</div>
         </div>`;
@@ -882,6 +882,7 @@
 
     let reactionPopupHtml = `<div id="picker-${key}" style="display:none; position:absolute; background:#37003c; border:1px solid #00ff85; border-radius:15px; padding:4px 8px; gap:6px; z-index:20; bottom:-32px; left:0; box-shadow:0 4px 10px rgba(0,0,0,0.5);">
       <span style="cursor:pointer;" onclick="addReaction('${key}', '🔥')">🔥</span>
+      <span style="cursor:pointer;" onclick="addReaction('${key}', '😂')">😂</span>
       <span style="cursor:pointer;" onclick="addReaction('${key}', '🤡')">🤡</span>
       <span style="cursor:pointer;" onclick="addReaction('${key}', '😭')">😭</span>
       <span style="cursor:pointer;" onclick="addReaction('${key}', '👍')">👍</span>
@@ -972,9 +973,9 @@
     if (el) el.remove();
   }
 
-  function prepareReply(senderName, encodedText) {
+  function prepareReply(replyKey, senderName, encodedText) {
     const text = decodeURIComponent(encodedText);
-    activeReplyData = { sender: senderName, text: text };
+    activeReplyData = { key: replyKey, sender: senderName, text: text };
     
     document.getElementById("reply-preview-sender").innerText = "Membalas " + senderName;
     document.getElementById("reply-preview-content").innerText = text;
@@ -1217,7 +1218,7 @@
     return senderColors[index];
   }
 
-    // FUNGSI UNTUK MENGHILANGKAN NOTIF DAN MELUNCUR KE PESAN MENTION
+    // FUNGSI UNTUK MENGHILANGKAN NOTIF DAN MELUNCUR KE PESAN MENTION ATAU REPLY
   function scrollToMention() {
     const toast = document.getElementById("mention-toast");
     if (!toast) return;
@@ -1225,9 +1226,24 @@
     const targetKey = toast.dataset.key;
     toast.style.display = "none"; // Sembunyikan notifikasi setelah diklik
     
-    // Gunakan fungsi peluncur dan kedip yang sudah kita buat sebelumnya
-    if (typeof scrollToMessage === "function") {
-      scrollToMessage(targetKey);
+    scrollToMessage(targetKey);
+  }
+
+  function scrollToMessage(key) {
+    if (!key) return;
+    const el = document.getElementById(`msg-${key}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Efek kedip latar belakang (highlight) sementara
+      el.style.transition = 'background-color 0.4s ease';
+      const originalBg = el.style.backgroundColor;
+      el.style.backgroundColor = 'rgba(0, 255, 133, 0.4)';
+      
+      setTimeout(() => {
+        el.style.backgroundColor = originalBg;
+        setTimeout(() => el.style.transition = '', 400); // Bersihkan style
+      }, 1200);
     }
   }
 
