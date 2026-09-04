@@ -764,7 +764,8 @@
     } 
     // JIKA PESAN NORMAL (TIDAK DIHAPUS)
     else {
-      let replyActionHtml = !isSystem ? `<span onclick="prepareReply('${data.senderName}', \`${encodeURIComponent(data.message)}\`)">Balas</span>` : "";
+      // Memperbolehkan pesan sistem/bot untuk memiliki tombol Balas
+      let replyActionHtml = `<span onclick="prepareReply('${data.senderName}', \`${encodeURIComponent(data.message.replace(/<[^>]*>?/gm, ''))}\`)">Balas</span>`;
       
       if (isMe && !isSystem) {
         const now = Date.now();
@@ -831,8 +832,8 @@
       senderNameStyle = `style="color: ${uniqueColor};"`;
     }
 
-    // Tombol pemicu pemilih emoji & daftar reaksi yang sudah masuk
-    let reactionPickerHtml = !isSystem ? `<span class="reaction-picker-btn" onclick="toggleReactionPicker('${key}')">😊 Reaksi</span>` : "";
+    // Tombol pemicu pemilih emoji & daftar reaksi yang sudah masuk (termasuk untuk pesan bot)
+    let reactionPickerHtml = `<span class="reaction-picker-btn" onclick="toggleReactionPicker('${key}')">😊 Reaksi</span>`;
     
     let reactionsListHtml = "";
     if (data.reactions) {
