@@ -22,10 +22,16 @@
       .header h2 { margin: 0 0 8px 0; color: #ffffff; font-size: 26px; }
       .league-title { color: #00ff85; font-size: 16px; display: block; margin-top: 4px; font-weight: bold; }
       
-      .logout-btn { background: #ff4a4a; color: white; border: none; padding: 10px 20px; font-size: 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; }
-      .logout-btn:hover { background: #e03838; }
+      /* PANEL BAWAH: LOGOUT KECIL, RUNNING TEXT & SUPPORTED BY */
+      .bottom-panel { display: flex; align-items: center; gap: 10px; margin-top: 15px; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 8px; border: 1px solid #4b0053; }
+      .logout-btn-small { background: #ff4a4a; color: white; border: none; padding: 6px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; white-space: nowrap; flex-shrink: 0; }
+      .logout-btn-small:hover { background: #e03838; }
+      
+      .running-ticker { flex: 1; overflow: hidden; white-space: nowrap; font-size: 13px; color: #00ff85; background: rgba(255,255,255,0.03); padding: 5px 8px; border-radius: 4px; }
+      .running-ticker span { display: inline-block; animation: marquee 15s linear infinite; }
+      @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-      .footer-brand { text-align: center; font-size: 12px; color: #a375aa; margin-top: 12px; font-style: italic; }
+      .footer-brand { text-align: center; font-size: 11px; color: #a375aa; margin-top: 6px; font-style: italic; }
 
       input[type="number"] { width: 85%; padding: 14px; margin: 12px 0; border: 1px solid #4b0053; border-radius: 8px; background: #ffffff; color: #000; font-size: 17px; }
       button { background: #00ff85; color: #37003c; border: none; padding: 14px 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; }
@@ -42,12 +48,12 @@
       
       .unread-badge { display: none; position: absolute; top: 12px; right: 20%; background: #ff4a4a; color: white; border-radius: 50%; width: 13px; height: 13px; border: 2px solid #37003c; }
       
-      /* HALL OF FAME DIPERKECIL AGAR 1 BARIS (3 BARIS TOTAL) */
-      .reward-container { background: rgba(0,255,133,0.08); border: 1px solid #00ff85; border-radius: 8px; padding: 8px 10px; margin-bottom: 14px; font-size: 12px; text-align: center; }
-      .reward-title { color: #00ff85; font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid rgba(0,255,133,0.2); padding-bottom: 3px; font-size: 13px; }
-      .reward-item { margin: 2px 0; color: #ffffff; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      /* HALL OF FAME DIPERKECIL MENJADI 3 BARIS PAS */
+      .reward-container { background: rgba(0,255,133,0.08); border: 1px solid #00ff85; border-radius: 8px; padding: 6px 8px; margin-bottom: 12px; font-size: 11px; text-align: center; }
+      .reward-title { color: #00ff85; font-weight: bold; margin-bottom: 2px; border-bottom: 1px solid rgba(0,255,133,0.2); padding-bottom: 2px; font-size: 12px; }
+      .reward-item { margin: 1px 0; color: #ffffff; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       
-      .chat-controls, .dashboard-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; font-size: 16px; }
+      .chat-controls, .dashboard-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; font-size: 15px; }
       
       #chat-box { height: 420px; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: scroll; display: flex; flex-direction: column; gap: 14px; }
       
@@ -56,14 +62,13 @@
       .msg.others { background: #4b0053; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
       .sender-name { font-size: 13px; font-weight: bold; opacity: 0.85; margin-bottom: 5px; }
       
-      /* Tombol Edit/Delete Pesan */
       .msg-actions { font-size: 11px; margin-top: 6px; display: flex; gap: 8px; opacity: 0.8; justify-content: flex-end; }
       .msg-actions span { cursor: pointer; text-decoration: underline; }
       .msg-actions span:hover { font-weight: bold; }
 
-      /* INPUT AREA TEXTAREA WRAP KE BAWAH */
-      .input-area { display: flex; gap: 10px; margin-top: 18px; align-items: flex-end; }
-      .input-area textarea { flex: 1; margin: 0; font-size: 16px; padding: 12px; border: 1px solid #4b0053; border-radius: 8px; background: #ffffff; color: #000; resize: none; max-height: 100px; line-height: 1.4; overflow-y: auto; }
+      /* INPUT AREA DINAMIS WRAP KE BAWAH */
+      .input-area { display: flex; gap: 10px; margin-top: 15px; align-items: flex-end; }
+      .input-area textarea { flex: 1; margin: 0; font-size: 16px; padding: 10px 12px; border: 1px solid #4b0053; border-radius: 8px; background: #ffffff; color: #000; resize: none; min-height: 24px; max-height: 120px; line-height: 1.4; overflow-y: auto; }
 
       .card { background: rgba(255,255,255,0.05); padding: 18px; border-radius: 8px; margin-bottom: 18px; border: 1px solid #4b0053; }
       .card h3 { margin-top: 0; color: #00ff85; font-size: 19px; border-bottom: 1px solid #4b0053; padding-bottom: 10px; }
@@ -79,6 +84,15 @@
       .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
       .modal-content { background: #37003c; border: 1px solid #00ff85; padding: 22px; border-radius: 10px; width: 88%; max-height: 82%; overflow-y: auto; text-align: center; }
       .modal-content h3 { color: #00ff85; margin-top: 0; border-bottom: 1px solid #4b0053; padding-bottom: 12px; font-size: 19px; }
+      
+      /* STYLING CUSTOM MODAL ALERTS / PROMPTS */
+      .custom-modal-text { font-size: 16px; margin-bottom: 15px; color: #fff; text-align: left; }
+      .custom-modal-input { width: 90%; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #4b0053; background: #fff; color: #000; margin-bottom: 15px; }
+      .custom-modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
+      .custom-modal-buttons button { padding: 8px 16px; font-size: 14px; border-radius: 6px; }
+      .btn-cancel { background: #555; color: #fff; }
+      .btn-cancel:hover { background: #666; }
+
       .player-list { list-style: none; padding: 0; margin: 0; text-align: left; font-size: 15px; }
       .player-list li { padding: 10px 0; border-bottom: 1px dashed #4b0053; display: flex; justify-content: space-between; align-items: center; }
       .player-info { display: flex; flex-direction: column; }
@@ -111,6 +125,17 @@
       <h3 id="modal-title">Memuat Tim...</h3>
       <div id="modal-body" style="text-align: left;">Silakan tunggu...</div>
       <button class="close-btn" onclick="closeModal()">Tutup</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="custom-alert-modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <h3 id="custom-alert-title">Informasi</h3>
+      <div class="custom-modal-text" id="custom-alert-msg">Pesan...</div>
+      <div id="custom-modal-input-wrapper"></div>
+      <div class="custom-modal-buttons" id="custom-alert-buttons">
+        <button onclick="closeCustomAlert()">OK</button>
+      </div>
     </div>
   </div>
 
@@ -192,7 +217,12 @@
       </div>
     </div>
 
-    <button class="logout-btn" id="btn-logout" onclick="logout()" style="display: none;">Logout</button>
+    <div class="bottom-panel" id="bottom-panel-ui" style="display: none;">
+      <button class="logout-btn-small" onclick="confirmLogout()">Logout</button>
+      <div class="running-ticker">
+        <span id="ticker-text">Memuat klasemen real-time...</span>
+      </div>
+    </div>
     <div class="footer-brand">supported by AW Design</div>
 
   </div>
@@ -232,7 +262,7 @@
       currentUser = JSON.parse(savedUser);
       document.getElementById("login-section").style.display = "none";
       document.getElementById("main-section").style.display = "block";
-      document.getElementById("btn-logout").style.display = "block";
+      document.getElementById("bottom-panel-ui").style.display = "flex";
       
       const selectedGw = document.getElementById("gwSelect").value;
       const dashboardGw = document.getElementById("gwDashboardSelect").value;
@@ -259,8 +289,53 @@
         deferredPrompt = null;
       });
     } else {
-      alert("Pintasan Otomatis:\nJika jendela instalasi tidak muncul otomatis, perangkat Anda memerlukan konfirmasi manual melalui menu titik tiga (⋮) di pojok kanan atas browser, lalu pilih 'Instal aplikasi'.");
+      showCustomAlert("Informasi", "Pintasan Otomatis:\nJika jendela instalasi tidak muncul otomatis, perangkat Anda memerlukan konfirmasi manual melalui menu titik tiga (⋮) di pojok kanan atas browser, lalu pilih 'Instal aplikasi'.");
     }
+  }
+
+  // CUSTOM MODAL ALERT / CONFIRM / PROMPT HANDLERS
+  function showCustomAlert(title, message, onOk = null) {
+    document.getElementById("custom-alert-title").innerText = title;
+    document.getElementById("custom-alert-msg").innerText = message;
+    document.getElementById("custom-modal-input-wrapper").innerHTML = "";
+    document.getElementById("custom-alert-buttons").innerHTML = `<button onclick="closeCustomAlert(); ${onOk ? '(' + onOk.toString() + ')()' : ''}">OK</button>`;
+    document.getElementById("custom-alert-modal").style.display = "flex";
+  }
+
+  function showCustomConfirm(title, message, onYes) {
+    document.getElementById("custom-alert-title").innerText = title;
+    document.getElementById("custom-alert-msg").innerText = message;
+    document.getElementById("custom-modal-input-wrapper").innerHTML = "";
+    document.getElementById("custom-alert-buttons").innerHTML = `
+      <button class="btn-cancel" onclick="closeCustomAlert()">Batal</button>
+      <button onclick="closeCustomAlert(); (${onYes.toString()})();">Ya</button>
+    `;
+    document.getElementById("custom-alert-modal").style.display = "flex";
+  }
+
+  function showCustomPrompt(title, message, defaultValue, onSubmitted) {
+    document.getElementById("custom-alert-title").innerText = title;
+    document.getElementById("custom-alert-msg").innerText = message;
+    document.getElementById("custom-modal-input-wrapper").innerHTML = `<input type="text" id="custom-prompt-input" class="custom-modal-input" value="${defaultValue || ''}">`;
+    document.getElementById("custom-alert-buttons").innerHTML = `
+      <button class="btn-cancel" onclick="closeCustomAlert()">Batal</button>
+      <button onclick="submitCustomPrompt(${onSubmitted.toString()})">Simpan</button>
+    `;
+    document.getElementById("custom-alert-modal").style.display = "flex";
+    setTimeout(() => {
+      const inp = document.getElementById("custom-prompt-input");
+      if(inp) { inp.focus(); inp.select(); }
+    }, 100);
+  }
+
+  function submitCustomPrompt(callback) {
+    const val = document.getElementById("custom-prompt-input").value;
+    closeCustomAlert();
+    callback(val);
+  }
+
+  function closeCustomAlert() {
+    document.getElementById("custom-alert-modal").style.display = "none";
   }
 
   function switchTab(tabName) {
@@ -296,7 +371,7 @@
 
         document.getElementById("login-section").style.display = "none";
         document.getElementById("main-section").style.display = "block";
-        document.getElementById("btn-logout").style.display = "block";
+        document.getElementById("bottom-panel-ui").style.display = "flex";
         
         const selectedGw = document.getElementById("gwSelect").value;
         const dashboardGw = document.getElementById("gwDashboardSelect").value;
@@ -307,6 +382,12 @@
       } else {
         document.getElementById("login-status").innerText = res.message;
       }
+    });
+  }
+
+  function confirmLogout() {
+    showCustomConfirm("Konfirmasi Logout", "Apakah Anda yakin ingin keluar dari akun ini?", function() {
+      logout();
     });
   }
 
@@ -368,6 +449,7 @@
         document.getElementById("display-league-name").innerText = res.leagueName;
         
         let standingsHTML = "";
+        let tickerString = "Klasemen Real-Time: ";
         res.leaderboard.forEach(item => {
           const isMe = (item.id.toString() === currentUser.managerId.toString());
           const rowClass = isMe ? "my-row" : "";
@@ -381,8 +463,11 @@
             <td class="highlight">${item.gwPoints}</td>
             <td>${item.totalPoints}</td>
           </tr>`;
+
+          tickerString += `[${item.rank}. ${item.teamName} - ${item.totalPoints} Pts]  `;
         });
         document.getElementById("standings-table").innerHTML = standingsHTML;
+        document.getElementById("ticker-text").innerText = tickerString;
 
         let historyHTML = "";
         for(let g = 1; g <= 38; g++) {
@@ -444,10 +529,10 @@
     document.getElementById("team-modal").style.display = "none";
   }
 
-  // AUTO RESIZE TEXTAREA (WRAP KE BAWAH)
+  // AUTO RESIZE TEXTAREA DINAMIS
   function autoResizeTextarea(textarea) {
     textarea.style.height = 'auto';
-    textarea.style.height = (textarea.scrollHeight - 10) + 'px';
+    textarea.style.height = textarea.scrollHeight + 'px';
   }
 
   function loadChat(gw) {
@@ -489,7 +574,6 @@
       }
     }
 
-    // Format teks dengan baris baru (newline) yang aman
     const formattedMsg = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
 
     const msgHTML = `<div class="${msgClass}" id="msg-${key}">
@@ -521,7 +605,7 @@
     const gw = parseInt(document.getElementById("gwSelect").value);
     
     if (gw !== CURRENT_LIVE_GW) {
-      alert("Obrolan ini adalah arsip. Anda hanya dapat mengirim pesan di Gameweek yang sedang berjalan (GW " + CURRENT_LIVE_GW + ").");
+      showCustomAlert("Informasi", "Obrolan ini adalah arsip. Anda hanya dapat mengirim pesan di Gameweek yang sedang berjalan (GW " + CURRENT_LIVE_GW + ").");
       return;
     }
 
@@ -542,20 +626,21 @@
 
   function editMessage(key, encodedOldText) {
     const oldText = decodeURIComponent(encodedOldText);
-    const newText = prompt("Edit pesan Anda (Maksimal 10 menit setelah dikirim):", oldText);
-    if (newText !== null && newText.trim() !== "") {
-      const gw = parseInt(document.getElementById("gwSelect").value);
-      db.ref(`chats/gw${gw}/${key}`).update({
-        message: newText.trim()
-      });
-    }
+    showCustomPrompt("Edit Pesan", "Ubah pesan Anda (Maksimal 10 menit setelah dikirim):", oldText, function(newText) {
+      if (newText !== null && newText.trim() !== "") {
+        const gw = parseInt(document.getElementById("gwSelect").value);
+        db.ref(`chats/gw${gw}/${key}`).update({
+          message: newText.trim()
+        });
+      }
+    });
   }
 
   function deleteMessage(key) {
-    if (confirm("Apakah Anda yakin ingin menghapus pesan ini?")) {
+    showCustomConfirm("Hapus Pesan", "Apakah Anda yakin ingin menghapus pesan ini?", function() {
       const gw = parseInt(document.getElementById("gwSelect").value);
       db.ref(`chats/gw${gw}/${key}`).remove();
-    }
+    });
   }
 </script>
 
