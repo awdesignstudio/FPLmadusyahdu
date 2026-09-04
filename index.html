@@ -773,7 +773,8 @@
         } else {
           actionsHtml = `<div class="msg-actions">${replyActionHtml}</div>`;
         }
-      } else if (!isSystem) {
+      } else {
+        // Hapus syarat !isSystem di sini agar pesan bot dan orang lain selalu menampilkan tombol Balas
         actionsHtml = `<div class="msg-actions">${replyActionHtml}</div>`;
       }
 
