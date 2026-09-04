@@ -123,7 +123,15 @@
       .mention-item:hover { background: rgba(0,255,133,0.2); color: #00ff85; font-weight: bold; }
       
       /* BADGE MENTION DI DALAM CHAT */
+      /* BADGE MENTION DI DALAM CHAT */
       .mention-badge { background: rgba(0,255,133,0.2); color: #00ff85; font-weight: bold; padding: 2px 6px; border-radius: 4px; border: 1px dashed #00ff85; font-size: 0.95em; cursor: pointer; }
+      
+      /* Supaya tidak tersamar saat berada di gelembung hijau (pesan sendiri) */
+      .msg.me .mention-badge {
+        background: rgba(55, 0, 60, 0.15); 
+        color: #37003c; 
+        border-color: #37003c;
+      }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -731,10 +739,13 @@
 
       formattedMsg = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
       
-      // MENTION FORMATTER: Ubah @Nama menjadi badge
-      formattedMsg = formattedMsg.replace(/@([a-zA-Z0-9\s_]+?(?=<br>|\s|$))/g, function(match, nama) {
-        return `<span class="mention-badge">${match}</span>`;
-      });
+      // MENTION FORMATTER: Ubah @Nama Manajer menjadi badge utuh
+      if (typeof leagueParticipants !== 'undefined' && leagueParticipants.length > 0) {
+        leagueParticipants.forEach(name => {
+          let mentionPattern = new RegExp("@" + name + "(?![a-zA-Z0-9])", "g");
+          formattedMsg = formattedMsg.replace(mentionPattern, `<span class="mention-badge">@${name}</span>`);
+        });
+      }
       
       // Tambahkan label kecil jika pesan pernah diedit
       if (data.isEdited) {
@@ -766,9 +777,12 @@
       const textDiv = el.querySelector('.msg-text');
       if (textDiv) {
         let updatedText = (data.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
-        updatedText = updatedText.replace(/@([a-zA-Z0-9\s_]+?(?=<br>|\s|$))/g, function(match, nama) {
-          return `<span class="mention-badge">${match}</span>`;
-        });
+        if (typeof leagueParticipants !== 'undefined' && leagueParticipants.length > 0) {
+          leagueParticipants.forEach(name => {
+            let mentionPattern = new RegExp("@" + name + "(?![a-zA-Z0-9])", "g");
+            updatedText = updatedText.replace(mentionPattern, `<span class="mention-badge">@${name}</span>`);
+          });
+        }
         if (data.isEdited) {
           updatedText += `<span style="font-size:11px; opacity:0.55; margin-left:6px; font-style:italic;">(diedit)</span>`;
         }
