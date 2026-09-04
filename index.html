@@ -1278,7 +1278,8 @@ function processSlashCommand(commandText, gw) {
     });
   }
   else if (cmd === "/bonus") {
-    callGAS('getLiveBonusPoints', targetGw, function(res) {
+    // Tambahkan 'null,' sebagai pengisi parameter kedua yang kosong
+    callGAS('getLiveBonusPoints', targetGw, null, function(res) {
       if (res.success) {
         let bonusHtml = `<div class='bot-header'>🏆 Live Bonus Points (GW ${targetGw})</div>`;
         if (res.matches.length === 0) {
