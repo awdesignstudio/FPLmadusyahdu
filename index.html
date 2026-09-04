@@ -641,10 +641,17 @@
         html += `<ul class="player-list">`;
         res.starting.forEach(p => {
           let badge = p.isCaptain ? `<span class="badge cap">C</span>` : (p.isVice ? `<span class="badge cap">V</span>` : "");
+          // Menangkap poin dari backend, gunakan "-" jika backend belum siap
+          let gwPts = p.gwPoints !== undefined ? p.gwPoints : "-";
+          let totPts = p.totalPoints !== undefined ? p.totalPoints : "-";
+          
           html += `<li>
             <div class="player-info">
               <strong style="font-size:15px;">${p.name}</strong>
               <span class="player-meta">${p.pos} • ${p.team}</span>
+              <span class="player-meta" style="color:#00ff85; font-size:12px; margin-top:2px;">
+                GW: <strong>${gwPts}</strong> pts | Total: <strong>${totPts}</strong> pts
+              </span>
             </div>
             <div>${badge}</div>
           </li>`;
@@ -654,10 +661,16 @@
         html += `<div style="color:#a375aa; font-weight:bold; margin-top:18px; margin-bottom:6px; font-size:13px;">CADANGAN (BENCH):</div>`;
         html += `<ul class="player-list" style="opacity:0.9;">`;
         res.bench.forEach(p => {
+          let gwPts = p.gwPoints !== undefined ? p.gwPoints : "-";
+          let totPts = p.totalPoints !== undefined ? p.totalPoints : "-";
+
           html += `<li>
             <div class="player-info">
               <strong style="font-size:15px;">${p.name}</strong>
               <span class="player-meta">${p.pos} • ${p.team}</span>
+              <span class="player-meta" style="color:#a375aa; font-size:12px; margin-top:2px;">
+                GW: <strong>${gwPts}</strong> pts | Total: <strong>${totPts}</strong> pts
+              </span>
             </div>
           </li>`;
         });
@@ -673,7 +686,6 @@
       }
     });
   }
-
   function closeModal() {
     document.getElementById("team-modal").style.display = "none";
   }
