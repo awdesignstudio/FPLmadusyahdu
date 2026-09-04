@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://resources.premierleague.com/premierleague/photo/2021/03/16/e7890bc4-332d-4786-acaf-2a3b90a59960/icon-app.png">
+    <link rel="manifest" href="./manifest.json">
     
     <title>FPL Mini Liga Chat</title>
     
@@ -88,7 +89,18 @@
     <!-- Firebase SDK V8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  </head>
+
+    <!-- Registrasi Service Worker PWA -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then((reg) => { console.log('Service Worker terdaftar:', reg.scope); })
+            .catch((err) => { console.log('Gagal mendaftarkan Service Worker:', err); });
+        });
+      }
+    </script>
+</head>
   <body>
 
   <div class="container" id="app-container">
