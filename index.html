@@ -389,46 +389,47 @@
     }
   }
 
+  let activePromptCallback = null;
+  let activeConfirmCallback = null;
+
   function showCustomAlert(title, message, onOk = null) {
+    activeConfirmCallback = onOk;
     document.getElementById("custom-alert-title").innerText = title;
     document.getElementById("custom-alert-msg").innerText = message;
     document.getElementById("custom-modal-input-wrapper").innerHTML = "";
-    document.getElementById("custom-alert-buttons").innerHTML = `<button onclick="closeCustomAlert(); ${onOk ? '(' + onOk.toString() + ')()' : ''}">OK</button>`;
+    document.getElementById("custom-alert-buttons").innerHTML = `<button onclick="executeConfirmYes()">OK</button>`;
     document.getElementById("custom-alert-modal").style.display = "flex";
   }
 
-  let currentConfirmCallback = null;
-  let currentPromptCallback = null;
-
   function showCustomConfirm(title, message, onYes) {
-    currentConfirmCallback = onYes;
+    activeConfirmCallback = onYes;
     document.getElementById("custom-alert-title").innerText = title;
     document.getElementById("custom-alert-msg").innerText = message;
     document.getElementById("custom-modal-input-wrapper").innerHTML = "";
     document.getElementById("custom-alert-buttons").innerHTML = `
       <button class="btn-cancel" onclick="closeCustomAlert()">Batal</button>
-      <button onclick="submitCustomConfirm()">Ya</button>
+      <button onclick="executeConfirmYes()">Ya</button>
     `;
     document.getElementById("custom-alert-modal").style.display = "flex";
   }
 
-  function submitCustomConfirm() {
+  function executeConfirmYes() {
     closeCustomAlert();
-    if (currentConfirmCallback) {
-      currentConfirmCallback();
-      currentConfirmCallback = null;
+    if (activeConfirmCallback) {
+      activeConfirmCallback();
+      activeConfirmCallback = null; // Reset setelah dieksekusi
     }
   }
 
   function showCustomPrompt(title, message, defaultValue, onSubmitted) {
-    currentPromptCallback = onSubmitted;
+    activePromptCallback = onSubmitted;
     document.getElementById("custom-alert-title").innerText = title;
     document.getElementById("custom-alert-msg").innerText = message;
-    // Menggunakan textarea agar bisa multi-line, auto-wrap, dan tidak perlu digeser-geser ke samping
     document.getElementById("custom-modal-input-wrapper").innerHTML = `<textarea id="custom-prompt-input" class="custom-modal-input" oninput="autoResizeTextarea(this)">${defaultValue || ''}</textarea>`;
+    
     document.getElementById("custom-alert-buttons").innerHTML = `
       <button class="btn-cancel" onclick="closeCustomAlert()">Batal</button>
-      <button onclick="submitCustomPrompt()">Simpan</button>
+      <button onclick="executePromptSave()">Simpan</button>
     `;
     document.getElementById("custom-alert-modal").style.display = "flex";
     setTimeout(() => {
@@ -441,18 +442,18 @@
     }, 100);
   }
 
-  function submitCustomPrompt() {
+  function executePromptSave() {
     const val = document.getElementById("custom-prompt-input").value;
     closeCustomAlert();
-    if (currentPromptCallback) {
-      currentPromptCallback(val);
-      currentPromptCallback = null;
+    if (activePromptCallback) {
+      activePromptCallback(val);
+      activePromptCallback = null; // Reset setelah dieksekusi
     }
   }
+
   function closeCustomAlert() {
     document.getElementById("custom-alert-modal").style.display = "none";
   }
-
   function switchTab(tabName) {
     document.getElementById('tab-chat').style.display = (tabName === 'chat') ? 'block' : 'none';
     document.getElementById('tab-dashboard').style.display = (tabName === 'dashboard') ? 'block' : 'none';
