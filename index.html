@@ -1400,31 +1400,94 @@ function processSlashCommand(commandText, gw) {
       }
     });
   }
-  else if (cmd === "/hasil" || cmd === "/skor") {
-    callGAS('getLiveMatchResults', targetGw, null, function(res) {
+  else if (cmd === "/bench") {
+    callGAS('getLeagueBenchPain', MY_LEAGUE_ID, targetGw, function(res) {
       if (res.success) {
-        let hasilHtml = `<div class='bot-header'>🏟️ Hasil Pertandingan (GW ${targetGw})</div>`;
-        if (res.matches.length === 0) {
-          hasilHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada pertandingan yang dimulai.</i>";
+        let benchHtml = `<div class='bot-header'>🪑 Tragedi Bangku Cadangan (GW ${targetGw})</div>`;
+        if (res.data.length === 0 || res.data[0].benchPts === 0) {
+          benchHtml += "<i style='font-size:12px; color:#aaa;'>Hebat! Tidak ada poin terbuang sia-sia di bench minggu ini.</i>";
         } else {
-          res.matches.forEach(m => {
-            hasilHtml += `<div style='margin-top:8px; font-weight:bold; color:#fff; background:rgba(255,255,255,0.1); padding:4px 6px; border-radius:4px;'>${m.title} (${m.status})</div>`;
-            if (m.goals.length > 0) hasilHtml += `<div class='bot-row' style='color:#00ff85; font-size:13px;'>⚽ ${m.goals.join(", ")}</div>`;
-            if (m.assists.length > 0) hasilHtml += `<div class='bot-row' style='color:#33ccff; font-size:13px;'>👟 ${m.assists.join(", ")}</div>`;
-            if (m.bonus.length > 0) {
-              let bnsStr = m.bonus.map(b => `${b.name} (+${b.pts})`).join(", ");
-              hasilHtml += `<div class='bot-row' style='color:#ffcc00; font-size:13px;'>🏆 ${bnsStr}</div>`;
-            }
+          res.data.forEach(b => {
+            benchHtml += `<div class='bot-row'><span><b>${b.team}</b> <small>(${b.name})</small></span> <span style="color:#ff4a4a; font-weight:bold;">${b.benchPts} pts</span></div>`;
+          });
+          benchHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Nangis di pojokan ngeliat poin bench lebih gede dari poin kapten 😭</div>`;
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: benchHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Bench Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/sultan") {
+    callGAS('getLeagueSultan', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let sultanHtml = `<div class='bot-header'>💰 Adu Sombong Team Value (GW ${targetGw})</div>`;
+        res.data.forEach((s, i) => {
+          let icon = i === 0 ? "👑" : (i === res.data.length - 1 ? "🧟" : "🔹");
+          sultanHtml += `<div class='bot-row'><span>${icon} <b>${s.team}</b></span> <span style="color:#00ff85; font-weight:bold;">£${s.value}M</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: sultanHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Sultan Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/template") {
+    callGAS('getLeagueTemplate', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let tempHtml = `<div class='bot-header'>🐑 Pemain Template Liga (GW ${targetGw})</div>`;
+        res.data.forEach(t => {
+          tempHtml += `<div class='bot-row'><span><b>${t.name}</b> <small>(${t.pos})</small></span> <span style="color:#33ccff; font-weight:bold;">${t.ownership}%</span></div>`;
+        });
+        tempHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Yang nggak punya mereka fiks orang gila (atau hipster) 🤓</div>`;
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: tempHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Template Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/zombie") {
+    callGAS('getLeagueZombie', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let zombieHtml = `<div class='bot-header'>🧟 Detektor Akun Zombie</div>`;
+        if (res.data.length === 0) {
+          zombieHtml += "<i style='font-size:12px; color:#00ff85;'>Luar biasa! Semua manajer di liga ini aktif gonta-ganti pemain.</i>";
+        } else {
+          zombieHtml += "<i style='font-size:12px; color:#aaa;'>Manajer berikut belum melakukan transfer dalam 3+ Gameweek terakhir:</i>";
+          res.data.forEach(z => {
+            zombieHtml += `<div class='bot-row'><span><b>${z.team}</b> <small>(${z.name})</small></span> <span style="color:#ffcc00; font-weight:bold;">${z.inactiveWeeks} GW</span></div>`;
           });
         }
-        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: hasilHtml, isBotHtml: true });
-      } else {
-        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Hasil Error: " + res.message });
-      }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: zombieHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Zombie Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/gatel") {
+    callGAS('getLeagueGatel', MY_LEAGUE_ID, null, function(res) {
+      if (res.success) {
+        let gatelHtml = `<div class='bot-header'>🚑 Rekor Pasien Gatal Tangan</div>`;
+        gatelHtml += `<div style='font-size:11px; color:#ccc; margin-bottom:6px;'>Total transfer yang dilakukan sejak GW 1:</div>`;
+        res.data.forEach((g, i) => {
+          let badge = i === 0 ? "🔥 (Knee-Jerker)" : (i === res.data.length - 1 ? "🧘‍♂️ (Sabar)" : "");
+          gatelHtml += `<div class='bot-row'><span><b>${g.team}</b> <small>(${g.name})</small></span> <span style="color:#ff4a4a; font-weight:bold;">${g.transfers}x ${badge}</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: gatelHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Gatel Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/profit") {
+    callGAS('getLeagueTransferProfit', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let profitHtml = `<div class='bot-header'>📈 Adu Nasib Transfer (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          profitHtml += "<i style='font-size:12px; color:#aaa;'>Tidak ada manajer yang melakukan transfer minggu ini.</i>";
+        } else {
+          res.data.forEach(p => {
+            let color = p.profit > 0 ? "#00ff85" : (p.profit < 0 ? "#ff4a4a" : "#aaa");
+            let icon = p.profit > 0 ? "📈" : (p.profit < 0 ? "📉" : "➖");
+            profitHtml += `<div class='bot-row'><span><b>${p.team}</b> <br><small>In: ${p.ptsIn} pts | Out: ${p.ptsOut} pts</small></span> <span style="color:${color}; font-weight:bold;">${icon} ${p.profit > 0 ? '+'+p.profit : p.profit}</span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: profitHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Profit Error: " + res.message }); }
     });
   }
   else {
-    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Unrecognized command. Try: /captain, /chips, /h2h @Name, /diff, /bonus, /hit, /blunder, /hasil" });
+    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit" });
   }
 }  // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
