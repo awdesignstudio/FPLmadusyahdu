@@ -548,9 +548,9 @@
           let isOnline = window.globalOnlineUsers[managerId];
           let html = "";
           
-          // Hanya ikon kecil meneruskan nama manajer
-          if (isRegistered) html += `<span style="font-size:11px; margin-left:4px; cursor:help; opacity:0.8; vertical-align:middle;" title="Sudah Registrasi">✔️</span>`;
-          if (isOnline) html += `<span style="font-size:10px; margin-left:4px; cursor:help; text-shadow: 0 0 5px #00ff85; vertical-align:middle;" title="Online Sekarang">🟢</span>`;
+          // Menggunakan flex-item agar benar-benar simetris di tengah
+          if (isRegistered) html += `<span style="font-size:11px; cursor:help; opacity:0.8; display:flex; align-items:center;" title="Sudah Registrasi">✔️</span>`;
+          if (isOnline) html += `<span style="font-size:9px; cursor:help; text-shadow: 0 0 5px #00ff85; display:flex; align-items:center;" title="Online Sekarang">🟢</span>`;
           
           badgeContainer.innerHTML = html;
         }
@@ -767,7 +767,7 @@
       if (res.success) {
         document.getElementById("display-league-name").innerText = res.leagueName;
         
-     let standingsHTML = "";
+   let standingsHTML = "";
         res.leaderboard.forEach(item => {
           const isMe = (item.id.toString() === currentUser.managerId.toString());
           const rowClass = isMe ? "my-row" : "";
@@ -776,15 +776,19 @@
           let isOnline = window.globalOnlineUsers && window.globalOnlineUsers[item.id];
           let badgeHtml = "";
           
-          // Hanya ikon kecil meneruskan nama manajer
-          if (isRegistered) badgeHtml += `<span style="font-size:11px; margin-left:4px; cursor:help; opacity:0.8; vertical-align:middle;" title="Sudah Registrasi">✔️</span>`;
-          if (isOnline) badgeHtml += `<span style="font-size:10px; margin-left:4px; cursor:help; text-shadow: 0 0 5px #00ff85; vertical-align:middle;" title="Online Sekarang">🟢</span>`;
+          // Menggunakan flex-item agar benar-benar simetris di tengah
+          if (isRegistered) badgeHtml += `<span style="font-size:11px; cursor:help; opacity:0.8; display:flex; align-items:center;" title="Sudah Registrasi">✔️</span>`;
+          if (isOnline) badgeHtml += `<span style="font-size:9px; cursor:help; text-shadow: 0 0 5px #00ff85; display:flex; align-items:center;" title="Online Sekarang">🟢</span>`;
           
           standingsHTML += `<tr class="${rowClass}">
             <td>${item.rank}</td>
             <td>
-              <a class="team-link" data-id="${item.id}" onclick="openTeamModal(${item.id}, '${item.teamName}', ${gw})"><strong>${item.teamName}</strong></a><br>
-              <span style="font-size:11px; color:#a375aa; vertical-align:middle;">${item.managerName}</span><span class="badges-container" style="display:inline-block; vertical-align:middle;">${badgeHtml}</span>
+              <a class="team-link" data-id="${item.id}" onclick="openTeamModal(${item.id}, '${item.teamName}', ${gw})"><strong>${item.teamName}</strong></a>
+              <!-- Menggunakan wrapper DIV Flexbox sebagai pengganti <br> agar nama dan ikon terkunci sejajar sempurna -->
+              <div style="display:flex; align-items:center; gap:4px; margin-top:3px; font-size:11px; color:#a375aa;">
+                <span>${item.managerName}</span>
+                <span class="badges-container" style="display:flex; align-items:center; gap:4px;">${badgeHtml}</span>
+              </div>
             </td>
             <td class="highlight">${item.gwPoints}</td>
             <td>${item.totalPoints}</td>
