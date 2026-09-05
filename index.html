@@ -461,10 +461,15 @@
     }
   };
 
+  // Variabel global penampung status manajer
+  window.globalRegisteredUsers = {};
+  window.globalOnlineUsers = {};
+
   function setupPresenceSystem() {
     const userStatusRef = db.ref(`presence/${currentUser.managerId}`);
+    const registeredUserRef = db.ref(`registered_users/${currentUser.managerId}`);
     const connectedRef = db.ref(".info/connected");
-
+    
     // 1. Deteksi bawaan Firebase saat koneksi terhubung
     connectedRef.on("value", function(snapshot) {
       if (snapshot.val() === true) {
@@ -474,43 +479,79 @@
           managerName: currentUser.managerName,
           lastOnline: firebase.database.ServerValue.TIMESTAMP
         });
+        
+        // ++ Catat secara permanen bahwa manajer ini pernah masuk ke aplikasi
+        registeredUserRef.update({
+          teamName: currentUser.teamName,
+          managerName: currentUser.managerName,
+          lastLogin: firebase.database.ServerValue.TIMESTAMP
+        });
       }
     });
-
+    
     // 2. Deteksi sensitif layar HP (Mengatasi browser yang tertidur)
     document.addEventListener("visibilitychange", function() {
       if (document.visibilityState === 'visible' && currentUser.managerId) {
-        // Saat kembali ke aplikasi/layar menyala, paksa push status online
-        firebase.database().goOnline(); // Paksa bangunkan koneksi Firebase
+        firebase.database().goOnline();
         userStatusRef.set({
           teamName: currentUser.teamName,
           managerName: currentUser.managerName,
           lastOnline: firebase.database.ServerValue.TIMESTAMP
         });
+        registeredUserRef.update({ lastLogin: firebase.database.ServerValue.TIMESTAMP });
       }
     });
 
-    // 3. Menampilkan daftar online ke UI
+    // ++ 3. Pantau daftar manajer yang sudah pernah login (Untuk Badge)
+    db.ref("registered_users").on("value", function(snapshot) {
+      window.globalRegisteredUsers = snapshot.val() || {};
+      refreshDashboardBadges(); // Segarkan badge klasemen
+    });
+
+    // 4. Menampilkan daftar online ke UI
     db.ref("presence").on("value", function(snapshot) {
       const activeUsers = snapshot.val();
+      window.globalOnlineUsers = activeUsers || {}; // Simpan ke memori global
       const onlineTextEl = document.getElementById("online-users-text");
+      
       if (!activeUsers) {
         onlineTextEl.innerText = "Manajer Online: Tidak ada";
+        refreshDashboardBadges();
         return;
       }
-
+      
       let names = [];
       Object.keys(activeUsers).forEach(id => {
         const u = activeUsers[id];
-        if (u && u.teamName) {
-          names.push(u.teamName);
-        }
+        if (u && u.teamName) { names.push(u.teamName); }
       });
-
+      
       if (names.length > 0) {
         onlineTextEl.innerText = "Manajer Online (" + names.length + "): " + names.join(", ");
       } else {
         onlineTextEl.innerText = "Manajer Online: Sendirian";
+      }
+      refreshDashboardBadges(); // Segarkan badge klasemen
+    });
+  }
+
+  // Fungsi tambahan untuk mengubah badge secara real-time tanpa perlu panggil API FPL lagi
+  function refreshDashboardBadges() {
+    const rows = document.querySelectorAll(".team-link");
+    rows.forEach(link => {
+      const managerId = link.getAttribute("data-id");
+      if (managerId) {
+        const badgeContainer = link.nextElementSibling;
+        if (badgeContainer && badgeContainer.classList.contains("badges-container")) {
+          let isRegistered = window.globalRegisteredUsers[managerId];
+          let isOnline = window.globalOnlineUsers[managerId];
+          let html = "";
+          
+          if (isRegistered) html += `<span style="font-size:9px; background:#a375aa; color:#fff; padding:2px 5px; border-radius:4px; margin-right:4px;" title="Sudah Registrasi / Pernah Login">✔️ Terdaftar</span>`;
+          if (isOnline) html += `<span style="font-size:9px; background:#00ff85; color:#37003c; padding:2px 5px; border-radius:4px; font-weight:bold;" title="Sedang Aktif Buka Aplikasi">🟢 Online</span>`;
+          
+          badgeContainer.innerHTML = html;
+        }
       }
     });
   }
@@ -729,10 +770,18 @@
           const isMe = (item.id.toString() === currentUser.managerId.toString());
           const rowClass = isMe ? "my-row" : "";
           
+          let isRegistered = window.globalRegisteredUsers && window.globalRegisteredUsers[item.id];
+          let isOnline = window.globalOnlineUsers && window.globalOnlineUsers[item.id];
+          let badgeHtml = "";
+          
+          if (isRegistered) badgeHtml += `<span style="font-size:9px; background:#a375aa; color:#fff; padding:2px 5px; border-radius:4px; margin-right:4px;" title="Sudah Registrasi / Pernah Login">✔️ Terdaftar</span>`;
+          if (isOnline) badgeHtml += `<span style="font-size:9px; background:#00ff85; color:#37003c; padding:2px 5px; border-radius:4px; font-weight:bold;" title="Sedang Aktif Buka Aplikasi">🟢 Online</span>`;
+          
           standingsHTML += `<tr class="${rowClass}">
             <td>${item.rank}</td>
             <td>
-              <a class="team-link" onclick="openTeamModal(${item.id}, '${item.teamName}', ${gw})"><strong>${item.teamName}</strong></a><br>
+              <a class="team-link" data-id="${item.id}" onclick="openTeamModal(${item.id}, '${item.teamName}', ${gw})"><strong>${item.teamName}</strong></a>
+              <span class="badges-container" style="display:inline-block; margin-left:6px; vertical-align:middle;">${badgeHtml}</span><br>
               <span style="font-size:11px; color:#a375aa;">${item.managerName}</span>
             </td>
             <td class="highlight">${item.gwPoints}</td>
