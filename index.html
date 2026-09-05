@@ -212,6 +212,16 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="secret-cmd-modal">
+    <div class="modal-content" style="max-width: 500px; text-align: left; padding: 15px;">
+      <h3 style="font-size: 16px; margin-bottom: 10px;">📜 Buku Rahasia Slash Command</h3>
+      <div id="secret-cmd-body" style="font-size: 13px; line-height: 1.5; color: #ccc; max-height: 55vh; overflow-y: auto; padding-right: 5px;">
+        <!-- Konten digenerate dari JS -->
+      </div>
+      <button class="close-btn" onclick="document.getElementById('secret-cmd-modal').style.display='none'" style="margin-top:10px; padding:10px;">Tutup Buku</button>
+    </div>
+  </div>
+
   <div id="login-section" style="text-align: center;">
     <!-- Header Khusus Tampil di Halaman Login -->
     <div class="login-header">
@@ -319,7 +329,10 @@
         </div>
       </div>
       <!-- TOMBOL LOGOUT DIPINDAH KE BAWAH TAB KLASEMEN -->
-      <button class="logout-btn-small" onclick="confirmLogout()" style="width: 100%; padding: 14px; font-size: 16px; margin-top: 15px; margin-bottom: 20px;">🚪 Keluar Akun (Logout)</button>
+      <button class="logout-btn-small" onclick="confirmLogout()" style="width: 100%; padding: 14px; font-size: 16px; margin-top: 15px; margin-bottom: 5px;">🚪 Keluar Akun (Logout)</button>
+      <div style="text-align: center; margin-bottom: 20px;">
+        <span onclick="checkSecretPin()" style="color: #a375aa; font-size: 11px; cursor: pointer; opacity: 0.4;">v1.0.0</span>
+      </div>
     </div>
   </div>
 </div>
@@ -1546,6 +1559,54 @@ function processSlashCommand(commandText, gw) {
 
   function toggleReaction(key, emoji) {
     addReaction(key, emoji);
+  }
+
+  // ==========================================
+  // FITUR RAHASIA: BUKU PANDUAN SLASH COMMAND
+  // ==========================================
+  function checkSecretPin() {
+    showCustomPrompt("Akses Rahasia", "Masukkan PIN untuk membuka buku panduan Command:", "", function(pin) {
+      if (pin === "121212") {
+        openSecretCommandBook();
+      } else if (pin !== null && pin.trim() !== "") {
+        showCustomAlert("Akses Ditolak", "PIN salah! Anda tidak memiliki akses.");
+      }
+    });
+  }
+
+  function openSecretCommandBook() {
+    const body = document.getElementById("secret-cmd-body");
+    let html = `<p style="margin-top:0; color:#00ff85;">Ketik perintah berikut di awal chat:</p>`;
+    
+    const commands = [
+      { cmd: "/hasil atau /skor", desc: "Tampilkan skor FT/Live, pencetak Gol, Assist, dan BPS.", out: "🏟️ Hasil Pertandingan: Ipswich 0-2 Liverpool..." },
+      { cmd: "/bonus", desc: "Pantau klasemen BPS dari pertandingan yang sedang berjalan.", out: "🏆 Live Bonus Points: Salah (+3 pts), Trent (+2 pts)..." },
+      { cmd: "/blunder", desc: "Tampilkan manajer yang kaptennya nge-blank (Poin <= 2).", out: "🤡 Papan Korban Kapten: Budi (Haaland) 2 pts" },
+      { cmd: "/hit", desc: "Cek manajer yang potong poin (minus) untuk transfer minggu ini.", out: "💸 Panic Transfer: Agus -4 pts, Joko -8 pts" },
+      { cmd: "/bench", desc: "Lihat siapa yang membuang poin paling banyak di bangku cadangan.", out: "🪑 Tragedi Bangku Cadangan: FC Kasihan 18 pts" },
+      { cmd: "/sultan", desc: "Adu kaya! Cek Team Value (Nilai Skuad) seluruh manajer.", out: "💰 Adu Sombong: 👑 Crazy Rich FC £103.5M" },
+      { cmd: "/template", desc: "Deteksi pemain pasaran dengan kepemilikan >50% di mini-liga.", out: "🐑 Pemain Template: Haaland (100%), Saka (80%)" },
+      { cmd: "/zombie", desc: "Deteksi akun mati yang tidak pernah transfer dalam 3+ GW terakhir.", out: "🧟 Detektor Akun Zombie: Andi (5 GW), Tono (3 GW)" },
+      { cmd: "/gatel", desc: "Hitung total transfer tiap manajer sejak GW 1.", out: "🚑 Pasien Gatal Tangan: Dani 15x 🔥 (Knee-Jerker)" },
+      { cmd: "/profit", desc: "Cek keuntungan transfer minggu ini (Poin Masuk dikurangi Poin Keluar).", out: "📈 Adu Nasib Transfer: In 15 | Out 2 📈 +13" },
+      { cmd: "/captain", desc: "Statistik pemain mana yang paling banyak dikaptenin di liga.", out: "👑 Captaincy Stats: Haaland (8 manajer), Salah (2 manajer)" },
+      { cmd: "/chips", desc: "Melihat siapa yang mengaktifkan Chip minggu ini.", out: "🃏 Active Chips: Joko (WILDCARD)" },
+      { cmd: "/diff", desc: "Cari pemain 'Differential' yang dimiliki <= 2 orang di liga.", out: "💎 Mini-League Differentials: Mbeumo (Owned by 1)" },
+      { cmd: "/h2h @Nama", desc: "Bandingkan langsung poin dan rank total kamu vs rival.", out: "⚔️ H2H BATTLE: Tim Kamu (50 Pts) vs Tim Budi (42 Pts)" }
+    ];
+
+    commands.forEach(c => {
+      html += `
+        <div style="background:rgba(255,255,255,0.05); padding:8px 10px; border-radius:6px; margin-bottom:10px; border-left:3px solid #00ff85;">
+          <strong style="color:#fff;">${c.cmd}</strong><br>
+          <span style="font-size:12px; opacity:0.9;">${c.desc}</span><br>
+          <i style="color:#ffcc00; font-size:11px; margin-top:4px; display:inline-block;">Output: ${c.out}</i>
+        </div>
+      `;
+    });
+
+    body.innerHTML = html;
+    document.getElementById('secret-cmd-modal').style.display = 'flex';
   }
 </script>
 
