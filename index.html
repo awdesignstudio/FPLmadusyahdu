@@ -1685,8 +1685,21 @@ function processSlashCommand(commandText, gw) {
         db.ref(`chats/gw${gw}/${tempKey}`).update({ message: trendHtml, isBotHtml: true });
       } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Trend Chip Error: " + res.message }); }
     });
-  }  else {
-    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /trendchip" });
+  }
+  else if (cmd === "/fdr") {
+    callGAS('getLeagueFDR', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let fdrHtml = `<div class='bot-header'>📅 Analisis Kesulitan Jadwal (GW ${targetGw})</div>`;
+        fdrHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Berdasarkan Starting XI.<br>🟩 Mudah (FDR 1-2) | ⬜ Normal (3) | 🟥 Susah (4-5)</div>`;
+        res.data.forEach(d => {
+          fdrHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size: 13px; text-align:right;"><span style="color:#00ff85;">${d.easy} 🟩</span> &nbsp;<span style="color:#aaa;">${d.normal} ⬜</span> &nbsp;<span style="color:#ff4a4a;">${d.hard} 🟥</span></span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: fdrHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "FDR Error: " + res.message }); }
+    });
+  }
+  else {
+    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /trendchip, /fdr" });
   }
 }  // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
@@ -1813,6 +1826,7 @@ function processSlashCommand(commandText, gw) {
       { cmd: "/chips", desc: "Melihat siapa yang mengaktifkan Chip minggu ini.", out: "🃏 Active Chips: Joko (WILDCARD)" },
       { cmd: "/trendchip", desc: "Menampilkan jumlah dan jenis chip yang paling banyak dipakai manajer.", out: "📊 Trend Chip: WILDCARD (5 manajer)" },
       { cmd: "/diff", desc: "Cari pemain 'Differential' yang dimiliki <= 2 orang di liga.", out: "💎 Mini-League Differentials: Mbeumo (Owned by 1)" },
+      { cmd: "/fdr", desc: "Menganalisis jadwal Starting XI tiap manajer (Mudah/Normal/Susah).", out: "📅 Analisis Jadwal: Budi 🟩 8 ⬜ 2 🟥 1" },
       { cmd: "/h2h @Nama", desc: "Bandingkan langsung poin dan rank total kamu vs rival.", out: "⚔️ H2H BATTLE: Tim Kamu (50 Pts) vs Tim Budi (42 Pts)" }
     ];
 
