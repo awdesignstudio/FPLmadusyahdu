@@ -289,17 +289,21 @@
     </div>
 
     <div id="tab-chat">
-      <div class="chat-controls">
-        <strong>Pilih Gameweek:</strong>
-        <select id="gwSelect" onchange="onGwChange(this.value)">
-          <!-- Dropdown dinamis -->
-        </select>
-      </div>
-
-      <div class="reward-container" id="rewards-banner">
-        <div class="reward-title" id="reward-heading-title">⭐ Hall of Fame GW 3 (Real-Time Live) ⭐</div>
-        <div class="reward-item" id="reward-motw">👑 Manager Of The Week : Memuat...</div>
-        <div class="reward-item" id="reward-topscorer">🔥 Most Points : Memuat...</div>
+      <div class="reward-container" id="rewards-banner" style="display: flex; justify-content: space-between; align-items: center; text-align: left; padding: 8px 10px;">
+        <!-- Bagian Kiri: Hall of Fame (Rata Kiri) -->
+        <div style="flex: 1; overflow: hidden; padding-right: 8px;">
+          <div class="reward-title" id="reward-heading-title" style="border-bottom: none; margin-bottom: 4px; padding-bottom: 0;">⭐ Hall of Fame GW 3 (Real-Time Live) ⭐</div>
+          <div class="reward-item" id="reward-motw">👑 Manager Of The Week : Memuat...</div>
+          <div class="reward-item" id="reward-topscorer">🔥 Most Points : Memuat...</div>
+        </div>
+        
+        <!-- Bagian Kanan: Pemilih GW -->
+        <div style="display: flex; flex-direction: column; align-items: flex-end; border-left: 1px solid rgba(0,255,133,0.3); padding-left: 10px;">
+          <span style="font-size: 10px; color: #00ff85; font-weight: bold; margin-bottom: 4px;">Pilih GW:</span>
+          <select id="gwSelect" onchange="onGwChange(this.value)" style="padding: 4px 6px; font-size: 12px; border-radius: 4px; width: 75px; text-align: center;">
+            <!-- Dropdown dinamis -->
+          </select>
+        </div>
       </div>
 
       <!-- INDIKATOR MANAJER ONLINE -->
