@@ -1887,24 +1887,28 @@ function processSlashCommand(commandText, gw) {
         if (res.data.length === 0) {
           jHtml += "<i style='font-size:12px; color:#aaa;'>Jadwal belum tersedia.</i>";
         } else {
-          res.data.forEach(d => {
-            jHtml += `<div style="margin-top:8px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:6px;">`;
-            jHtml += `<div style="color:#ffcc00; font-weight:bold; font-size:13px;">📺 ${d.match}</div>`;
-            jHtml += `<div style="color:#aaa; font-size:11px; margin-bottom:4px;">🕒 ${d.kickoff}</div>`;
+          // Melakukan iterasi berdasarkan kelompok hari
+          res.data.forEach(group => {
+            // Header Hari
+            jHtml += `<div style="background:rgba(255,255,255,0.1); padding:4px 8px; margin-top:10px; font-weight:bold; font-size:12px; color:#fff; text-align:center; border-radius:4px;">${group.date}</div>`;
             
-            // Tampilkan Top 3 manajer yang paling banyak pemainnya di laga ini
-            let topManagers = d.managers.slice(0, 3);
-            if (topManagers.length > 0) {
-              let mList = topManagers.map(m => {
-                let namesJson = JSON.stringify(m.players).replace(/"/g, '&quot;');
-                // Kita gunakan fungsi pop-up yang sudah ada untuk memunculkan daftar nama pemainnya!
-                return `<span style="cursor:pointer; color:#00ff85; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('Pemain ${m.name}', '${namesJson}')" title="Klik lihat pemain andalannya">${m.name} (${m.count})</span>`;
-              }).join(", ");
-              jHtml += `<div style="font-size:12px; color:#fff;">Paling deg-degan: ${mList}</div>`;
-            } else {
-              jHtml += `<div style="font-size:12px; color:#aaa;"><i>Tidak ada manajer yang pakai pemain di laga ini.</i></div>`;
-            }
-            jHtml += `</div>`;
+            // Iterasi pertandingan di hari tersebut
+            group.fixtures.forEach(d => {
+              jHtml += `<div style="margin-top:4px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:6px;">`;
+              jHtml += `<div style="color:#ffcc00; font-weight:bold; font-size:13px;">📺 ${d.match} <span style="color:#aaa; font-size:11px; font-weight:normal;">(🕒 ${d.time})</span></div>`;
+              
+              let topManagers = d.managers.slice(0, 3);
+              if (topManagers.length > 0) {
+                let mList = topManagers.map(m => {
+                  let namesJson = JSON.stringify(m.players).replace(/"/g, '&quot;');
+                  return `<span style="cursor:pointer; color:#00ff85; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('Pemain ${m.name}', '${namesJson}')" title="Klik lihat pemain andalannya">${m.name} (${m.count})</span>`;
+                }).join(", ");
+                jHtml += `<div style="font-size:12px; color:#fff; margin-top:2px;">In action: ${mList}</div>`;
+              } else {
+                jHtml += `<div style="font-size:12px; color:#aaa; margin-top:2px;"><i>Tidak ada manajer yang pakai pemain di laga ini.</i></div>`;
+              }
+              jHtml += `</div>`;
+            });
           });
         }
         db.ref(`chats/gw${gw}/${tempKey}`).update({ message: jHtml, isBotHtml: true });
