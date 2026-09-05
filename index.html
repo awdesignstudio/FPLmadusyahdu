@@ -535,21 +535,22 @@
     });
   }
 
-  // Fungsi tambahan untuk mengubah badge secara real-time tanpa perlu panggil API FPL lagi
+ // Fungsi tambahan untuk mengubah badge secara real-time tanpa perlu panggil API FPL lagi
   function refreshDashboardBadges() {
     const rows = document.querySelectorAll(".team-link");
     rows.forEach(link => {
       const managerId = link.getAttribute("data-id");
       if (managerId) {
-        const badgeContainer = link.nextElementSibling;
-        if (badgeContainer && badgeContainer.classList.contains("badges-container")) {
+        const td = link.closest("td");
+        const badgeContainer = td.querySelector(".badges-container");
+        if (badgeContainer) {
           let isRegistered = window.globalRegisteredUsers[managerId];
           let isOnline = window.globalOnlineUsers[managerId];
           let html = "";
           
-          // Hanya menampilkan ikon kecil, tanpa teks
-          if (isRegistered) html += `<span style="font-size:11px; margin-left:4px; cursor:help; opacity:0.8;" title="Sudah Registrasi">✔️</span>`;
-          if (isOnline) html += `<span style="font-size:10px; margin-left:4px; cursor:help; text-shadow: 0 0 5px #00ff85;" title="Online Sekarang">🟢</span>`;
+          // Hanya ikon kecil meneruskan nama manajer
+          if (isRegistered) html += `<span style="font-size:11px; margin-left:4px; cursor:help; opacity:0.8; vertical-align:middle;" title="Sudah Registrasi">✔️</span>`;
+          if (isOnline) html += `<span style="font-size:10px; margin-left:4px; cursor:help; text-shadow: 0 0 5px #00ff85; vertical-align:middle;" title="Online Sekarang">🟢</span>`;
           
           badgeContainer.innerHTML = html;
         }
@@ -766,7 +767,7 @@
       if (res.success) {
         document.getElementById("display-league-name").innerText = res.leagueName;
         
-        let standingsHTML = "";
+     let standingsHTML = "";
         res.leaderboard.forEach(item => {
           const isMe = (item.id.toString() === currentUser.managerId.toString());
           const rowClass = isMe ? "my-row" : "";
@@ -775,15 +776,15 @@
           let isOnline = window.globalOnlineUsers && window.globalOnlineUsers[item.id];
           let badgeHtml = "";
           
-          // Hanya menampilkan ikon kecil, tanpa teks
-          if (isRegistered) badgeHtml += `<span style="font-size:11px; margin-left:4px; cursor:help; opacity:0.8;" title="Sudah Registrasi">✔️</span>`;
-          if (isOnline) badgeHtml += `<span style="font-size:10px; margin-left:4px; cursor:help; text-shadow: 0 0 5px #00ff85;" title="Online Sekarang">🟢</span>`;
+          // Hanya ikon kecil meneruskan nama manajer
+          if (isRegistered) badgeHtml += `<span style="font-size:11px; margin-left:4px; cursor:help; opacity:0.8; vertical-align:middle;" title="Sudah Registrasi">✔️</span>`;
+          if (isOnline) badgeHtml += `<span style="font-size:10px; margin-left:4px; cursor:help; text-shadow: 0 0 5px #00ff85; vertical-align:middle;" title="Online Sekarang">🟢</span>`;
           
           standingsHTML += `<tr class="${rowClass}">
             <td>${item.rank}</td>
-            <td style="padding-right: 0;">
-              <a class="team-link" data-id="${item.id}" onclick="openTeamModal(${item.id}, '${item.teamName}', ${gw})"><strong>${item.teamName}</strong></a><span class="badges-container" style="display:inline-block; vertical-align:middle;">${badgeHtml}</span><br>
-              <span style="font-size:11px; color:#a375aa;">${item.managerName}</span>
+            <td>
+              <a class="team-link" data-id="${item.id}" onclick="openTeamModal(${item.id}, '${item.teamName}', ${gw})"><strong>${item.teamName}</strong></a><br>
+              <span style="font-size:11px; color:#a375aa; vertical-align:middle;">${item.managerName}</span><span class="badges-container" style="display:inline-block; vertical-align:middle;">${badgeHtml}</span>
             </td>
             <td class="highlight">${item.gwPoints}</td>
             <td>${item.totalPoints}</td>
