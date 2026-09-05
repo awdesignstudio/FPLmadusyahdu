@@ -1520,7 +1520,7 @@ function processSlashCommand(commandText, gw) {
       } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Gatel Error: " + res.message }); }
     });
   }
-  else if (cmd === "/profit") {
+ else if (cmd === "/profit") {
     callGAS('getLeagueTransferProfit', MY_LEAGUE_ID, targetGw, function(res) {
       if (res.success) {
         let profitHtml = `<div class='bot-header'>📈 Adu Nasib Transfer (GW ${targetGw})</div>`;
@@ -1537,8 +1537,31 @@ function processSlashCommand(commandText, gw) {
       } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Profit Error: " + res.message }); }
     });
   }
+  else if (cmd === "/trendchip") {
+    callGAS('getLeagueCaptains', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let trendHtml = `<div class='bot-header'>📊 Trend Chip Liga (GW ${targetGw})</div>`;
+        if (res.chips.length === 0) {
+          trendHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada chip yang dimainkan di GW ini.</i>";
+        } else {
+          let chipCounts = {};
+          // Hitung jumlah tiap chip
+          res.chips.forEach(c => {
+            let chipName = c.chip.toUpperCase();
+            chipCounts[chipName] = (chipCounts[chipName] || 0) + 1;
+          });
+          // Urutkan dari yang terbanyak
+          let sortedChips = Object.keys(chipCounts).sort((a,b) => chipCounts[b] - chipCounts[a]);
+          sortedChips.forEach(chip => {
+            trendHtml += `<div class='bot-row'><span>Chip <b>${chip}</b></span> <strong style="color:#33ccff;">${chipCounts[chip]} manajer</strong></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: trendHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Trend Chip Error: " + res.message }); }
+    });
+  }
   else {
-    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit" });
+    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /trendchip" });
   }
 }  // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
@@ -1663,6 +1686,7 @@ function processSlashCommand(commandText, gw) {
       { cmd: "/profit", desc: "Cek keuntungan transfer minggu ini (Poin Masuk dikurangi Poin Keluar).", out: "📈 Adu Nasib Transfer: In 15 | Out 2 📈 +13" },
       { cmd: "/captain", desc: "Statistik pemain mana yang paling banyak dikaptenin di liga.", out: "👑 Captaincy Stats: Haaland (8 manajer), Salah (2 manajer)" },
       { cmd: "/chips", desc: "Melihat siapa yang mengaktifkan Chip minggu ini.", out: "🃏 Active Chips: Joko (WILDCARD)" },
+      { cmd: "/trendchip", desc: "Menampilkan jumlah dan jenis chip yang paling banyak dipakai manajer.", out: "📊 Trend Chip: WILDCARD (5 manajer)" },
       { cmd: "/diff", desc: "Cari pemain 'Differential' yang dimiliki <= 2 orang di liga.", out: "💎 Mini-League Differentials: Mbeumo (Owned by 1)" },
       { cmd: "/h2h @Nama", desc: "Bandingkan langsung poin dan rank total kamu vs rival.", out: "⚔️ H2H BATTLE: Tim Kamu (50 Pts) vs Tim Budi (42 Pts)" }
     ];
