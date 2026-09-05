@@ -1537,30 +1537,24 @@ function processSlashCommand(commandText, gw) {
       } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Profit Error: " + res.message }); }
     });
   }
-  else if (cmd === "/trendchip") {
-    callGAS('getLeagueCaptains', MY_LEAGUE_ID, targetGw, function(res) {
+ else if (cmd === "/trendchip") {
+    callGAS('getGlobalChipUsage', targetGw, null, function(res) {
       if (res.success) {
-        let trendHtml = `<div class='bot-header'>📊 Trend Chip Liga (GW ${targetGw})</div>`;
-        if (res.chips.length === 0) {
-          trendHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada chip yang dimainkan di GW ini.</i>";
+        let trendHtml = `<div class='bot-header'>🌍 Trend Chip Global FPL (GW ${targetGw})</div>`;
+        if (!res.chips || res.chips.length === 0) {
+          trendHtml += "<i style='font-size:12px; color:#aaa;'>Data chip global belum tersedia untuk GW ini.</i>";
         } else {
-          let chipCounts = {};
-          // Hitung jumlah tiap chip
-          res.chips.forEach(c => {
-            let chipName = c.chip.toUpperCase();
-            chipCounts[chipName] = (chipCounts[chipName] || 0) + 1;
-          });
-          // Urutkan dari yang terbanyak
-          let sortedChips = Object.keys(chipCounts).sort((a,b) => chipCounts[b] - chipCounts[a]);
-          sortedChips.forEach(chip => {
-            trendHtml += `<div class='bot-row'><span>Chip <b>${chip}</b></span> <strong style="color:#33ccff;">${chipCounts[chip]} manajer</strong></div>`;
+          let sortedChips = res.chips.sort((a,b) => b.num_played - a.num_played);
+          sortedChips.forEach(c => {
+            let chipName = c.chip_name.toUpperCase();
+            let formattedNum = c.num_played.toLocaleString('id-ID'); 
+            trendHtml += `<div class='bot-row'><span>Chip <b>${chipName}</b></span> <strong style="color:#33ccff;">${formattedNum} user</strong></div>`;
           });
         }
         db.ref(`chats/gw${gw}/${tempKey}`).update({ message: trendHtml, isBotHtml: true });
       } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Trend Chip Error: " + res.message }); }
     });
-  }
-  else {
+  }  else {
     db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /trendchip" });
   }
 }  // ==========================================
