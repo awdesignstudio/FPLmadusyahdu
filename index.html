@@ -88,11 +88,11 @@
       /* === KOTAK CHAT FLEX (OTOMATIS PENUH MENGIKUTI RUANG SISA) === */
       #chat-box { flex: 1; min-height: 0; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; margin-bottom: 6px; }
       
-      /* === GELEMBUNG CHAT (GELAP ALA WHATSAPP) === */
-      .msg { max-width: 82%; padding: 10px 14px; border-radius: 12px; font-size: 15.5px; line-height: 1.4; word-wrap: break-word; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.2); }
+     /* === GELEMBUNG CHAT (GELAP ALA WHATSAPP) === */
+      .msg { max-width: 82%; min-width: 180px; padding: 10px 14px; border-radius: 12px; font-size: 15.5px; line-height: 1.4; word-wrap: break-word; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.2); }
       .msg.me { background: #005c4b; color: #ffffff; align-self: flex-end; border-bottom-right-radius: 0px; font-weight: 400; }
       .msg.others { background: #4b0053; color: #ffffff; align-self: flex-start; border-bottom-left-radius: 0px; font-weight: 400; }
-      .sender-name { font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+      .sender-name { font-size: 13px; font-weight: bold; margin-bottom: 4px; display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
       
       .msg-actions { font-size: 11px; margin-top: 6px; display: flex; gap: 10px; opacity: 0.75; justify-content: flex-end; }
       .msg-actions span { cursor: pointer; text-decoration: none; }
