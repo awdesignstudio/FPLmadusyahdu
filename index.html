@@ -447,6 +447,7 @@
     const userStatusRef = db.ref(`presence/${currentUser.managerId}`);
     const connectedRef = db.ref(".info/connected");
 
+    // 1. Deteksi bawaan Firebase saat koneksi terhubung
     connectedRef.on("value", function(snapshot) {
       if (snapshot.val() === true) {
         userStatusRef.onDisconnect().remove();
@@ -458,6 +459,20 @@
       }
     });
 
+    // 2. Deteksi sensitif layar HP (Mengatasi browser yang tertidur)
+    document.addEventListener("visibilitychange", function() {
+      if (document.visibilityState === 'visible' && currentUser.managerId) {
+        // Saat kembali ke aplikasi/layar menyala, paksa push status online
+        firebase.database().goOnline(); // Paksa bangunkan koneksi Firebase
+        userStatusRef.set({
+          teamName: currentUser.teamName,
+          managerName: currentUser.managerName,
+          lastOnline: firebase.database.ServerValue.TIMESTAMP
+        });
+      }
+    });
+
+    // 3. Menampilkan daftar online ke UI
     db.ref("presence").on("value", function(snapshot) {
       const activeUsers = snapshot.val();
       const onlineTextEl = document.getElementById("online-users-text");
@@ -481,13 +496,6 @@
       }
     });
   }
-
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-  });
-
   function installPWA() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
