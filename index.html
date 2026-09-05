@@ -1686,9 +1686,12 @@ function processSlashCommand(commandText, gw) {
     ];
 
     commands.forEach(c => {
+      // Ambil perintah utamanya saja (misal ambil "/hasil" dari "/hasil atau /skor")
+      let cmdToCopy = c.cmd.split(" ")[0];
+
       html += `
-        <div style="background:rgba(255,255,255,0.05); padding:8px 10px; border-radius:6px; margin-bottom:10px; border-left:3px solid #00ff85;">
-          <strong style="color:#fff;">${c.cmd}</strong><br>
+        <div onclick="copyAndUseCommand('${cmdToCopy}')" style="background:rgba(255,255,255,0.05); padding:8px 10px; border-radius:6px; margin-bottom:10px; border-left:3px solid #00ff85; cursor:pointer; transition:0.2s;" onmouseover="this.style.background='rgba(0, 255, 133, 0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+          <strong style="color:#fff;">${c.cmd}</strong> <span style="font-size:10px; background:#00ff85; color:#37003c; padding:2px 6px; border-radius:4px; margin-left:5px; font-weight:bold;">Klik & Copy 📋</span><br>
           <span style="font-size:12px; opacity:0.9;">${c.desc}</span><br>
           <i style="color:#ffcc00; font-size:11px; margin-top:4px; display:inline-block;">Output: ${c.out}</i>
         </div>
@@ -1697,6 +1700,21 @@ function processSlashCommand(commandText, gw) {
 
     body.innerHTML = html;
     document.getElementById('secret-cmd-modal').style.display = 'flex';
+  }
+
+  // Fungsi baru untuk Copy ke Clipboard & Paste otomatis ke input chat
+  function copyAndUseCommand(cmd) {
+    document.getElementById('secret-cmd-modal').style.display = 'none'; // Tutup buku rahasia
+    
+    // Eksekusi copy ke clipboard sistem (HP/PC)
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(cmd);
+    }
+    
+    // Langsung tempelkan ke kolom chat pengguna dan otomatis aktifkan keyboard
+    const chatInput = document.getElementById("chatMessage");
+    chatInput.value = cmd + (cmd === "/h2h" ? " @" : " "); // Tambah spasi (atau '@' khusus untuk perintah h2h)
+    chatInput.focus();
   }
 </script>
 
