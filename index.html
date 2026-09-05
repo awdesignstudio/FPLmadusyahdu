@@ -875,7 +875,7 @@
     document.getElementById("team-modal").style.display = "none";
   }
   
-  // FUNGSI BARU UNTUK MENAMPILKAN POP UP NAMA MANAGER
+ // FUNGSI BARU UNTUK MENAMPILKAN POP UP NAMA MANAGER
   function showManagersModal(title, namesArrayStr) {
     document.getElementById("manager-list-title").innerText = title;
     let html = "";
@@ -885,9 +885,30 @@
         html = "Tidak ada data.";
       } else {
         html = "<ol style='padding-left: 20px; margin-top: 0;'>";
+        let isGrouping = false;
+        
         namesArray.forEach(name => {
-          html += `<li style='margin-bottom: 6px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 4px;'><strong>${name}</strong></li>`;
+          // Deteksi jika item adalah nama Manager (diawali --- dari command jadwal)
+          if (name.startsWith("---")) {
+            if (isGrouping) html += "</li>"; // Tutup tag <li> sebelumnya jika ada
+            let cleanName = name.replace(/---/g, '').trim();
+            // Buka list baru (bernomor), buat Manager tebal (bold)
+            html += `<li style='margin-top: 12px; font-weight: bold; color: #00ff85;'>${cleanName}`;
+            isGrouping = true;
+          } 
+          // Deteksi jika item adalah nama Pemain (diawali • dari command jadwal)
+          else if (name.startsWith("•")) {
+            // Gunakan DIV agar tidak mendapat nomor baru. Font normal dan menjorok ke dalam.
+            html += `<div style='font-weight: normal; color: #ffffff; padding-left: 12px; margin-top: 5px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 5px; font-size: 13.5px;'>${name}</div>`;
+          } 
+          // Format default untuk modal lain yang tidak pakai --- atau • (seperti /captain, /fomo)
+          else {
+            if (isGrouping) { html += "</li>"; isGrouping = false; }
+            html += `<li style='margin-bottom: 6px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 4px;'><strong>${name}</strong></li>`;
+          }
         });
+        
+        if (isGrouping) html += "</li>"; // Pastikan tag penutup dipanggil di akhir loop
         html += "</ol>";
       }
     } catch (e) {
