@@ -1880,32 +1880,36 @@ function processSlashCommand(commandText, gw) {
       } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Hipster Error: " + res.message }); }
     });
   }
-  else if (cmd === "/jadwal" || cmd === "/fixture") {
+ else if (cmd === "/jadwal" || cmd === "/fixture") {
     callGAS('getLeagueFixtures', MY_LEAGUE_ID, targetGw, function(res) {
       if (res.success) {
         let jHtml = `<div class='bot-header'>📅 Jadwal & Manajer Terdampak (GW ${targetGw})</div>`;
         if (res.data.length === 0) {
           jHtml += "<i style='font-size:12px; color:#aaa;'>Jadwal belum tersedia.</i>";
         } else {
-          // Melakukan iterasi berdasarkan kelompok hari
           res.data.forEach(group => {
-            // Header Hari
             jHtml += `<div style="background:rgba(255,255,255,0.1); padding:4px 8px; margin-top:10px; font-weight:bold; font-size:12px; color:#fff; text-align:center; border-radius:4px;">${group.date}</div>`;
             
-            // Iterasi pertandingan di hari tersebut
             group.fixtures.forEach(d => {
-              jHtml += `<div style="margin-top:4px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:6px;">`;
-              jHtml += `<div style="color:#ffcc00; font-weight:bold; font-size:13px;">📺 ${d.match} <span style="color:#aaa; font-size:11px; font-weight:normal;">(🕒 ${d.time})</span></div>`;
+              jHtml += `<div style="margin-top:6px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:6px;">`;
+              jHtml += `<div style="display:flex; justify-content:space-linejoin; align-items:center;">`;
+              jHtml += `<span style="color:#ffcc00; font-weight:bold; font-size:13px;">📺 ${d.match}</span>`;
+              jHtml += `<span style="color:#aaa; font-size:11px;">🕒 ${d.time}</span>`;
+              jHtml += `</div>`;
               
-              let topManagers = d.managers.slice(0, 3);
-              if (topManagers.length > 0) {
-                let mList = topManagers.map(m => {
-                  let namesJson = JSON.stringify(m.players).replace(/"/g, '&quot;');
-                  return `<span style="cursor:pointer; color:#00ff85; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('Pemain ${m.name}', '${namesJson}')" title="Klik lihat pemain andalannya">${m.name} (${m.count})</span>`;
-                }).join(", ");
-                jHtml += `<div style="font-size:12px; color:#fff; margin-top:2px;">In action: ${mList}</div>`;
+              if (d.managers.length > 0) {
+                // Menyiapkan data keseluruhan manajer untuk dimasukkan ke dalam modal/pop-up saat diklik
+                let modalTitle = `Manajer di Laga ${d.match}`;
+                let detailedList = [];
+                d.managers.forEach(m => {
+                  detailedList.push(`--- ${m.name} (${m.team}) ---`);
+                  m.players.forEach(p => detailedList.push(`• ${p}`));
+                });
+                let managersJson = JSON.stringify(detailedList).replace(/"/g, '&quot;');
+                
+                jHtml += `<div style="font-size:12px; margin-top:3px;"><span style="cursor:pointer; color:#00ff85; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('${modalTitle}', '${managersJson}')" title="Klik untuk melihat rincian manajer & pemain">👥 ${d.managers.length} manager terlibat</span></div>`;
               } else {
-                jHtml += `<div style="font-size:12px; color:#aaa; margin-top:2px;"><i>Tidak ada manajer yang pakai pemain di laga ini.</i></div>`;
+                jHtml += `<div style="font-size:11px; color:#aaa; margin-top:2px;"><i>Tidak ada manajer yang pakai pemain di laga ini.</i></div>`;
               }
               jHtml += `</div>`;
             });
