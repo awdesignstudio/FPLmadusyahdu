@@ -205,11 +205,22 @@
 
 <div class="container" id="app-container">
   
-  <div class="modal-overlay" id="team-modal">
+ <div class="modal-overlay" id="team-modal">
     <div class="modal-content">
       <h3 id="modal-title">Memuat Tim...</h3>
       <div id="modal-body" style="text-align: left;">Silakan tunggu...</div>
       <button class="close-btn" onclick="closeModal()">Tutup</button>
+    </div>
+  </div>
+  
+  <!-- MODAL BARU UNTUK LIST NAMA MANAGER -->
+  <div class="modal-overlay" id="manager-list-modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <h3 id="manager-list-title">Daftar Manager</h3>
+      <div id="manager-list-body" style="text-align: left; max-height: 50vh; overflow-y: auto; color: #fff; font-size: 14px; line-height: 1.6;">
+        <!-- List nama akan dirender di sini -->
+      </div>
+      <button class="close-btn" onclick="document.getElementById('manager-list-modal').style.display='none'">Tutup</button>
     </div>
   </div>
 
@@ -808,6 +819,28 @@
   function closeModal() {
     document.getElementById("team-modal").style.display = "none";
   }
+  
+  // FUNGSI BARU UNTUK MENAMPILKAN POP UP NAMA MANAGER
+  function showManagersModal(title, namesArrayStr) {
+    document.getElementById("manager-list-title").innerText = title;
+    let html = "";
+    try {
+      let namesArray = JSON.parse(namesArrayStr);
+      if (namesArray.length === 0) {
+        html = "Tidak ada data.";
+      } else {
+        html = "<ol style='padding-left: 20px; margin-top: 0;'>";
+        namesArray.forEach(name => {
+          html += `<li style='margin-bottom: 6px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 4px;'><strong>${name}</strong></li>`;
+        });
+        html += "</ol>";
+      }
+    } catch (e) {
+      html = "Gagal memuat data nama.";
+    }
+    document.getElementById("manager-list-body").innerHTML = html;
+    document.getElementById("manager-list-modal").style.display = "flex";
+  }
 
   function autoResizeTextarea(textarea) {
     if (textarea.value === '') {
@@ -1360,21 +1393,41 @@ function processSlashCommand(commandText, gw) {
             botText += "<i style='font-size:12px; color:#aaa;'>[API Restricted] Data unavailable. Picks are hidden until the Gameweek deadline passes.</i>";
           }
           for (let cap in res.captains) {
-            botText += `<div class='bot-row'><span>${cap}</span> <strong>${res.captains[cap]} managers</strong></div>`;
+            let capData = res.captains[cap];
+            // Cek apakah API GAS mengembalikan array (nama2) atau sekadar angka integer
+            let isArray = Array.isArray(capData);
+            let count = isArray ? capData.length : capData;
+            
+            // Encode ke string JSON agar bisa dipassing ke fungsi onclick
+            let namesJson = isArray ? JSON.stringify(capData).replace(/"/g, '&quot;') : JSON.stringify(["Fitur nama belum didukung backend. Ubah kode GAS agar mengembalikan array nama!"]).replace(/"/g, '&quot;');
+            
+            botText += `<div class='bot-row'><span>${cap}</span> <strong style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Kapten: ${cap}', '${namesJson}')" title="Klik untuk lihat daftar manager">${count} managers</strong></div>`;
           }
         } else {
           botText = "<div class='bot-header'>🃏 Active Chips Played (GW " + targetGw + ")</div>";
           if (res.chips.length === 0) botText += "<i style='font-size:12px; color:#aaa;'>No chips played by any manager this Gameweek.</i>";
+          
+          // Kelompokkan data chip berdasarkan jenisnya (agar outputnya jadi format "jumlah manager")
+          let chipGroups = {};
           res.chips.forEach(c => {
-            botText += `<div class='bot-row'><span>${c.team}</span> <strong>${c.chip.toUpperCase()}</strong></div>`;
+            let chipName = c.chip.toUpperCase();
+            if (!chipGroups[chipName]) chipGroups[chipName] = [];
+            chipGroups[chipName].push(c.team); // Masukkan nama tim ke dalam array chip tersebut
           });
+          
+          for (let chip in chipGroups) {
+            let count = chipGroups[chip].length;
+            let namesJson = JSON.stringify(chipGroups[chip]).replace(/"/g, '&quot;');
+            
+            botText += `<div class='bot-row'><span>Chip: ${chip}</span> <strong style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Manager yang pakai chip ${chip}', '${namesJson}')" title="Klik untuk lihat daftar manager">${count} managers</strong></div>`;
+          }
         }
         db.ref(`chats/gw${gw}/${tempKey}`).update({ message: botText, isBotHtml: true });
       } else {
         db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "API Request Failed. Report: " + (res.message || "Unknown Error") });
       }
     });
-  } 
+  }
   else if (cmd === "/h2h") {
     // Ambil nama target (bisa berupa teks setelah /h2h, di-join kembali jika ada spasi sebelum argumen GW)
     let nameArgs = args.slice(1);
@@ -1407,7 +1460,11 @@ function processSlashCommand(commandText, gw) {
           diffHtml += "<i style='font-size:12px; color:#aaa;'>Tidak ada differential unik yang ditemukan di bawah ambang batas.</i>";
         } else {
           res.diffs.forEach(d => {
-            diffHtml += `<div class='bot-row'><span><b>${d.name}</b> (${d.team})</span> <span>Owned by <b>${d.count}</b> manager(s) <small>(${d.globalOwnership}% global)</small></span></div>`;
+            // Cek apakah data dari GAS sudah berisi array nama owners
+            let owners = Array.isArray(d.owners) ? d.owners : ["Fitur nama belum didukung backend. Ubah API GAS agar mengirim array 'owners'!"];
+            let namesJson = JSON.stringify(owners).replace(/"/g, '&quot;');
+            
+            diffHtml += `<div class='bot-row'><span><b>${d.name}</b> (${d.team})</span> <span>Owned by <b style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Pemilik ${d.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${d.count} manager(s)</b> <small>(${d.globalOwnership}% global)</small></span></div>`;
           });
         }
         db.ref(`chats/gw${gw}/${tempKey}`).update({ message: diffHtml, isBotHtml: true });
@@ -1504,7 +1561,11 @@ function processSlashCommand(commandText, gw) {
       if (res.success) {
         let tempHtml = `<div class='bot-header'>🐑 Pemain Template Liga (GW ${targetGw})</div>`;
         res.data.forEach(t => {
-          tempHtml += `<div class='bot-row'><span><b>${t.name}</b> <small>(${t.pos})</small></span> <span style="color:#33ccff; font-weight:bold;">${t.ownership}%</span></div>`;
+          // Cek apakah data dari GAS sudah berisi array nama owners
+          let owners = Array.isArray(t.owners) ? t.owners : ["Fitur nama belum didukung backend. Ubah API GAS agar mengirim array 'owners'!"];
+          let namesJson = JSON.stringify(owners).replace(/"/g, '&quot;');
+          
+          tempHtml += `<div class='bot-row'><span><b>${t.name}</b> <small>(${t.pos})</small></span> <span style="cursor:pointer; color:#33ccff; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('Pemilik ${t.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${t.ownership}%</span></div>`;
         });
         tempHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Yang nggak punya mereka fiks orang gila (atau hipster) 🤓</div>`;
         db.ref(`chats/gw${gw}/${tempKey}`).update({ message: tempHtml, isBotHtml: true });
