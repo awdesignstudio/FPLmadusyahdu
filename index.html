@@ -175,6 +175,15 @@
 
       .reaction-picker-btn { font-size: 11px; opacity: 0.7; cursor: pointer; text-decoration: underline; margin-top: 4px; display: inline-block; color: #d1b3d6; }
       .reaction-picker-btn:hover { opacity: 1; color: #ffffff; }
+
+      /* === MODAL PIN & NUMPAD === */
+      #pin-display { font-size: 28px; letter-spacing: 12px; text-align: center; margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; min-height: 35px; color: #00ff85; border: 1px solid #4b0053; }
+      .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 250px; margin: 0 auto; }
+      .numpad-btn { background: #4b0053; color: white; font-size: 22px; font-weight: bold; border: 1px solid #a375aa; border-radius: 8px; padding: 15px 0; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+      .numpad-btn:active { background: #00c774; border-color: #00c774; transform: scale(0.95); }
+      .numpad-btn.action-btn { background: #ff4a4a; border-color: #ff4a4a; font-size: 18px; }
+      .numpad-btn.action-btn:active { background: #e03838; }
+      .numpad-btn.close-btn-pad { background: #555; border-color: #555; font-size: 18px; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -219,6 +228,27 @@
         <!-- Konten digenerate dari JS -->
       </div>
       <button class="close-btn" onclick="document.getElementById('secret-cmd-modal').style.display='none'" style="margin-top:10px; padding:10px;">Tutup Buku</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="pin-modal">
+    <div class="modal-content" style="max-width: 320px; padding: 25px 20px;">
+      <h3 style="font-size: 16px; margin-top: 0; border-bottom: none; color: #fff;">Masukkan PIN Admin</h3>
+      <div id="pin-display"></div>
+      <div class="numpad">
+        <div class="numpad-btn" onclick="pressPin('1')">1</div>
+        <div class="numpad-btn" onclick="pressPin('2')">2</div>
+        <div class="numpad-btn" onclick="pressPin('3')">3</div>
+        <div class="numpad-btn" onclick="pressPin('4')">4</div>
+        <div class="numpad-btn" onclick="pressPin('5')">5</div>
+        <div class="numpad-btn" onclick="pressPin('6')">6</div>
+        <div class="numpad-btn" onclick="pressPin('7')">7</div>
+        <div class="numpad-btn" onclick="pressPin('8')">8</div>
+        <div class="numpad-btn" onclick="pressPin('9')">9</div>
+        <div class="numpad-btn action-btn" onclick="clearPin()">DEL</div>
+        <div class="numpad-btn" onclick="pressPin('0')">0</div>
+        <div class="numpad-btn close-btn-pad" onclick="closePinModal()">✕</div>
+      </div>
     </div>
   </div>
 
@@ -1564,14 +1594,48 @@ function processSlashCommand(commandText, gw) {
   // ==========================================
   // FITUR RAHASIA: BUKU PANDUAN SLASH COMMAND
   // ==========================================
+  let secretPinInput = "";
+
   function checkSecretPin() {
-    showCustomPrompt("Akses Rahasia", "Masukkan PIN untuk membuka buku panduan Command:", "", function(pin) {
-      if (pin === "121212") {
-        openSecretCommandBook();
-      } else if (pin !== null && pin.trim() !== "") {
-        showCustomAlert("Akses Ditolak", "PIN salah! Anda tidak memiliki akses.");
-      }
-    });
+    secretPinInput = "";
+    updatePinDisplay();
+    document.getElementById('pin-modal').style.display = 'flex';
+  }
+
+  function pressPin(num) {
+    if (secretPinInput.length < 6) {
+      secretPinInput += num;
+      updatePinDisplay();
+    }
+    
+    // Otomatis cek saat sudah 6 digit
+    if (secretPinInput.length === 6) {
+      setTimeout(() => {
+        if (secretPinInput === "121212") {
+          closePinModal();
+          openSecretCommandBook();
+        } else {
+          closePinModal();
+          showCustomAlert("Akses Ditolak", "PIN salah! Anda tidak memiliki akses admin.");
+        }
+      }, 150); // Jeda sepersekian detik agar titik PIN terakhir terlihat sebelum pop-up
+    }
+  }
+
+  function clearPin() {
+    secretPinInput = secretPinInput.slice(0, -1);
+    updatePinDisplay();
+  }
+
+  function closePinModal() {
+    document.getElementById('pin-modal').style.display = 'none';
+    secretPinInput = "";
+  }
+
+  function updatePinDisplay() {
+    const display = document.getElementById('pin-display');
+    // Mengubah angka menjadi simbol bullet (●)
+    display.innerText = secretPinInput.replace(/./g, '●') || '';
   }
 
   function openSecretCommandBook() {
