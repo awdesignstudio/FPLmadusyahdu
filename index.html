@@ -1880,8 +1880,39 @@ function processSlashCommand(commandText, gw) {
       } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Hipster Error: " + res.message }); }
     });
   }
+  else if (cmd === "/jadwal" || cmd === "/fixture") {
+    callGAS('getLeagueFixtures', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let jHtml = `<div class='bot-header'>📅 Jadwal & Manajer Terdampak (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          jHtml += "<i style='font-size:12px; color:#aaa;'>Jadwal belum tersedia.</i>";
+        } else {
+          res.data.forEach(d => {
+            jHtml += `<div style="margin-top:8px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:6px;">`;
+            jHtml += `<div style="color:#ffcc00; font-weight:bold; font-size:13px;">📺 ${d.match}</div>`;
+            jHtml += `<div style="color:#aaa; font-size:11px; margin-bottom:4px;">🕒 ${d.kickoff}</div>`;
+            
+            // Tampilkan Top 3 manajer yang paling banyak pemainnya di laga ini
+            let topManagers = d.managers.slice(0, 3);
+            if (topManagers.length > 0) {
+              let mList = topManagers.map(m => {
+                let namesJson = JSON.stringify(m.players).replace(/"/g, '&quot;');
+                // Kita gunakan fungsi pop-up yang sudah ada untuk memunculkan daftar nama pemainnya!
+                return `<span style="cursor:pointer; color:#00ff85; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('Pemain ${m.name}', '${namesJson}')" title="Klik lihat pemain andalannya">${m.name} (${m.count})</span>`;
+              }).join(", ");
+              jHtml += `<div style="font-size:12px; color:#fff;">Paling deg-degan: ${mList}</div>`;
+            } else {
+              jHtml += `<div style="font-size:12px; color:#aaa;"><i>Tidak ada manajer yang pakai pemain di laga ini.</i></div>`;
+            }
+            jHtml += `</div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: jHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Jadwal Error: " + res.message }); }
+    });
+  }
   else {
-    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /fdr, /or, /arsenal, /bank, /vice, /boncos, /form, /fomo, /bucin, /cuan, /hoki, /nyesel, /roket, /hipster" });
+    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /fdr, /or, /arsenal, /bank, /vice, /boncos, /form, /fomo, /bucin, /cuan, /hoki, /nyesel, /roket, /hipster, /jadwal" });
   }
 } // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
@@ -2020,8 +2051,9 @@ function processSlashCommand(commandText, gw) {
       { cmd: "/cuan atau /investor", desc: "Adu profit/loss nilai tim dibandingkan modal awal (£100.0M).", out: "📈 Adu Cuan: Crazy Rich FC 📈 +£2.5M" },
       { cmd: "/hoki atau /autosub", desc: "Cek penyelamatan dramatis dari poin pemain cadangan (Auto-sub).", out: "🍀 Penyelamatan Auto-Sub: Budi (+10 pts dari Smith Rowe)" },
       { cmd: "/nyesel", desc: "Lacak manajer yang salah pilih Kapten (kalah poin dari Vice-nya).", out: "🤦 Tragedi Salah Kapten: Andi (Cap 2 pts vs Vice 15 pts)" },
-      { cmd: "/roket atau /longsor", desc: "Adu perubahan Peringkat Dunia (OR) naik/turun minggu ini.", out: "🚀 Adu Tanda Panah: Joko 🚀 +50.000 rank" },
+     { cmd: "/roket atau /longsor", desc: "Adu perubahan Peringkat Dunia (OR) naik/turun minggu ini.", out: "🚀 Adu Tanda Panah: Joko 🚀 +50.000 rank" },
       { cmd: "/hipster", desc: "Kalkulasi rata-rata kepemilikan global 11 pemain inti. Makin kecil makin hipster.", out: "🕶️ Pasukan Anti-Template: Tono (Rata-rata 5.2%)" },
+      { cmd: "/jadwal atau /fixture", desc: "Cek jadwal tanding (WIB) & lihat manajer mana yang paling deg-degan.", out: "📅 Jadwal: ARS vs LIV | Paling deg-degan: Budi (4)" },
       { cmd: "/h2h @Nama", desc: "Bandingkan langsung poin dan rank total kamu vs rival.", out: "⚔️ H2H BATTLE: Tim Kamu (50 Pts) vs Tim Budi (42 Pts)" }
     ];
 
