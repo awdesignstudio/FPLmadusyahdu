@@ -100,7 +100,8 @@
       .input-area textarea { flex: 1; margin: 0; font-size: 15px; padding: 10px 12px; border: 1px solid #4b0053; border-radius: 10px; background: #2a0030; color: #fff; resize: none; height: 40px; max-height: 120px; line-height: 1.3; overflow-y: auto; box-sizing: border-box; transition: border-color 0.2s; }
       .input-area textarea:focus { outline: none; border: 1px solid #00ff85; }
       .input-area textarea::placeholder { color: #aaa; }
-      #send-btn { padding: 0 16px; height: 40px; font-size: 15px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+      #send-btn { width: 44px; height: 44px; padding: 0; margin: 0; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0; background: #00c774; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+      #send-btn:active { transform: scale(0.9); }
       
       .reply-preview { display: none; background: rgba(0, 92, 75, 0.6); border-left: 4px solid #00ff85; padding: 8px 10px; border-radius: 6px; font-size: 12px; position: relative; }
       .reply-preview-title { color: #00ff85; font-weight: bold; margin-bottom: 3px; }
@@ -330,7 +331,7 @@
         </div>
         <div class="input-row">
           <textarea id="chatMessage" placeholder="Ketik pesan... 😊" rows="1" oninput="autoResizeTextarea(this); handleMentionInput(this)"></textarea>
-          <button id="send-btn" onclick="sendMessage()">Kirim</button>
+          <button id="send-btn" onclick="sendMessage()" title="Kirim">✈️</button>
         </div>
       </div>
     </div>
