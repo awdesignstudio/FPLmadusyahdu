@@ -1755,7 +1755,7 @@ function processSlashCommand(commandText, gw) {
       } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Vice Error: " + res.message }); }
     });
   }
-  else if (cmd === "/boncos" || cmd === "/total_minus") {
+ else if (cmd === "/boncos" || cmd === "/total_minus") {
     callGAS('getLeagueTotalMinus', MY_LEAGUE_ID, null, function(res) {
       if (res.success) {
         let mHtml = `<div class='bot-header'>📉 Total Poin Dikorbankan (Minus Transfer)</div>`;
@@ -1767,8 +1767,121 @@ function processSlashCommand(commandText, gw) {
       } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Boncos Error: " + res.message }); }
     });
   }
+  else if (cmd === "/form" || cmd === "/onfire") {
+    callGAS('getLeagueForm', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let fHtml = `<div class='bot-header'>🔥 Detektor Manajer Gacor (3 GW Terakhir)</div>`;
+        res.data.forEach(d => {
+          fHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#ffcc00;">${d.formPts} pts</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: fHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Form Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/fomo" || cmd === "/latah") {
+    callGAS('getLeagueFomo', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let fomoHtml = `<div class='bot-header'>🐑 Tren Ikut-ikutan / Transfer In (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          fomoHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada pergerakan transfer masuk yang masif.</i>";
+        } else {
+          res.data.forEach(d => {
+            let namesJson = JSON.stringify(d.owners).replace(/"/g, '&quot;');
+            fomoHtml += `<div class='bot-row'><span><b>${d.name}</b> <small>(${d.team})</small></span> <span>Dibeli <strong style="cursor:pointer; color:#33ccff; text-decoration:underline;" onclick="showManagersModal('Latah beli ${d.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${d.count} manager</strong></span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: fomoHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Fomo Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/bucin" || cmd === "/fansboy") {
+    callGAS('getLeagueBucin', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let bHtml = `<div class='bot-header'>😍 Deteksi Fans Garis Keras (GW ${targetGw})</div>`;
+        bHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Manajer yang pakai maksimal 3 pemain dari klub yang sama di Starting XI.</div>`;
+        if (res.data.length === 0) {
+          bHtml += "<i style='font-size:12px; color:#00ff85;'>Wah sehat, skuad di liga ini sangat bervariasi!</i>";
+        } else {
+          res.data.forEach(d => {
+            bHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.name}</b> <br><small>(${d.team})</small></span> <span style="font-weight:bold; font-size:12px; color:#ff4a4a; text-align:right;">Triple<br>${d.club}</span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: bHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Bucin Error: " + res.message }); }
+    });
+  }
+ else if (cmd === "/cuan" || cmd === "/investor") {
+    callGAS('getLeagueCuan', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let cHtml = `<div class='bot-header'>📈 Adu Cuan Profit/Loss Tim (GW ${targetGw})</div>`;
+        res.data.forEach(d => {
+          let color = d.profit > 0 ? "#00ff85" : (d.profit < 0 ? "#ff4a4a" : "#aaa");
+          let icon = d.profit > 0 ? "📈 +" : (d.profit < 0 ? "📉 " : "➖ ");
+          cHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:${color};">${icon}£${Math.abs(d.profit).toFixed(1)}M</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: cHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Cuan Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/hoki" || cmd === "/autosub") {
+    callGAS('getLeagueHoki', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let hHtml = `<div class='bot-header'>🍀 Penyelamatan Auto-Sub (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          hHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada auto-sub dramatis yang menghasilkan poin besar.</i>";
+        } else {
+          res.data.forEach(d => {
+            hHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; color:#00ff85; text-align:right;">Masuk: ${d.playerIn}<br>+${d.points} pts</span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: hHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Hoki Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/nyesel") {
+    callGAS('getLeagueNyesel', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let nHtml = `<div class='bot-header'>🤦 Tragedi Salah Kapten (GW ${targetGw})</div>`;
+        nHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Manajer yang poin Kaptennya dikalahkan telak oleh poin Vice-nya.</div>`;
+        if (res.data.length === 0) {
+          nHtml += "<i style='font-size:12px; color:#00ff85;'>Luar biasa! Semua pilihan kapten sudah tepat sasaran.</i>";
+        } else {
+          res.data.forEach(d => {
+            nHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#ff4a4a;">Cap: ${d.cap} (${d.capPts})</span><br><span style="color:#33ccff;">Vice: ${d.vice} (${d.vicePts})</span></span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: nHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Nyesel Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/roket" || cmd === "/longsor") {
+    callGAS('getLeagueArrows', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let aHtml = `<div class='bot-header'>🚀 Adu Tanda Panah Peringkat (GW ${targetGw})</div>`;
+        res.data.forEach(d => {
+          let color = d.diff > 0 ? "#00ff85" : (d.diff < 0 ? "#ff4a4a" : "#aaa");
+          let icon = d.diff > 0 ? "🚀 +" : (d.diff < 0 ? "🔻 " : "➖ ");
+          aHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:${color};">${icon}${Math.abs(d.diff).toLocaleString('id-ID')}</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: aHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Arrows Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/hipster") {
+    callGAS('getLeagueHipster', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let hipHtml = `<div class='bot-header'>🕶️ Pasukan Anti-Template (GW ${targetGw})</div>`;
+        hipHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Rata-rata persentase kepemilikan global 11 pemain inti.</div>`;
+        res.data.forEach((d, i) => {
+          let icon = i === 0 ? "👑" : "🔹";
+          hipHtml += `<div class='bot-row'><span>${icon} <b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#00ff85;">${d.avgOwnership}%</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: hipHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Hipster Error: " + res.message }); }
+    });
+  }
   else {
-    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /trendchip, /fdr, /or, /arsenal, /bank, /vice, /boncos" });
+    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /fdr, /or, /arsenal, /bank, /vice, /boncos, /form, /fomo, /bucin, /cuan, /hoki, /nyesel, /roket, /hipster" });
   }
 } // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
@@ -1898,9 +2011,17 @@ function processSlashCommand(commandText, gw) {
       { cmd: "/fdr", desc: "Menganalisis jadwal Starting XI tiap manajer (Mudah/Normal/Susah).", out: "📅 Analisis Jadwal: Budi 🟩 8 ⬜ 2 🟥 1" },
       { cmd: "/or atau /global", desc: "Pamer Peringkat Dunia (Overall Rank) tiap manajer.", out: "🌍 Peringkat Dunia: Crazy Rich FC 150.000" },
       { cmd: "/arsenal atau /sisa_chip", desc: "Cek chip apa saja yang BELUM dipakai musuh.", out: "🎒 Sisa Persenjataan: Budi (WC, BB, TC, FH)" },
-      { cmd: "/bank atau /pelit", desc: "Intip sisa saldo uang di bank yang belum dibelanjakan.", out: "🏦 Adu Saldo Nganggur: Andi £3.5M" },
+    { cmd: "/bank atau /pelit", desc: "Intip sisa saldo uang di bank yang belum dibelanjakan.", out: "🏦 Adu Saldo Nganggur: Andi £3.5M" },
       { cmd: "/vice", desc: "Lihat siapa pemain Wakil Kapten favorit minggu ini.", out: "🛡️ Vice Captaincy Stats: Saka (5 managers)" },
       { cmd: "/boncos atau /total_minus", desc: "Hitung total poin yang sudah dikorbankan untuk transfer sejak GW 1.", out: "📉 Total Poin Dikorbankan: Joko -28 pts" },
+      { cmd: "/form atau /onfire", desc: "Deteksi siapa yang paling gacor khusus dalam 3 GW terakhir.", out: "🔥 Detektor Manajer Gacor: Budi 210 pts" },
+      { cmd: "/fomo atau /latah", desc: "Lihat tren pemain apa yang paling banyak dibeli manajer di GW ini.", out: "🐑 Tren Ikut-ikutan: Palmer (Dibeli 5 manager)" },
+    { cmd: "/bucin atau /fansboy", desc: "Cek siapa yang nimbun 3 pemain dari 1 klub yang sama di Starting XI.", out: "😍 Deteksi Fans: Joko (Triple Man City)" },
+      { cmd: "/cuan atau /investor", desc: "Adu profit/loss nilai tim dibandingkan modal awal (£100.0M).", out: "📈 Adu Cuan: Crazy Rich FC 📈 +£2.5M" },
+      { cmd: "/hoki atau /autosub", desc: "Cek penyelamatan dramatis dari poin pemain cadangan (Auto-sub).", out: "🍀 Penyelamatan Auto-Sub: Budi (+10 pts dari Smith Rowe)" },
+      { cmd: "/nyesel", desc: "Lacak manajer yang salah pilih Kapten (kalah poin dari Vice-nya).", out: "🤦 Tragedi Salah Kapten: Andi (Cap 2 pts vs Vice 15 pts)" },
+      { cmd: "/roket atau /longsor", desc: "Adu perubahan Peringkat Dunia (OR) naik/turun minggu ini.", out: "🚀 Adu Tanda Panah: Joko 🚀 +50.000 rank" },
+      { cmd: "/hipster", desc: "Kalkulasi rata-rata kepemilikan global 11 pemain inti. Makin kecil makin hipster.", out: "🕶️ Pasukan Anti-Template: Tono (Rata-rata 5.2%)" },
       { cmd: "/h2h @Nama", desc: "Bandingkan langsung poin dan rank total kamu vs rival.", out: "⚔️ H2H BATTLE: Tim Kamu (50 Pts) vs Tim Budi (42 Pts)" }
     ];
 
