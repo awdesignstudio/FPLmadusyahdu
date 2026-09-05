@@ -34,11 +34,12 @@
       .league-title { color: #00c774; font-size: 12px; display: block; font-weight: bold; margin-top: 2px; }
       
       /* APP HEADER BARU (FLEXBOX) */
-      .app-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00c774; padding-bottom: 10px; margin-bottom: 10px; }
+      .app-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00c774; padding-bottom: 10px; margin-bottom: 10px; position: relative; }
+      .header-titles { text-align: center; position: absolute; left: 50%; transform: translateX(-50%); width: max-content; line-height: 1.2; z-index: 0; pointer-events: none; }
       .header-titles h2 { margin: 0; color: #ffffff; font-size: 18px; white-space: nowrap; }
 
       /* TOMBOL NAVIGASI HEADER KIRI-KANAN (PENGGANTI TAB) */
-      .nav-btn { background: rgba(255,255,255,0.05); color: #a375aa; border: 1px solid #4b0053; width: 42px; height: 42px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; font-size: 20px; transition: all 0.2s; position: relative; }
+      .nav-btn { background: rgba(255,255,255,0.05); color: #a375aa; border: 1px solid rgba(0, 255, 133, 0.4); width: 42px; height: 42px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; font-size: 20px; transition: all 0.2s; position: relative; z-index: 1; }
       .nav-btn.active { background: #00c774; color: #ffffff; border-color: #00c774; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
       .nav-btn:hover:not(.active) { background: rgba(0, 199, 116, 0.2); color: #00c774; }
 
@@ -81,7 +82,7 @@
       .chat-controls, .dashboard-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 6px; font-size: 13px; }
       
       /* === KOTAK CHAT FLEX (OTOMATIS PENUH MENGIKUTI RUANG SISA) === */
-      #chat-box { flex: 1; min-height: 0; border: 1px solid #4b0053; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; margin-bottom: 6px; }
+      #chat-box { flex: 1; min-height: 0; border: 1px solid #00ff85; border-radius: 8px; background: #1f0024; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; margin-bottom: 6px; }
       
       /* === GELEMBUNG CHAT (GELAP ALA WHATSAPP) === */
       .msg { max-width: 82%; padding: 10px 14px; border-radius: 12px; font-size: 15.5px; line-height: 1.4; word-wrap: break-word; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.2); }
