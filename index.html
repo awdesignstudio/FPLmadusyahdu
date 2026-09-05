@@ -38,7 +38,7 @@
       .header-titles h2 { margin: 0; color: #ffffff; font-size: 18px; white-space: nowrap; }
 
       /* TOMBOL NAVIGASI HEADER KIRI-KANAN (PENGGANTI TAB) */
-      .nav-btn { background: rgba(255,255,255,0.05); color: #a375aa; border: 1px solid #4b0053; padding: 8px 0; width: 105px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; transition: all 0.2s; position: relative; white-space: nowrap; }
+      .nav-btn { background: rgba(255,255,255,0.05); color: #a375aa; border: 1px solid #4b0053; width: 42px; height: 42px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; font-size: 20px; transition: all 0.2s; position: relative; }
       .nav-btn.active { background: #00c774; color: #ffffff; border-color: #00c774; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
       .nav-btn:hover:not(.active) { background: rgba(0, 199, 116, 0.2); color: #00c774; }
 
@@ -268,8 +268,8 @@
     
     <!-- HEADER APP BARU (Tombol Kiri, Judul Tengah, Tombol Kanan) -->
     <div class="app-header">
-      <button class="nav-btn active" id="btn-tab-chat" onclick="switchTab('chat')">
-        💬 Chat <span class="unread-badge" id="chat-badge"></span>
+      <button class="nav-btn active" id="btn-tab-chat" onclick="switchTab('chat')" title="Buka Chat">
+        💬<span class="unread-badge" id="chat-badge"></span>
       </button>
       
       <div class="header-titles">
@@ -277,8 +277,8 @@
         <span id="display-league-name" class="league-title"></span>
       </div>
       
-      <button class="nav-btn" id="btn-tab-dashboard" onclick="switchTab('dashboard')">
-        📊 Klasemen
+      <button class="nav-btn" id="btn-tab-dashboard" onclick="switchTab('dashboard')" title="Buka Klasemen">
+        📊
       </button>
     </div>
 
