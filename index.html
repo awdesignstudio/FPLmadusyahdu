@@ -1470,12 +1470,12 @@ function processSlashCommand(commandText, gw) {
           }
           for (let cap in res.captains) {
             let capData = res.captains[cap];
-            // Cek apakah API GAS mengembalikan array (nama2) atau sekadar angka integer
+           // Cek apakah API GAS mengembalikan array (nama2) atau sekadar angka integer
             let isArray = Array.isArray(capData);
             let count = isArray ? capData.length : capData;
             
             // Encode ke string JSON agar bisa dipassing ke fungsi onclick
-            let namesJson = isArray ? JSON.stringify(capData).replace(/"/g, '&quot;') : JSON.stringify(["Fitur nama belum didukung backend. Ubah kode GAS agar mengembalikan array nama!"]).replace(/"/g, '&quot;');
+            let namesJson = isArray ? JSON.stringify(capData).replace(/"/g, '&quot;').replace(/'/g, "\\'") : JSON.stringify(["Fitur nama belum didukung backend. Ubah kode GAS agar mengembalikan array nama!"]).replace(/"/g, '&quot;').replace(/'/g, "\\'");
             
             botText += `<div class='bot-row'><span>${cap}</span> <strong style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Kapten: ${cap}', '${namesJson}')" title="Klik untuk lihat daftar manager">${count} managers</strong></div>`;
           }
@@ -1491,9 +1491,9 @@ function processSlashCommand(commandText, gw) {
             chipGroups[chipName].push(c.team); // Masukkan nama tim ke dalam array chip tersebut
           });
           
-          for (let chip in chipGroups) {
+      for (let chip in chipGroups) {
             let count = chipGroups[chip].length;
-            let namesJson = JSON.stringify(chipGroups[chip]).replace(/"/g, '&quot;');
+            let namesJson = JSON.stringify(chipGroups[chip]).replace(/"/g, '&quot;').replace(/'/g, "\\'");
             
             botText += `<div class='bot-row'><span>Chip: ${chip}</span> <strong style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Manager yang pakai chip ${chip}', '${namesJson}')" title="Klik untuk lihat daftar manager">${count} managers</strong></div>`;
           }
@@ -1536,9 +1536,9 @@ function processSlashCommand(commandText, gw) {
           diffHtml += "<i style='font-size:12px; color:#aaa;'>Tidak ada differential unik yang ditemukan di bawah ambang batas.</i>";
         } else {
           res.diffs.forEach(d => {
-            // Cek apakah data dari GAS sudah berisi array nama owners
+           // Cek apakah data dari GAS sudah berisi array nama owners
             let owners = Array.isArray(d.owners) ? d.owners : ["Fitur nama belum didukung backend. Ubah API GAS agar mengirim array 'owners'!"];
-            let namesJson = JSON.stringify(owners).replace(/"/g, '&quot;');
+            let namesJson = JSON.stringify(owners).replace(/"/g, '&quot;').replace(/'/g, "\\'");
             
             diffHtml += `<div class='bot-row'><span><b>${d.name}</b> (${d.team})</span> <span>Owned by <b style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Pemilik ${d.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${d.count} manager(s)</b> <small>(${d.globalOwnership}% global)</small></span></div>`;
           });
@@ -1637,9 +1637,9 @@ function processSlashCommand(commandText, gw) {
       if (res.success) {
         let tempHtml = `<div class='bot-header'>🐑 Pemain Template Liga (GW ${targetGw})</div>`;
         res.data.forEach(t => {
-          // Cek apakah data dari GAS sudah berisi array nama owners
+         // Cek apakah data dari GAS sudah berisi array nama owners
           let owners = Array.isArray(t.owners) ? t.owners : ["Fitur nama belum didukung backend. Ubah API GAS agar mengirim array 'owners'!"];
-          let namesJson = JSON.stringify(owners).replace(/"/g, '&quot;');
+          let namesJson = JSON.stringify(owners).replace(/"/g, '&quot;').replace(/'/g, "\\'");
           
           tempHtml += `<div class='bot-row'><span><b>${t.name}</b> <small>(${t.pos})</small></span> <span style="cursor:pointer; color:#33ccff; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('Pemilik ${t.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${t.ownership}%</span></div>`;
         });
@@ -1765,10 +1765,10 @@ function processSlashCommand(commandText, gw) {
           vHtml += "<i style='font-size:12px; color:#aaa;'>[API Restricted] Data unavailable. Picks are hidden until the Gameweek deadline passes.</i>";
         }
         for (let vCap in res.vices) {
-          let capData = res.vices[vCap];
+        let capData = res.vices[vCap];
           let isArray = Array.isArray(capData);
           let count = isArray ? capData.length : capData;
-          let namesJson = isArray ? JSON.stringify(capData).replace(/"/g, '&quot;') : JSON.stringify(["Fitur nama belum didukung."]).replace(/"/g, '&quot;');
+          let namesJson = isArray ? JSON.stringify(capData).replace(/"/g, '&quot;').replace(/'/g, "\\'") : JSON.stringify(["Fitur nama belum didukung."]).replace(/"/g, '&quot;').replace(/'/g, "\\'");
           
           vHtml += `<div class='bot-row'><span>${vCap}</span> <strong style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Vice Kapten: ${vCap}', '${namesJson}')" title="Klik untuk lihat daftar manager">${count} managers</strong></div>`;
         }
@@ -1806,8 +1806,8 @@ function processSlashCommand(commandText, gw) {
         if (res.data.length === 0) {
           fomoHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada pergerakan transfer masuk yang masif.</i>";
         } else {
-          res.data.forEach(d => {
-            let namesJson = JSON.stringify(d.owners).replace(/"/g, '&quot;');
+         res.data.forEach(d => {
+            let namesJson = JSON.stringify(d.owners).replace(/"/g, '&quot;').replace(/'/g, "\\'");
             fomoHtml += `<div class='bot-row'><span><b>${d.name}</b> <small>(${d.team})</small></span> <span>Dibeli <strong style="cursor:pointer; color:#33ccff; text-decoration:underline;" onclick="showManagersModal('Latah beli ${d.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${d.count} manager</strong></span></div>`;
           });
         }
@@ -1921,12 +1921,12 @@ function processSlashCommand(commandText, gw) {
               if (d.managers.length > 0) {
                 // Menyiapkan data keseluruhan manajer untuk dimasukkan ke dalam modal/pop-up saat diklik
                 let modalTitle = `Manajer di Laga ${d.match}`;
-                let detailedList = [];
+             let detailedList = [];
                 d.managers.forEach(m => {
                   detailedList.push(`--- ${m.name} (${m.team}) ---`);
                   m.players.forEach(p => detailedList.push(`• ${p}`));
                 });
-                let managersJson = JSON.stringify(detailedList).replace(/"/g, '&quot;');
+                let managersJson = JSON.stringify(detailedList).replace(/"/g, '&quot;').replace(/'/g, "\\'");
                 
                 jHtml += `<div style="font-size:12px; margin-top:3px;"><span style="cursor:pointer; color:#00ff85; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('${modalTitle}', '${managersJson}')" title="Klik untuk melihat rincian manajer & pemain">👥 ${d.managers.length} manager terlibat</span></div>`;
               } else {
