@@ -295,21 +295,27 @@
 
   <div id="main-section" style="display: none;">
     
-    <!-- HEADER APP BARU (Tombol Kiri, Judul Tengah, Tombol Kanan) -->
-  <div class="app-header">
-<button class="nav-btn active" id="btn-tab-chat" onclick="switchTab('chat')" title="Buka Chat">
-💬<span class="unread-badge" id="chat-badge"></span>
-</button>
-
-<div class="header-titles">
-<h2>🏆 FPL Live</h2>
-<span id="display-league-name" class="league-title"></span>
-</div>
-
-<div style="display: flex; gap: 8px;">
-<button class="nav-btn" id="btn-fullscreen" onclick="toggleFullScreen()" title="Mode Layar Penuh / Browser">🔲</button>
-<button class="nav-btn" id="btn-tab-dashboard" onclick="switchTab('dashboard')" title="Buka Klasemen">📊</button>
-</div>
+  <!-- HEADER APP BARU (Tombol Kiri, Judul Tengah, Tombol Kanan) -->
+    <div class="app-header">
+      <button class="nav-btn active" id="btn-tab-chat" onclick="switchTab('chat')" title="Buka Chat">
+        💬<span class="unread-badge" id="chat-badge"></span>
+      </button>
+      
+      <div class="header-titles">
+        <h2>🏆 FPL Live</h2>
+        <span id="display-league-name" class="league-title"></span>
+      </div>
+      
+      <div style="display: flex; gap: 8px;">
+        <!-- Tombol toggle dibuat display: none secara bawaan -->
+        <button class="nav-btn" id="btn-fullscreen-toggle" onclick="toggleFullScreen()" title="Ubah Tampilan Browser" style="display: none;">
+          🔲
+        </button>
+        <button class="nav-btn" id="btn-tab-dashboard" onclick="switchTab('dashboard')" title="Buka Klasemen">
+          📊
+        </button>
+      </div>
+    </div>
 </div>
 
     <div id="install-container">
@@ -439,14 +445,21 @@
   const CURRENT_LIVE_GW = calculateCurrentLiveGW();
   let activeReplyData = null;
 
-  window.onload = function() {
+ window.onload = function() {
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+      // JIKA DIBUKA SEBAGAI APLIKASI (PWA INSTALL)
       const installContainer = document.getElementById("install-container");
       if (installContainer) {
         installContainer.style.display = "none";
       }
+      // Tombol toggle dibiarkan tersembunyi (tidak perlu diutak-atik)
+    } else {
+      // JIKA DIBUKA MELALUI LINK BROWSER
+      const btnFullscreen = document.getElementById("btn-fullscreen-toggle");
+      if (btnFullscreen) {
+        btnFullscreen.style.display = "flex"; // Tampilkan tombol toggle
+      }
     }
-
     let gwOptionsHTML = "";
     for (let i = 1; i <= CURRENT_LIVE_GW; i++) {
       let label = (i === CURRENT_LIVE_GW) ? " (Live)" : " (Arsip)";
@@ -648,9 +661,25 @@
     }
   }
 
-  function closeCustomAlert() {
+ function closeCustomAlert() {
     document.getElementById("custom-alert-modal").style.display = "none";
   }
+  
+  // FUNGSI UNTUK MENGHILANGKAN ATAU MEMUNCULKAN UI BROWSER
+  function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+      // Masuk ke mode mirip aplikasi (Menyembunyikan address bar & titik tiga)
+      document.documentElement.requestFullscreen().catch(err => {
+        showCustomAlert("Informasi", "Fitur ini diblokir oleh perangkat/browser Anda.");
+      });
+    } else {
+      // Kembali ke tampilan awal browser (Memunculkan address bar & titik tiga untuk install)
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
+
  function switchTab(tabName) {
     document.getElementById('tab-chat').style.display = (tabName === 'chat') ? 'block' : 'none';
     document.getElementById('tab-dashboard').style.display = (tabName === 'dashboard') ? 'block' : 'none';
