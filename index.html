@@ -2019,7 +2019,7 @@ else if (cmd === "/jadwal" || cmd === "/fixture") {
       } else { handleSlashResult(gw, cmd, false, "PHP Error: " + res.message); }
     });
   }
-  else if (cmd === "/dukun" || cmd === "/gaib") {
+else if (cmd === "/dukun" || cmd === "/gaib") {
     callGAS('getLeagueDukun', MY_LEAGUE_ID, targetGw, function(res) {
       if (res.success) {
         let dHtml = `<div class='bot-header'>🔮 Dukun Susuk / Jalur Orang Dalam (GW ${targetGw})</div>`;
@@ -2035,8 +2035,58 @@ else if (cmd === "/jadwal" || cmd === "/fixture") {
       } else { handleSlashResult(gw, cmd, false, "Dukun Error: " + res.message); }
     });
   }
+  else if (cmd === "/pawang" || cmd === "/insting") {
+    callGAS('getLeaguePawang', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let pHtml = `<div class='bot-header'>🎯 Insting Pawang Kapten (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          pHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada data kapten.</i>";
+        } else {
+          res.data.forEach((d, i) => {
+            let medal = i === 0 ? "👑" : "🎯";
+            pHtml += `<div class='bot-row' style="padding: 4px 0;"><span>${medal} <b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#33ccff;">Kapten: ${d.player}</span><br><span style="color:#00ff85;">Gacor: ${d.points} pts 🔥</span></span></div>`;
+          });
+          pHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Yang kemarin kaptenin Haaland nge-blank, sungkem dulu sini sama Suhu! 🙇‍♂️</div>`;
+        }
+        handleSlashResult(gw, cmd, true, pHtml);
+      } else { handleSlashResult(gw, cmd, false, "Pawang Error: " + res.message); }
+    });
+  }
+  else if (cmd === "/murni" || cmd === "/halal") {
+    callGAS('getLeagueMurni', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let mHtml = `<div class='bot-header'>😇 Poin Halal Tanpa Minus (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          mHtml += "<i style='font-size:12px; color:#ff4a4a;'>Semua manajer di liga ini ngambil minus transfer! Pada gatel tangannya. 📉</i>";
+        } else {
+          res.data.forEach((d, i) => {
+            let medal = i === 0 ? "🥇" : "🥈";
+            mHtml += `<div class='bot-row'><span>${medal} <b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#00ff85;">${d.points} pts murni ✨</span></div>`;
+          });
+          mHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Yang kemarin minus -8 tapi dapetnya dikit, mending diem aja. 🤫</div>`;
+        }
+        handleSlashResult(gw, cmd, true, mHtml);
+      } else { handleSlashResult(gw, cmd, false, "Murni Error: " + res.message); }
+    });
+  }
+  else if (cmd === "/cepek" || cmd === "/klub100") {
+    callGAS('getLeagueCepek', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let cHtml = `<div class='bot-header'>💯 Klub Elit Cepek (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          cHtml += "<i style='font-size:12px; color:#aaa;'>Kosong. Mentok di poin rata-rata aja pada belagu. 🥱</i>";
+        } else {
+          res.data.forEach(d => {
+            cHtml += `<div class='bot-row'><span>👑 <b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#00ff85;">${d.points} pts 🔥</span></div>`;
+          });
+          cHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Sembah Suhu! Minggir lu semua para medioker! 🙇‍♂️</div>`;
+        }
+        handleSlashResult(gw, cmd, true, cHtml);
+      } else { handleSlashResult(gw, cmd, false, "Cepek Error: " + res.message); }
+    });
+  }
   else {
-    handleSlashResult(gw, cmd, false, "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /fdr, /or, /arsenal, /bank, /vice, /boncos, /form, /fomo, /bucin, /cuan, /hoki, /nyesel, /roket, /hipster, /jadwal, /mantan, /preman, /beban, /php, /dukun");
+    handleSlashResult(gw, cmd, false, "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /fdr, /or, /arsenal, /bank, /vice, /boncos, /form, /fomo, /bucin, /cuan, /hoki, /nyesel, /roket, /hipster, /jadwal, /mantan, /preman, /beban, /php, /dukun, /pawang, /murni, /cepek");
   }
 } // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
@@ -2181,11 +2231,13 @@ else if (cmd === "/jadwal" || cmd === "/fixture") {
       { cmd: "/h2h @Nama", desc: "Bandingkan langsung poin dan rank total kamu vs rival.", out: "⚔️ H2H BATTLE: Tim Kamu (50 Pts) vs Tim Budi (42 Pts)" },
       { cmd: "/mantan atau /kualat", desc: "Manajer yang jual pemain, eh pemainnya malah hauling.", out: "💔 Kutukan Mantan: Budi jual Mbeumo, hasil 15 poin." },
       { cmd: "/preman atau /tarkam", desc: "Hitung total minus dari Kartu Kuning & Merah di tim.", out: "🟨 FC Tarkam: Andi (-4 pts dari kartu)." },
-      { cmd: "/beban atau /makangaji", desc: "Pemain termahal di Starting XI tapi cuma ngasih <=2 poin.", out: "💸 Beban Tim: Joko (Haaland - £15.0M) cuma ngasih 2 poin." },
+ { cmd: "/beban atau /makangaji", desc: "Pemain termahal di Starting XI tapi cuma ngasih <=2 poin.", out: "💸 Beban Tim: Joko (Haaland - £15.0M) cuma ngasih 2 poin." },
       { cmd: "/php atau /scam", desc: "Pemain paling banyak di-Transfer In tapi malah nge-blank.", out: "🤡 Korban PHP: 5 manajer beli Jackson, hasil: 2 poin." },
-      { cmd: "/dukun atau /gaib", desc: "Manajer yang dapat poin dari pemain ber-ownership sangat rendah (<2%).", out: "🔮 Dukun Susuk: Dani dapet 12 poin dari Winks." }
+      { cmd: "/dukun atau /gaib", desc: "Manajer yang dapat poin dari pemain ber-ownership sangat rendah (<2%).", out: "🔮 Dukun Susuk: Dani dapet 12 poin dari Winks." },
+      { cmd: "/pawang atau /insting", desc: "Pamer manajer yang kaptennya mencetak poin paling gacor minggu ini.", out: "🎯 Insting Pawang: Dani kaptenin Salah dapet 34 pts!" },
+      { cmd: "/murni atau /halal", desc: "Pamer poin tertinggi tanpa nyentuh tombol transfer (minus).", out: "😇 Poin Halal: Joko dapet 70 poin murni tanpa minus." },
+      { cmd: "/cepek atau /klub100", desc: "Klub eksklusif buat manajer yang berhasil nembus 100+ poin.", out: "💯 Klub Elit Cepek: Sembah Suhu Tono (105 Pts)!" }
     ];
-
     commands.forEach(c => {
       // Ambil perintah utamanya saja (misal ambil "/hasil" dari "/hasil atau /skor")
       let cmdToCopy = c.cmd.split(" ")[0];
