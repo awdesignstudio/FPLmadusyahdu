@@ -98,33 +98,12 @@
       .msg-actions span { cursor: pointer; text-decoration: none; }
       .msg-actions span:hover { font-weight: bold; color: #00ff85; text-decoration: underline; }
 
-   /* INPUT AREA & REPLY PREVIEW */
-.input-area { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-bottom: 0px; }
-.input-row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
-
-#btn-fullscreen-toggle { background: transparent; border: none; color: #a375aa; font-size: 24px; cursor: pointer; padding: 0; padding-bottom: 5px; flex-shrink: 0; transition: color 0.2s; }
-#btn-fullscreen-toggle:hover { color: #00ff85; }
-
-/* GAYA AWAL: SUDAH SEPERTI APLIKASI PENUH (DEFAULT UNTUK BROWSER LINK) */
-.app-header, #install-container, #rewards-banner, .online-status-bar { display: flex !important; }
-.container { padding: 12px 14px 10px 14px !important; max-width: 800px !important; }
-#chat-box { border-radius: 8px !important; margin-bottom: 6px !important; }
-
-/* KETIKA DIUBAH KE MODE WEB STANDARD (MUNCUL ADDRESS BAR / MENU CHROME) */
-body.web-browser-mode .app-header,
-body.web-browser-mode #install-container,
-body.web-browser-mode #rewards-banner,
-body.web-browser-mode .online-status-bar { display: none !important; }
-
-body.web-browser-mode .container { padding: 0 !important; max-width: 100% !important; height: 100vh; height: 100dvh; }
-body.web-browser-mode #main-section { height: 100%; }
-body.web-browser-mode #tab-chat { height: 100%; display: flex; flex-direction: column; }
-body.web-browser-mode #chat-box { border-radius: 0 !important; border: none !important; flex: 1 !important; margin-bottom: 0 !important; }
-body.web-browser-mode .input-area { background: #2a0030; padding: 10px; }
-
-.input-area textarea { flex: 1; margin: 0; font-size: 15px; padding: 10px 12px; border: 1px solid #4b0053; border-radius: 10px; background: #2a0030; color: #fff; resize: none; height: 40px; max-height: 120px; line-height: 1.3; overflow-y: auto; box-sizing: border-box; transition: border-color 0.2s; }
-.input-area textarea:focus { outline: none; border: 1px solid #00ff85; }
-.input-area textarea::placeholder { color: #aaa; }
+      /* INPUT AREA & REPLY PREVIEW */
+      .input-area { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-bottom: 0px; }
+      .input-row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
+      .input-area textarea { flex: 1; margin: 0; font-size: 15px; padding: 10px 12px; border: 1px solid #4b0053; border-radius: 10px; background: #2a0030; color: #fff; resize: none; height: 40px; max-height: 120px; line-height: 1.3; overflow-y: auto; box-sizing: border-box; transition: border-color 0.2s; }
+      .input-area textarea:focus { outline: none; border: 1px solid #00ff85; }
+      .input-area textarea::placeholder { color: #aaa; }
       
       .reply-preview { display: none; background: rgba(0, 92, 75, 0.6); border-left: 4px solid #00ff85; padding: 8px 10px; border-radius: 6px; font-size: 12px; position: relative; }
       .reply-preview-title { color: #00ff85; font-weight: bold; margin-bottom: 3px; }
@@ -213,15 +192,14 @@ body.web-browser-mode .input-area { background: #2a0030; padding: 10px; }
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-     <script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-        .then((reg) => { console.log('Service Worker terdaftar:', reg.scope); })
-        .catch((err) => { console.log('Gagal mendaftarkan Service Worker:', err); });
-    });
-}
-</script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then((reg) => { console.log('Service Worker terdaftar:', reg.scope); })
+            .catch((err) => { console.log('Gagal mendaftarkan Service Worker:', err); });
+        });
+      }
+    </script>
 </head>
 <body>
 
@@ -343,15 +321,14 @@ if ('serviceWorker' in navigator) {
       </div>
 
       <!-- INDIKATOR MANAJER ONLINE -->
-    <div class="online-status-bar">
-<span class="online-dot"></span>
-<div class="online-list" id="online-users-text">Manajer Online: Memuat...</div>
-</div>
-<div id="chat-box" style="position: relative;">
-    <!-- Tombol Transparan Mengambang di Pojok Kanan Atas Chat (Khusus Browser) -->
-    <button id="btn-browser-mode-toggle" onclick="toggleBrowserMode()" title="Ubah Tampilan Browser/Aplikasi" style="display: none; position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.4); color: #00ff85; border: 1px solid rgba(0,255,133,0.3); border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; z-index: 50; align-items: center; justify-content: center; backdrop-filter: blur(2px); transition: all 0.2s;">⚙️</button>
-</div>
-<!-- NOTIFIKASI MENTION MELAYANG -->
+      <div class="online-status-bar">
+        <span class="online-dot"></span>
+        <div class="online-list" id="online-users-text">Manajer Online: Memuat...</div>
+      </div>
+
+      <div id="chat-box"></div>
+      
+      <!-- NOTIFIKASI MENTION MELAYANG -->
       <div id="mention-toast" onclick="scrollToMention()" style="display:none; position:absolute; bottom:130px; right:20px; background:#ff4a4a; color:#fff; padding:8px 15px; border-radius:20px; font-size:13px; font-weight:bold; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.5); z-index:100; border:1px solid #fff;">
         🔔 Disebut oleh <span id="mention-toast-sender">Seseorang</span>
       </div>
@@ -366,11 +343,9 @@ if ('serviceWorker' in navigator) {
           <span class="reply-preview-close" onclick="cancelReply()">✕</span>
         </div>
         <div class="input-row">
-<button id="btn-fullscreen-toggle" onclick="toggleFullscreenChat()" title="Layar Penuh Chat">⛶</button>
-<textarea id="chatMessage" placeholder="Ketik pesan..." rows="1"
-oninput="autoResize Textarea(this); handleMentionInput(this)"></textarea>
-<button id="send-btn" onclick="sendMessage()" title="Kirim"> </button>
-</div>
+          <textarea id="chatMessage" placeholder="Ketik pesan... 😊" rows="1" oninput="autoResizeTextarea(this); handleMentionInput(this)"></textarea>
+          <button id="send-btn" onclick="sendMessage()" title="Kirim">✈️</button>
+        </div>
       </div>
     </div>
 
@@ -413,62 +388,51 @@ oninput="autoResize Textarea(this); handleMentionInput(this)"></textarea>
 <script>
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNOARLVkXFnVwiJESkv3H3zBzqS3j9w3W99h78vrvx16B-3b443VZg5ZP7vQHCr2iC/exec";
 
- const firebaseConfig = {
-    apiKey: "AlzaSyDDdJPT545c5itfAYNM8-8N017p4QLzUNU",
+  const firebaseConfig = {
+    apiKey: "AIzaSyDDdJPT545c5itfAYNM8-8N017p4QLzUNU",
     authDomain: "fpl-chat-11494.firebaseapp.com",
     projectId: "fpl-chat-11494",
     storageBucket: "fpl-chat-11494.firebasestorage.app",
     messagingSenderId: "672234993639",
     appId: "1:672234993639:web:6e346a7e9b89f8ed3a2f42",
     measurementId: "G-QWHCN08BDZ",
-    databaseURL: "https://fpl-chat-11494-default-rtdb.asia-southeast1.firebasedatabase.app"
-};
-firebase.initializeApp(firebaseConfig);
+    databaseURL: "https://fpl-chat-11494-default-rtdb.asia-southeast1.firebasedatabase.app" 
+  };
+  
+  firebase.initializeApp(firebaseConfig); 
   const db = firebase.database();
-let currentUser = {};
-let currentChatRef = null;
-const MY_LEAGUE_ID = 182620;
+  let currentUser = {};
+  let currentChatRef = null;
+  const MY_LEAGUE_ID = 182620;
 
-// FUNGSI OTOMATIS HITUNG GAMEEWEEK BERDASARKAN KAMIS 3 SEPTEMBER 2026 SEBAGAI AWAL GW 3
-function calculateCurrentLiveGW() {
-    const baseDate = new Date("2026-09-03T00:00:00"); 
+  // FUNGSI OTOMATIS HITUNG GAMEEWEEK BERDASARKAN KAMIS 3 SEPTEMBER 2026 SEBAGAI AWAL GW 3
+  function calculateCurrentLiveGW() {
+    const baseDate = new Date("2026-09-03T00:00:00"); // Kamis, 3 September 2026 (Mulai GW 3)
     const baseGw = 3;
     const now = new Date();
+    
     const diffTime = now - baseDate;
-    const diffDays = Math.floor(diffTime / (1000*60*60*24));
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays < 0) return baseGw;
-    
     const weeksPassed = Math.floor(diffDays / 7);
     let calculatedGw = baseGw + weeksPassed;
+    
     return Math.min(calculatedGw, 38); // Batas maksimal 38 GW
-}
-const CURRENT_LIVE_GW = calculateCurrentLiveGW();
+  }
+
+  const CURRENT_LIVE_GW = calculateCurrentLiveGW();
   let activeReplyData = null;
 
-window.onload = function() {
-    if (window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true) {
-        const installContainer = document.getElementById("install-container");
-        if (installContainer) {
-            installContainer.style.display = "none";
-        }
-        // JIKA SUDAH DI-INSTALL SEBAGAI APLIKASI: Sembunyikan tombol browser mode
-        const browserToggleBtn = document.getElementById("btn-browser-mode-toggle");
-        if (browserToggleBtn) {
-            browserToggleBtn.style.display = "none";
-        }
-    } else {
-        // JIKA DIBUKA LEWAT LINK BROWSER BIASA: Tampilkan tombol pengaturnya di pojok kanan atas chat
-        const browserToggleBtn = document.getElementById("btn-browser-mode-toggle");
-        if (browserToggleBtn) {
-            browserToggleBtn.style.display = "flex";
-        }
+  window.onload = function() {
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+      const installContainer = document.getElementById("install-container");
+      if (installContainer) {
+        installContainer.style.display = "none";
+      }
     }
-    
+
     let gwOptionsHTML = "";
-    // ... (sisa kode di bawahnya tetap berjalan seperti biasa)
-};
     for (let i = 1; i <= CURRENT_LIVE_GW; i++) {
       let label = (i === CURRENT_LIVE_GW) ? " (Live)" : " (Arsip)";
       let selected = (i === CURRENT_LIVE_GW) ? "selected" : "";
@@ -697,56 +661,46 @@ window.onload = function() {
     });
   }
 
-function login() {
-    // Perhatikan penulisan inputManagerld (huruf 'l' kecil di 'ld' sesuai HTML asli)
-    const inputEl = document.getElementById("inputManagerld") || document.getElementById("inputManagerId");
-    
-    if (!inputEl) {
-        console.error("Elemen input ID Manajer tidak ditemukan di HTML.");
-        return;
-    }
-
-    const managerId = inputEl.value.trim();
-    if (!managerId) {
-        document.getElementById("login-status").innerText = "Silakan masukkan ID Manajer terlebih dahulu.";
-        return;
-    }
-
+ function login() {
+    const managerId = document.getElementById("inputManagerId").value;
+    if(!managerId) return;
     document.getElementById("login-status").innerText = "Mengecek ke server FPL...";
     
     callGAS('verifyFPLManager', managerId, null, function(res) {
-        if (res.success) {
-            document.getElementById("login-status").innerText = "Mengecek keanggotaan Liga Madu Syahdu...";
+      if (res.success) {
+        document.getElementById("login-status").innerText = "Mengecek keanggotaan Liga Madu Syahdu...";
+        
+        // Pengecekan ekstra: Pastikan manager terdaftar di klasemen Liga Madu Syahdu
+        callGAS('getDashboardData', MY_LEAGUE_ID, CURRENT_LIVE_GW, function(dashboardRes) {
+          if (dashboardRes.success) {
+            // Cari apakah ID manajer yang login ada di dalam leaderboard liga
+            const isMember = dashboardRes.leaderboard.some(item => item.id.toString() === managerId.toString());
             
-            callGAS('getDashboardData', MY_LEAGUE_ID, CURRENT_LIVE_GW, function(dashboardRes) {
-                if (dashboardRes.success) {
-                    const isMember = dashboardRes.leaderboard.some(item => item.id.toString() === managerId.toString());
-                    
-                    if (isMember) {
-                        currentUser = res;
-                        localStorage.setItem("fpl_current_user", JSON.stringify(res));
-                        document.getElementById("login-section").style.display = "none";
-                        document.getElementById("main-section").style.display = "block";
-                        
-                        setupPresenceSystem();
-                        const selectedGw = document.getElementById("gwSelect").value || CURRENT_LIVE_GW;
-                        const dashboardGw = document.getElementById("gwDashboardSelect").value || CURRENT_LIVE_GW;
-                        
-                        loadChat(selectedGw); 
-                        loadRewardsForChat(MY_LEAGUE_ID, selectedGw);
-                        buildDashboard(MY_LEAGUE_ID, dashboardGw);
-                    } else {
-                        document.getElementById("login-status").innerText = "Akses Ditolak: Anda tidak terdaftar di Liga Madu Syahdu.";
-                    }
-                } else {
-                    document.getElementById("login-status").innerText = "Gagal memverifikasi keanggotaan liga. Coba lagi.";
-                }
-            });
-        } else {
-            document.getElementById("login-status").innerText = res.message || "ID Manajer tidak ditemukan.";
-        }
+            if (isMember) {
+              currentUser = res;
+              localStorage.setItem("fpl_current_user", JSON.stringify(res));
+              document.getElementById("login-section").style.display = "none";
+              document.getElementById("main-section").style.display = "block";
+              
+              setupPresenceSystem();
+              const selectedGw = document.getElementById("gwSelect").value;
+              const dashboardGw = document.getElementById("gwDashboardSelect").value;
+              
+              loadChat(selectedGw); 
+              loadRewardsForChat(MY_LEAGUE_ID, selectedGw);
+              buildDashboard(MY_LEAGUE_ID, dashboardGw);
+            } else {
+              document.getElementById("login-status").innerText = "Akses Ditolak: Anda tidak terdaftar di Liga Madu Syahdu.";
+            }
+          } else {
+            document.getElementById("login-status").innerText = "Gagal memverifikasi keanggotaan liga. Coba lagi.";
+          }
+        });
+      } else {
+        document.getElementById("login-status").innerText = res.message;
+      }
     });
-}
+  }
   function confirmLogout() {
     showCustomConfirm("Konfirmasi Logout", "Apakah Anda yakin ingin keluar dari akun ini?", function() {
       logout();
@@ -1477,534 +1431,518 @@ function login() {
     }
   }
 
-// =========================================
-// LOGIKA SLASH COMMANDS & BOT VAR (PREVIEW MODE)
-// =========================================
+ // ==========================================
+// LOGIKA SLASH COMMANDS & BOT VAR
+// ==========================================
 function processSlashCommand(commandText, gw) {
-    const args = commandText.trim().split(/\s+/);
-    const cmd = args[0].toLowerCase();
+  const args = commandText.trim().split(/\s+/);
+  const cmd = args[0].toLowerCase();
 
-    let targetGw = gw;
-    let argIndex = 1;
+  // Deteksi argumen GW opsional (bisa di indeks ke-1 atau ke-2 tergantung perintah)
+  let targetGw = gw; 
+  let argIndex = 1;
 
-    // Jika perintahnya /h2h, argumen ke-1 adalah nama target, jadi cari angka GW di argumen ke-2 (jika ada)
-    if (cmd === "/h2h") {
-        argIndex = 2;
+  // Jika perintahnya /h2h, argumen ke-1 adalah nama target, jadi cari angka GW di argumen ke-2 (jika ada)
+  if (cmd === "/h2h") {
+    argIndex = 2;
+  }
+
+  if (args.length > argIndex) {
+    const parsedGw = parseInt(args[argIndex].replace(/\D/g, ''));
+    if (!isNaN(parsedGw) && parsedGw >= 1 && parsedGw <= 38) {
+      targetGw = parsedGw;
     }
+  }
 
-    if (args.length > argIndex) {
-        const parsedGw = parseInt(args[argIndex].replace(/\D/g, ""));
-        if (!isNaN(parsedGw) && parsedGw >= 1 && parsedGw <= 38) {
-            targetGw = parsedGw;
+  const tempKey = db.ref("chats/gw" + gw).push({
+    managerId: "SYSTEM", senderName: "🤖 FPL VAR", 
+    message: "Fetching live data from FPL API for " + cmd + " (GW " + targetGw + ")...", timestamp: firebase.database.ServerValue.TIMESTAMP
+  }).key;
+
+  if (cmd === "/captain" || cmd === "/chips") {
+    callGAS('getLeagueCaptains', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let botText = "";
+        if (cmd === "/captain") {
+          botText = "<div class='bot-header'>👑 Captaincy Stats (GW " + targetGw + ")</div>";
+          if (Object.keys(res.captains).length === 0) {
+            botText += "<i style='font-size:12px; color:#aaa;'>[API Restricted] Data unavailable. Picks are hidden until the Gameweek deadline passes.</i>";
+          }
+          for (let cap in res.captains) {
+            let capData = res.captains[cap];
+           // Cek apakah API GAS mengembalikan array (nama2) atau sekadar angka integer
+            let isArray = Array.isArray(capData);
+            let count = isArray ? capData.length : capData;
+            
+            // Encode ke string JSON agar bisa dipassing ke fungsi onclick
+            let namesJson = isArray ? JSON.stringify(capData).replace(/"/g, '&quot;').replace(/'/g, "\\'") : JSON.stringify(["Fitur nama belum didukung backend. Ubah kode GAS agar mengembalikan array nama!"]).replace(/"/g, '&quot;').replace(/'/g, "\\'");
+            
+            botText += `<div class='bot-row'><span>${cap}</span> <strong style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Kapten: ${cap}', '${namesJson}')" title="Klik untuk lihat daftar manager">${count} managers</strong></div>`;
+          }
+        } else {
+          botText = "<div class='bot-header'>🃏 Active Chips Played (GW " + targetGw + ")</div>";
+          if (res.chips.length === 0) botText += "<i style='font-size:12px; color:#aaa;'>No chips played by any manager this Gameweek.</i>";
+          
+          // Kelompokkan data chip berdasarkan jenisnya (agar outputnya jadi format "jumlah manager")
+          let chipGroups = {};
+          res.chips.forEach(c => {
+            let chipName = c.chip.toUpperCase();
+            if (!chipGroups[chipName]) chipGroups[chipName] = [];
+            chipGroups[chipName].push(c.team); // Masukkan nama tim ke dalam array chip tersebut
+          });
+          
+      for (let chip in chipGroups) {
+            let count = chipGroups[chip].length;
+            let namesJson = JSON.stringify(chipGroups[chip]).replace(/"/g, '&quot;').replace(/'/g, "\\'");
+            
+            botText += `<div class='bot-row'><span>Chip: ${chip}</span> <strong style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Manager yang pakai chip ${chip}', '${namesJson}')" title="Klik untuk lihat daftar manager">${count} managers</strong></div>`;
+          }
         }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: botText, isBotHtml: true });
+      } else {
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "API Request Failed. Report: " + (res.message || "Unknown Error") });
+      }
+    });
+  }
+  else if (cmd === "/h2h") {
+    // Ambil nama target (bisa berupa teks setelah /h2h, di-join kembali jika ada spasi sebelum argumen GW)
+    let nameArgs = args.slice(1);
+    if (nameArgs.length > 1 && !isNaN(parseInt(nameArgs[nameArgs.length - 1].replace(/\D/g, '')))) {
+      nameArgs.pop(); // Buang bagian angka GW jika disertakan di belakang
+    }
+    let targetName = nameArgs.join(" ").replace("@", "").trim();
+
+    if (!targetName) {
+      db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Format salah! Gunakan: <b>/h2h @NamaManajer</b> (Contoh: /h2h Budi)" });
+      return;
     }
 
-    // 1. TAMPILKAN LOADING ALERT (Hanya di layar user, tidak nge-push ke Firebase)
-    document.getElementById("custom-alert-title").innerText = "Memproses...";
-    document.getElementById("custom-alert-msg").innerHTML = `<div style="text-align:center;">Mengambil data dari FPL API untuk <b>${cmd}</b> (GW ${targetGw})...</div>`;
-    document.getElementById("custom-modal-input-wrapper").innerHTML = "";
-    document.getElementById("custom-alert-buttons").innerHTML = "";
-    document.getElementById("custom-alert-modal").style.display = "flex";
-
-    // 2. FUNGSI EKSEKUSI PUSH KE CHAT FIREBASE
-    const pushToChat = (htmlString) => {
-        db.ref("chats/gw" + gw).push({
-            managerId: "SYSTEM",
-            senderName: "⚽ FPL VAR",
-            message: htmlString,
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
-            isBotHtml: true
-        });
-    };
-
-    // 3. FUNGSI PREVIEW HTML DI MODAL SEBELUM KIRIM
-    const handlePreview = (htmlString) => {
-        document.getElementById("custom-alert-title").innerText = "Preview Command";
-        // Bungkus HTML dengan container yg bisa discroll agar rapi
-        document.getElementById("custom-alert-msg").innerHTML = `<div style="max-height: 55vh; overflow-y: auto; text-align: left; padding-right: 5px; font-size: 14px;">${htmlString}</div>`;
-        document.getElementById("custom-modal-input-wrapper").innerHTML = "";
-        
-        // Buat tombol Batal (Tutup) & Kirim
-        document.getElementById("custom-alert-buttons").innerHTML = `
-            <button class="btn-cancel" onclick="closeCustomAlert()">Batal / Tutup</button>
-            <button onclick="executeConfirmYes()" style="background:#00c774;">Kirim ke Chat</button>
-        `;
-        
-        // Arahkan callback executeConfirmYes() bawaan sistem ke fungsi pushToChat
-        window.activeConfirmCallback = function() {
-            pushToChat(htmlString);
-        };
-    };
-
-    // 4. FUNGSI ERROR (Jika API Gagal)
-    const handleError = (msg) => {
-        document.getElementById("custom-alert-title").innerText = "Peringatan";
-        document.getElementById("custom-alert-msg").innerHTML = `<div style="text-align:left; color:#ff4a4a;">${msg}</div>`;
-        document.getElementById("custom-modal-input-wrapper").innerHTML = "";
-        document.getElementById("custom-alert-buttons").innerHTML = `<button class="btn-cancel" onclick="closeCustomAlert()">Tutup</button>`;
-    };
-
-    // =====================================
-    // EKSEKUSI API SESUAI COMMAND DENGAN KEMBALINYA TEKS ORIGINAL KOCAK
-    // =====================================
-    if (cmd === "/captain" || cmd === "/chips") {
-        callGAS('getLeagueCaptains', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let botText = "";
-                if (cmd === "/captain") {
-                    botText = "<div class='bot-header'>👑 Captaincy Stats (GW " + targetGw + ")</div>";
-                    if (Object.keys(res.captains).length === 0) {
-                        botText += "<i style='font-size:12px; color:#aaa;'>[API Restricted] Data unavailable. Picks are hidden until the Gameweek deadline passes.</i>";
-                    }
-                    for (let cap in res.captains) {
-                        let capData = res.captains[cap];
-                        let isArray = Array.isArray(capData);
-                        let count = isArray ? capData.length : capData;
-                        let namesJson = isArray ? JSON.stringify(capData).replace(/"/g, '&quot;').replace(/'/g, "\\'") : JSON.stringify(["Fitur nama belum didukung."]).replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                        botText += `<div class='bot-row'><span>${cap}</span> <strong style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Kapten: ${cap}', '${namesJson}')" title="Klik untuk lihat daftar manager">${count} managers</strong></div>`;
-                    }
-                } else {
-                    botText = "<div class='bot-header'>🚀 Active Chips Played (GW " + targetGw + ")</div>";
-                    if (res.chips.length === 0) {
-                        botText += "<i style='font-size:12px; color:#aaa;'>No chips played by any manager this Gameweek.</i>";
-                    } else {
-                        let chipGroups = {};
-                        res.chips.forEach(c => {
-                            let chipName = c.chip.toUpperCase();
-                            if (!chipGroups[chipName]) chipGroups[chipName] = [];
-                            chipGroups[chipName].push(c.team);
-                        });
-                        for (let chip in chipGroups) {
-                            let count = chipGroups[chip].length;
-                            let namesJson = JSON.stringify(chipGroups[chip]).replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                            botText += `<div class='bot-row'><span>Chip: ${chip}</span> <strong style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Manager yang pakai chip ${chip}', '${namesJson}')" title="Klik untuk lihat daftar manager">${count} managers</strong></div>`;
-                        }
-                    }
-                }
-                handlePreview(botText);
-            } else {
-                handleError("Error: " + res.message);
-            }
-        });
-    }
-    else if (cmd === "/h2h") {
-        let nameArgs = args.slice(1);
-        if (nameArgs.length > 1 && !isNaN(parseInt(nameArgs[nameArgs.length - 1].replace(/\D/g, "")))) {
-            nameArgs.pop();
+    callGAS('getH2HByName', MY_LEAGUE_ID, { gw: targetGw, myId: currentUser.managerId, targetName: targetName }, function(res) {
+      if (res.success) {
+        let h2hHtml = `<div class='bot-header'>⚔️ H2H BATTLE (GW ${targetGw})</div>`;
+        h2hHtml += `<div class='bot-row'><span><b>${res.me.team}</b><br><small>${res.me.name}</small></span> <span style="text-align:right;"><b>GW: ${res.me.gwPts}</b><br>Tot: ${res.me.totPts} (Rank ${res.me.rank})</span></div>`;
+        h2hHtml += `<div class='bot-row' style="margin-top:6px; color:#ff4a4a;"><span><b>${res.opponent.team}</b><br><small>${res.opponent.name}</small></span> <span style="text-align:right;"><b>GW: ${res.opponent.gwPts}</b><br>Tot: ${res.opponent.totPts} (Rank ${res.opponent.rank})</span></div>`;
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: h2hHtml, isBotHtml: true });
+      } else {
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "H2H Error: " + res.message });
+      }
+    });
+  }
+  else if (cmd === "/diff") {
+    callGAS('getLeagueDifferentials', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let diffHtml = `<div class='bot-header'>💎 Mini-League Differentials (GW ${targetGw})</div>`;
+        if (res.diffs.length === 0) {
+          diffHtml += "<i style='font-size:12px; color:#aaa;'>Tidak ada differential unik yang ditemukan di bawah ambang batas.</i>";
+        } else {
+          res.diffs.forEach(d => {
+           // Cek apakah data dari GAS sudah berisi array nama owners
+            let owners = Array.isArray(d.owners) ? d.owners : ["Fitur nama belum didukung backend. Ubah API GAS agar mengirim array 'owners'!"];
+            let namesJson = JSON.stringify(owners).replace(/"/g, '&quot;').replace(/'/g, "\\'");
+            
+            diffHtml += `<div class='bot-row'><span><b>${d.name}</b> (${d.team})</span> <span>Owned by <b style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Pemilik ${d.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${d.count} manager(s)</b> <small>(${d.globalOwnership}% global)</small></span></div>`;
+          });
         }
-        let targetName = nameArgs.join(" ").replace("@", "").trim();
-        if (!targetName) {
-            handleError("Format salah! Gunakan: <b>/h2h @NamaManajer</b> (Contoh: /h2h Budi)");
-            return;
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: diffHtml, isBotHtml: true });
+      } else {
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Diff Error: " + res.message });
+      }
+    });
+  }
+  else if (cmd === "/bonus") {
+    // Tambahkan 'null,' sebagai pengisi parameter kedua yang kosong
+    callGAS('getLiveBonusPoints', targetGw, null, function(res) {
+      if (res.success) {
+        let bonusHtml = `<div class='bot-header'>🏆 Live Bonus Points (GW ${targetGw})</div>`;
+        if (res.matches.length === 0) {
+          bonusHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada pertandingan yang berjalan atau selesai.</i>";
+        } else {
+          res.matches.forEach(m => {
+            bonusHtml += `<div style='margin-top:6px; font-weight:bold; color:#ffcc00;'>${m.match} (${m.status})</div>`;
+            m.top.forEach(t => {
+              bonusHtml += `<div class='bot-row' style='padding-left:10px;'><span>↳ ${t.name}</span> <strong>+${t.pts} pts <small>(BPS: ${t.bps})</small></strong></div>`;
+            });
+          });
         }
-        callGAS('getH2HByName', MY_LEAGUE_ID, { gw: targetGw, myId: currentUser.managerId, targetName: targetName }, function(res) {
-            if (res.success) {
-                let h2hHtml = `<div class='bot-header'>⚔️ H2H BATTLE (GW ${targetGw})</div>`;
-                h2hHtml += `<div class='bot-row'><span><b>${res.me.team}</b><br><small>${res.me.name}</small></span> <span style="text-align:right;"><b>GW: ${res.me.gwPts}</b><br>Tot: ${res.me.totPts} (Rank ${res.me.rank})</span></div>`;
-                h2hHtml += `<div class='bot-row' style="margin-top:6px; color:#ff4a4a;"><span><b>${res.opponent.team}</b><br><small>${res.opponent.name}</small></span> <span style="text-align:right;"><b>GW: ${res.opponent.gwPts}</b><br>Tot: ${res.opponent.totPts} (Rank ${res.opponent.rank})</span></div>`;
-                handlePreview(h2hHtml);
-            } else {
-                handleError("H2H Error: " + res.message);
-            }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: bonusHtml, isBotHtml: true });
+      } else {
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Bonus Error: " + res.message });
+      }
+    });
+  }
+  else if (cmd === "/hit") {
+    callGAS('getLeagueTransfersCost', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let hitHtml = `<div class='bot-header'>💸 Panic Transfer & Hit Tracker (GW ${targetGw})</div>`;
+        if (res.hitList.length === 0) {
+          hitHtml += "<i style='font-size:12px; color:#aaa;'>Aman! Belum ada manajer yang ambil minus (hit) di GW ini. Semua main aman.</i>";
+        } else {
+          res.hitList.forEach(h => {
+            hitHtml += `<div class='bot-row'><span><b>${h.team}</b> <small>(${h.name})</small></span> <span style="color:#ff4a4a; font-weight:bold;">-${h.hit} pts</span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: hitHtml, isBotHtml: true });
+      } else {
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Hit Error: " + res.message });
+      }
+    });
+  }
+ else if (cmd === "/blunder") {
+    callGAS('getLeagueCaptainBlunders', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let blunderHtml = `<div class='bot-header'>🤡 Papan Korban Kapten / Blunder (GW ${targetGw})</div>`;
+        if (res.blunderList.length === 0) {
+          blunderHtml += "<i style='font-size:12px; color:#aaa;'>Aman jaya! Belum ada kapten manajer yang bernasib tragis (semua di atas 2 poin) di GW ini.</i>";
+        } else {
+          res.blunderList.forEach(b => {
+            blunderHtml += `<div class='bot-row'><span><b>${b.team}</b> <small>(${b.name})</small><br>Kapten: <i>${b.captain}</i></span> <span style="color:#ff4a4a; font-weight:bold;">${b.points} pts</span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: blunderHtml, isBotHtml: true });
+      } else {
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Blunder Error: " + res.message });
+      }
+    });
+  }
+  else if (cmd === "/bench") {
+    callGAS('getLeagueBenchPain', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let benchHtml = `<div class='bot-header'>🪑 Tragedi Bangku Cadangan (GW ${targetGw})</div>`;
+        if (res.data.length === 0 || res.data[0].benchPts === 0) {
+          benchHtml += "<i style='font-size:12px; color:#aaa;'>Hebat! Tidak ada poin terbuang sia-sia di bench minggu ini.</i>";
+        } else {
+          res.data.forEach(b => {
+            benchHtml += `<div class='bot-row'><span><b>${b.team}</b> <small>(${b.name})</small></span> <span style="color:#ff4a4a; font-weight:bold;">${b.benchPts} pts</span></div>`;
+          });
+          benchHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Nangis di pojokan ngeliat poin bench lebih gede dari poin kapten 😭</div>`;
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: benchHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Bench Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/sultan") {
+    callGAS('getLeagueSultan', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let sultanHtml = `<div class='bot-header'>💰 Adu Sombong Team Value (GW ${targetGw})</div>`;
+        res.data.forEach((s, i) => {
+          let icon = i === 0 ? "👑" : (i === res.data.length - 1 ? "🧟" : "🔹");
+          sultanHtml += `<div class='bot-row'><span>${icon} <b>${s.team}</b></span> <span style="color:#00ff85; font-weight:bold;">£${s.value}M</span></div>`;
         });
-    }
-    else if (cmd === "/diff") {
-        callGAS('getLeagueDifferentials', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let diffHtml = `<div class='bot-header'>💎 Mini-League Differentials (GW ${targetGw})</div>`;
-                if (res.diffs.length === 0) {
-                    diffHtml += "<i style='font-size:12px; color:#aaa;'>Tidak ada differential unik yang ditemukan di bawah ambang batas.</i>";
-                } else {
-                    res.diffs.forEach(d => {
-                        let owners = Array.isArray(d.owners) ? d.owners : ["Fitur nama belum didukung."];
-                        let namesJson = JSON.stringify(owners).replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                        diffHtml += `<div class='bot-row'><span><b>${d.name}</b> (${d.team})</span> <span>Owned by <b style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Pemilik ${d.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${d.count} manager(s)</b> <small>(${d.globalOwnership}% global)</small></span></div>`;
-                    });
-                }
-                handlePreview(diffHtml);
-            } else { handleError("Diff Error: " + res.message); }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: sultanHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Sultan Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/template") {
+    callGAS('getLeagueTemplate', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let tempHtml = `<div class='bot-header'>🐑 Pemain Template Liga (GW ${targetGw})</div>`;
+        res.data.forEach(t => {
+         // Cek apakah data dari GAS sudah berisi array nama owners
+          let owners = Array.isArray(t.owners) ? t.owners : ["Fitur nama belum didukung backend. Ubah API GAS agar mengirim array 'owners'!"];
+          let namesJson = JSON.stringify(owners).replace(/"/g, '&quot;').replace(/'/g, "\\'");
+          
+          tempHtml += `<div class='bot-row'><span><b>${t.name}</b> <small>(${t.pos})</small></span> <span style="cursor:pointer; color:#33ccff; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('Pemilik ${t.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${t.ownership}%</span></div>`;
         });
-    }
-    else if (cmd === "/bonus") {
-        callGAS('getLiveBonusPoints', targetGw, null, function(res) {
-            if (res.success) {
-                let bonusHtml = `<div class='bot-header'>🌟 Live Bonus Points (GW ${targetGw})</div>`;
-                if (res.matches.length === 0) {
-                    bonusHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada pertandingan yang berjalan atau selesai.</i>";
-                } else {
-                    res.matches.forEach(m => {
-                        bonusHtml += `<div style='margin-top:6px; font-weight:bold; color:#ffcc00;'>${m.match} (${m.status})</div>`;
-                        m.top.forEach(t => {
-                            bonusHtml += `<div class='bot-row' style='padding-left: 10px;'><span>${t.name}</span> <strong>+${t.pts} pts <small>(BPS: ${t.bps})</small></strong></div>`;
-                        });
-                    });
-                }
-                handlePreview(bonusHtml);
-            } else { handleError("Bonus Error: " + res.message); }
+        tempHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Yang nggak punya mereka fiks orang gila (atau hipster) 🤓</div>`;
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: tempHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Template Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/zombie") {
+    callGAS('getLeagueZombie', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let zombieHtml = `<div class='bot-header'>🧟 Detektor Akun Zombie</div>`;
+        if (res.data.length === 0) {
+          zombieHtml += "<i style='font-size:12px; color:#00ff85;'>Luar biasa! Semua manajer di liga ini aktif gonta-ganti pemain.</i>";
+        } else {
+          zombieHtml += "<i style='font-size:12px; color:#aaa;'>Manajer berikut belum melakukan transfer dalam 3+ Gameweek terakhir:</i>";
+          res.data.forEach(z => {
+            zombieHtml += `<div class='bot-row'><span><b>${z.team}</b> <small>(${z.name})</small></span> <span style="color:#ffcc00; font-weight:bold;">${z.inactiveWeeks} GW</span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: zombieHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Zombie Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/gatel") {
+    callGAS('getLeagueGatel', MY_LEAGUE_ID, null, function(res) {
+      if (res.success) {
+        let gatelHtml = `<div class='bot-header'>🚑 Rekor Pasien Gatal Tangan</div>`;
+        gatelHtml += `<div style='font-size:11px; color:#ccc; margin-bottom:6px;'>Total transfer yang dilakukan sejak GW 1:</div>`;
+        res.data.forEach((g, i) => {
+          let badge = i === 0 ? "🔥 (Knee-Jerker)" : (i === res.data.length - 1 ? "🧘‍♂️ (Sabar)" : "");
+          gatelHtml += `<div class='bot-row'><span><b>${g.team}</b> <small>(${g.name})</small></span> <span style="color:#ff4a4a; font-weight:bold;">${g.transfers}x ${badge}</span></div>`;
         });
-    }
-    else if (cmd === "/hit") {
-        callGAS('getLeagueTransfersCost', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let hitHtml = `<div class='bot-header'>🚑 Panic Transfer & Hit Tracker (GW ${targetGw})</div>`;
-                if (res.hitList.length === 0) {
-                    hitHtml += "<i style='font-size:12px; color:#aaa;'>Aman! Belum ada manajer yang ambil minus (hit) di GW ini. Semua main aman.</i>";
-                } else {
-                    res.hitList.forEach(h => {
-                        hitHtml += `<div class='bot-row'><span><b>${h.team}</b> <small>(${h.name})</small></span> <span style="color:#ff4a4a; font-weight:bold;">-${h.hit} pts</span></div>`;
-                    });
-                }
-                handlePreview(hitHtml);
-            } else { handleError("Hit Error: " + res.message); }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: gatelHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Gatel Error: " + res.message }); }
+    });
+  }
+ else if (cmd === "/profit") {
+    callGAS('getLeagueTransferProfit', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let profitHtml = `<div class='bot-header'>📈 Adu Nasib Transfer (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          profitHtml += "<i style='font-size:12px; color:#aaa;'>Tidak ada manajer yang melakukan transfer minggu ini.</i>";
+        } else {
+          res.data.forEach(p => {
+            let color = p.profit > 0 ? "#00ff85" : (p.profit < 0 ? "#ff4a4a" : "#aaa");
+            let icon = p.profit > 0 ? "📈" : (p.profit < 0 ? "📉" : "➖");
+            profitHtml += `<div class='bot-row'><span><b>${p.team}</b> <br><small>In: ${p.ptsIn} pts | Out: ${p.ptsOut} pts</small></span> <span style="color:${color}; font-weight:bold;">${icon} ${p.profit > 0 ? '+'+p.profit : p.profit}</span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: profitHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Profit Error: " + res.message }); }
+    });
+  }
+ else if (cmd === "/trendchip") {
+    callGAS('getGlobalChipUsage', targetGw, null, function(res) {
+      if (res.success) {
+        let trendHtml = `<div class='bot-header'>🌍 Trend Chip Global FPL (GW ${targetGw})</div>`;
+        if (!res.chips || res.chips.length === 0) {
+          trendHtml += "<i style='font-size:12px; color:#aaa;'>Data chip global belum tersedia untuk GW ini.</i>";
+        } else {
+          let sortedChips = res.chips.sort((a,b) => b.num_played - a.num_played);
+          sortedChips.forEach(c => {
+            let chipName = c.chip_name.toUpperCase();
+            let formattedNum = c.num_played.toLocaleString('id-ID'); 
+            trendHtml += `<div class='bot-row'><span>Chip <b>${chipName}</b></span> <strong style="color:#33ccff;">${formattedNum} user</strong></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: trendHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Trend Chip Error: " + res.message }); }
+    });
+  }
+ else if (cmd === "/fdr") {
+    callGAS('getLeagueFDR', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let fdrHtml = `<div class='bot-header'>📅 Analisis Kesulitan Jadwal (GW ${targetGw})</div>`;
+        fdrHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Berdasarkan Starting XI.<br>🟩 Mudah (FDR 1-2) | ⬜ Normal (3) | 🟥 Susah (4-5)</div>`;
+        res.data.forEach(d => {
+          fdrHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size: 13px; text-align:right;"><span style="color:#00ff85;">${d.easy} 🟩</span> &nbsp;<span style="color:#aaa;">${d.normal} ⬜</span> &nbsp;<span style="color:#ff4a4a;">${d.hard} 🟥</span></span></div>`;
         });
-    }
-    else if (cmd === "/blunder") {
-        callGAS('getLeagueCaptainBlunders', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let blunderHtml = `<div class='bot-header'>🤡 Papan Korban Kapten / Blunder (GW ${targetGw})</div>`;
-                if (res.blunderList.length === 0) {
-                    blunderHtml += "<i style='font-size:12px; color:#aaa;'>Aman jaya! Belum ada kapten manajer yang bernasib tragis (semua di atas 2 poin) di GW ini.</i>";
-                } else {
-                    res.blunderList.forEach(b => {
-                        blunderHtml += `<div class='bot-row'><span><b>${b.team}</b> <small>(${b.name})</small><br>Kapten: <i>${b.captain}</i></span> <span style="color:#ff4a4a; font-weight:bold;">${b.points} pts</span></div>`;
-                    });
-                }
-                handlePreview(blunderHtml);
-            } else { handleError("Blunder Error: " + res.message); }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: fdrHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "FDR Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/or" || cmd === "/global") {
+    callGAS('getLeagueOR', MY_LEAGUE_ID, null, function(res) {
+      if (res.success) {
+        let orHtml = `<div class='bot-header'>🌍 Peringkat Dunia / Overall Rank</div>`;
+        res.data.forEach(d => {
+          orHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#33ccff;">${d.rank.toLocaleString('id-ID')}</span></div>`;
         });
-    }
-    else if (cmd === "/bench") {
-        callGAS('getLeagueBenchPain', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let benchHtml = `<div class='bot-header'>🪑 Tragedi Bangku Cadangan (GW ${targetGw})</div>`;
-                if (res.data.length === 0 || res.data[0].benchPts === 0) {
-                    benchHtml += "<i style='font-size:12px; color:#aaa;'>Hebat! Tidak ada poin terbuang sia-sia di bench minggu ini.</i>";
-                } else {
-                    res.data.forEach(b => {
-                        benchHtml += `<div class='bot-row'><span><b>${b.team}</b> <small>(${b.name})</small></span> <span style="color:#ff4a4a; font-weight:bold;">${b.benchPts} pts</span></div>`;
-                    });
-                    benchHtml += `<div style="margin-top:6px; font-size: 11px; font-style:italic; color:#ccc;">Nangis di pojokan ngeliat poin bench lebih gede dari poin kapten</div>`;
-                }
-                handlePreview(benchHtml);
-            } else { handleError("Bench Error: " + res.message); }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: orHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "OR Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/arsenal" || cmd === "/sisa_chip") {
+    callGAS('getLeagueArsenal', MY_LEAGUE_ID, null, function(res) {
+      if (res.success) {
+        let arsHtml = `<div class='bot-header'>🎒 Sisa Persenjataan (Chips Tersedia)</div>`;
+        res.data.forEach(d => {
+          arsHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="text-align:right; font-size:12px; color:#00ff85; font-weight:bold;">${d.chips.join(", ") || "<i style='color:#ff4a4a;'>Kosong/Habis</i>"}</span></div>`;
         });
-    }
-    else if (cmd === "/sultan") {
-        callGAS('getLeagueSultan', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let sultanHtml = `<div class='bot-header'>💰 Adu Sombong Team Value (GW ${targetGw})</div>`;
-                res.data.forEach((s, i) => {
-                    let icon = i === 0 ? "🥇" : (i === res.data.length - 1 ? "😭" : "💸");
-                    sultanHtml += `<div class='bot-row'><span>${icon} <b>${s.team}</b></span> <span style="color:#00ff85; font-weight:bold;">£${s.value}M</span></div>`;
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: arsHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Arsenal Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/bank" || cmd === "/pelit") {
+    callGAS('getLeagueBank', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let bHtml = `<div class='bot-header'>🏦 Adu Saldo Nganggur (GW ${targetGw})</div>`;
+        res.data.forEach(d => {
+          bHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#ffcc00;">£${d.bank}M</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: bHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Bank Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/vice") {
+    callGAS('getLeagueViceCaptains', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let vHtml = `<div class='bot-header'>🛡️ Vice Captaincy Stats (GW ${targetGw})</div>`;
+        if (Object.keys(res.vices).length === 0) {
+          vHtml += "<i style='font-size:12px; color:#aaa;'>[API Restricted] Data unavailable. Picks are hidden until the Gameweek deadline passes.</i>";
+        }
+        for (let vCap in res.vices) {
+        let capData = res.vices[vCap];
+          let isArray = Array.isArray(capData);
+          let count = isArray ? capData.length : capData;
+          let namesJson = isArray ? JSON.stringify(capData).replace(/"/g, '&quot;').replace(/'/g, "\\'") : JSON.stringify(["Fitur nama belum didukung."]).replace(/"/g, '&quot;').replace(/'/g, "\\'");
+          
+          vHtml += `<div class='bot-row'><span>${vCap}</span> <strong style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Vice Kapten: ${vCap}', '${namesJson}')" title="Klik untuk lihat daftar manager">${count} managers</strong></div>`;
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: vHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Vice Error: " + res.message }); }
+    });
+  }
+ else if (cmd === "/boncos" || cmd === "/total_minus") {
+    callGAS('getLeagueTotalMinus', MY_LEAGUE_ID, null, function(res) {
+      if (res.success) {
+        let mHtml = `<div class='bot-header'>📉 Total Poin Dikorbankan (Minus Transfer)</div>`;
+        res.data.forEach(d => {
+          let color = d.totalMinus > 0 ? "#ff4a4a" : "#00ff85";
+          mHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:${color};">-${d.totalMinus} pts</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: mHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Boncos Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/form" || cmd === "/onfire") {
+    callGAS('getLeagueForm', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let fHtml = `<div class='bot-header'>🔥 Detektor Manajer Gacor (3 GW Terakhir)</div>`;
+        res.data.forEach(d => {
+          fHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#ffcc00;">${d.formPts} pts</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: fHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Form Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/fomo" || cmd === "/latah") {
+    callGAS('getLeagueFomo', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let fomoHtml = `<div class='bot-header'>🐑 Tren Ikut-ikutan / Transfer In (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          fomoHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada pergerakan transfer masuk yang masif.</i>";
+        } else {
+         res.data.forEach(d => {
+            let namesJson = JSON.stringify(d.owners).replace(/"/g, '&quot;').replace(/'/g, "\\'");
+            fomoHtml += `<div class='bot-row'><span><b>${d.name}</b> <small>(${d.team})</small></span> <span>Dibeli <strong style="cursor:pointer; color:#33ccff; text-decoration:underline;" onclick="showManagersModal('Latah beli ${d.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${d.count} manager</strong></span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: fomoHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Fomo Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/bucin" || cmd === "/fansboy") {
+    callGAS('getLeagueBucin', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let bHtml = `<div class='bot-header'>😍 Deteksi Fans Garis Keras (GW ${targetGw})</div>`;
+        bHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Manajer yang pakai maksimal 3 pemain dari klub yang sama di Starting XI.</div>`;
+        if (res.data.length === 0) {
+          bHtml += "<i style='font-size:12px; color:#00ff85;'>Wah sehat, skuad di liga ini sangat bervariasi!</i>";
+        } else {
+          res.data.forEach(d => {
+            bHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.name}</b> <br><small>(${d.team})</small></span> <span style="font-weight:bold; font-size:12px; color:#ff4a4a; text-align:right;">Triple<br>${d.club}</span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: bHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Bucin Error: " + res.message }); }
+    });
+  }
+ else if (cmd === "/cuan" || cmd === "/investor") {
+    callGAS('getLeagueCuan', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let cHtml = `<div class='bot-header'>📈 Adu Cuan Profit/Loss Tim (GW ${targetGw})</div>`;
+        res.data.forEach(d => {
+          let color = d.profit > 0 ? "#00ff85" : (d.profit < 0 ? "#ff4a4a" : "#aaa");
+          let icon = d.profit > 0 ? "📈 +" : (d.profit < 0 ? "📉 " : "➖ ");
+          cHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:${color};">${icon}£${Math.abs(d.profit).toFixed(1)}M</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: cHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Cuan Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/hoki" || cmd === "/autosub") {
+    callGAS('getLeagueHoki', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let hHtml = `<div class='bot-header'>🍀 Penyelamatan Auto-Sub (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          hHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada auto-sub dramatis yang menghasilkan poin besar.</i>";
+        } else {
+          res.data.forEach(d => {
+            hHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; color:#00ff85; text-align:right;">Masuk: ${d.playerIn}<br>+${d.points} pts</span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: hHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Hoki Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/nyesel") {
+    callGAS('getLeagueNyesel', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let nHtml = `<div class='bot-header'>🤦 Tragedi Salah Kapten (GW ${targetGw})</div>`;
+        nHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Manajer yang poin Kaptennya dikalahkan telak oleh poin Vice-nya.</div>`;
+        if (res.data.length === 0) {
+          nHtml += "<i style='font-size:12px; color:#00ff85;'>Luar biasa! Semua pilihan kapten sudah tepat sasaran.</i>";
+        } else {
+          res.data.forEach(d => {
+            nHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#ff4a4a;">Cap: ${d.cap} (${d.capPts})</span><br><span style="color:#33ccff;">Vice: ${d.vice} (${d.vicePts})</span></span></div>`;
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: nHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Nyesel Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/roket" || cmd === "/longsor") {
+    callGAS('getLeagueArrows', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let aHtml = `<div class='bot-header'>🚀 Adu Tanda Panah Peringkat (GW ${targetGw})</div>`;
+        res.data.forEach(d => {
+          let color = d.diff > 0 ? "#00ff85" : (d.diff < 0 ? "#ff4a4a" : "#aaa");
+          let icon = d.diff > 0 ? "🚀 +" : (d.diff < 0 ? "🔻 " : "➖ ");
+          aHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:${color};">${icon}${Math.abs(d.diff).toLocaleString('id-ID')}</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: aHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Arrows Error: " + res.message }); }
+    });
+  }
+  else if (cmd === "/hipster") {
+    callGAS('getLeagueHipster', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let hipHtml = `<div class='bot-header'>🕶️ Pasukan Anti-Template (GW ${targetGw})</div>`;
+        hipHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Rata-rata persentase kepemilikan global 11 pemain inti.</div>`;
+        res.data.forEach((d, i) => {
+          let icon = i === 0 ? "👑" : "🔹";
+          hipHtml += `<div class='bot-row'><span>${icon} <b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#00ff85;">${d.avgOwnership}%</span></div>`;
+        });
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: hipHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Hipster Error: " + res.message }); }
+    });
+  }
+ else if (cmd === "/jadwal" || cmd === "/fixture") {
+    callGAS('getLeagueFixtures', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let jHtml = `<div class='bot-header'>📅 Jadwal & Manajer Terdampak (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          jHtml += "<i style='font-size:12px; color:#aaa;'>Jadwal belum tersedia.</i>";
+        } else {
+          res.data.forEach(group => {
+            jHtml += `<div style="background:rgba(255,255,255,0.1); padding:4px 8px; margin-top:10px; font-weight:bold; font-size:12px; color:#fff; text-align:center; border-radius:4px;">${group.date}</div>`;
+            
+            group.fixtures.forEach(d => {
+              jHtml += `<div style="margin-top:6px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:6px;">`;
+              jHtml += `<div style="display:flex; justify-content:space-linejoin; align-items:center;">`;
+              jHtml += `<span style="color:#ffcc00; font-weight:bold; font-size:13px;">📺 ${d.match}</span>`;
+              jHtml += `<span style="color:#aaa; font-size:11px;">🕒 ${d.time}</span>`;
+              jHtml += `</div>`;
+              
+              if (d.managers.length > 0) {
+                // Menyiapkan data keseluruhan manajer untuk dimasukkan ke dalam modal/pop-up saat diklik
+                let modalTitle = `Manajer di Laga ${d.match}`;
+             let detailedList = [];
+                d.managers.forEach(m => {
+                  detailedList.push(`--- ${m.name} (${m.team}) ---`);
+                  m.players.forEach(p => detailedList.push(`• ${p}`));
                 });
-                handlePreview(sultanHtml);
-            } else { handleError("Sultan Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/template") {
-        callGAS('getLeagueTemplate', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let tempHtml = `<div class='bot-header'>🐑 Pemain Template Liga (GW ${targetGw})</div>`;
-                res.data.forEach(t => {
-                    let owners = Array.isArray(t.owners) ? t.owners : ["Nama tidak didukung."];
-                    let namesJson = JSON.stringify(owners).replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                    tempHtml += `<div class='bot-row'><span><b>${t.name}</b> <small>(${t.pos})</small></span> <span style="cursor:pointer; color:#33ccff; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('Pemilik ${t.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${t.ownership}%</span></div>`;
-                });
-                tempHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Yang nggak punya mereka fiks orang gila (atau hipster)</div>`;
-                handlePreview(tempHtml);
-            } else { handleError("Template Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/zombie") {
-        callGAS('getLeagueZombie', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let zombieHtml = `<div class='bot-header'>🧟 Detektor Akun Zombie</div>`;
-                if (res.data.length === 0) {
-                    zombieHtml += "<i style='font-size:12px; color:#00ff85;'>Luar biasa! Semua manajer di liga ini aktif gonta-ganti pemain.</i>";
-                } else {
-                    zombieHtml += "<i style='font-size: 12px; color:#aaa;'>Manajer berikut belum melakukan transfer dalam 3+ Gameweek terakhir:</i>";
-                    res.data.forEach(z => {
-                        zombieHtml += `<div class='bot-row'><span><b>${z.team}</b> <small>(${z.name})</small></span> <span style="color:#ffcc00; font-weight:bold;">${z.inactiveWeeks} GW</span></div>`;
-                    });
-                }
-                handlePreview(zombieHtml);
-            } else { handleError("Zombie Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/gatel") {
-        callGAS('getLeagueGatel', MY_LEAGUE_ID, null, function(res) {
-            if (res.success) {
-                let gatelHtml = `<div class='bot-header'>🔄 Rekor Pasien Gatal Tangan</div>`;
-                gatelHtml += `<div style='font-size: 11px; color:#ccc; margin-bottom: 6px;'>Total transfer yang dilakukan sejak GW 1:</div>`;
-                res.data.forEach((g, i) => {
-                    let badge = i === 0 ? "🚑 (Knee-Jerker)" : (i === res.data.length - 1 ? "🧘 (Sabar)" : "");
-                    gatelHtml += `<div class='bot-row'><span><b>${g.team}</b> <small>(${g.name})</small></span> <span style="color:#ff4a4a; font-weight:bold;">${g.transfers}x ${badge}</span></div>`;
-                });
-                handlePreview(gatelHtml);
-            } else { handleError("Gatel Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/profit") {
-        callGAS('getLeagueTransferProfit', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let profitHtml = `<div class='bot-header'>📈 Adu Nasib Transfer (GW ${targetGw})</div>`;
-                if (res.data.length === 0) {
-                    profitHtml += "<i style='font-size:12px; color:#aaa;'>Tidak ada manajer yang melakukan transfer minggu ini.</i>";
-                } else {
-                    res.data.forEach(p => {
-                        let color = p.profit > 0 ? "#00ff85" : (p.profit < 0 ? "#ff4a4a" : "#aaa");
-                        let icon = p.profit > 0 ? "🔥" : (p.profit < 0 ? "📉" : "⚖️");
-                        profitHtml += `<div class='bot-row'><span><b>${p.team}</b> <br><small>In: ${p.ptsIn} pts | Out: ${p.ptsOut} pts</small></span> <span style="color:${color}; font-weight:bold;">${icon} ${p.profit > 0 ? '+'+p.profit : p.profit}</span></div>`;
-                    });
-                }
-                handlePreview(profitHtml);
-            } else { handleError("Profit Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/trendchip") {
-        callGAS('getGlobalChipUsage', targetGw, null, function(res) {
-            if (res.success) {
-                let trendHtml = `<div class='bot-header'>🌍 Trend Chip Global FPL (GW ${targetGw})</div>`;
-                if (!res.chips || res.chips.length === 0) {
-                    trendHtml += "<i style='font-size:12px; color:#aaa;'>Data chip global belum tersedia untuk GW ini.</i>";
-                } else {
-                    let sortedChips = res.chips.sort((a,b) => b.num_played - a.num_played);
-                    sortedChips.forEach(c => {
-                        let chipName = c.chip_name.toUpperCase();
-                        let formattedNum = c.num_played.toLocaleString('id-ID');
-                        trendHtml += `<div class='bot-row'><span>Chip <b>${chipName}</b></span> <strong style="color:#33ccff;">${formattedNum} user</strong></div>`;
-                    });
-                }
-                handlePreview(trendHtml);
-            } else { handleError("Trend Chip Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/fdr") {
-        callGAS('getLeagueFDR', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let fdrHtml = `<div class='bot-header'>📅 Analisis Kesulitan Jadwal (GW ${targetGw})</div>`;
-                fdrHtml += `<div style="font-size: 11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom: 6px;">Berdasarkan Starting XI.<br> <span style="color:#00ff85;">Mudah (FDR 1-2)</span> | <span style="color:#aaa;">Normal (3)</span> | <span style="color:#ff4a4a;">Susah (4-5)</span></div>`;
-                res.data.forEach(d => {
-                    fdrHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size: 13px; text-align:right;"><span style="color:#00ff85;">${d.easy} 🟢</span> &nbsp;<span style="color:#aaa;">${d.normal} ⚪</span> &nbsp;<span style="color:#ff4a4a;">${d.hard} 🔴</span></span></div>`;
-                });
-                handlePreview(fdrHtml);
-            } else { handleError("FDR Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/or" || cmd === "/global") {
-        callGAS('getLeagueOR', MY_LEAGUE_ID, null, function(res) {
-            if (res.success) {
-                let orHtml = `<div class='bot-header'>🌍 Peringkat Dunia / Overall Rank</div>`;
-                res.data.forEach(d => {
-                    orHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#33ccff;">${d.rank.toLocaleString('id-ID')}</span></div>`;
-                });
-                handlePreview(orHtml);
-            } else { handleError("OR Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/arsenal" || cmd === "/sisa_chip") {
-        callGAS('getLeagueArsenal', MY_LEAGUE_ID, null, function(res) {
-            if (res.success) {
-                let arsHtml = `<div class='bot-header'>🔫 Sisa Persenjataan (Chips Tersedia)</div>`;
-                res.data.forEach(d => {
-                    arsHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="text-align:right; font-size:12px; color:#00ff85; font-weight:bold;">${d.chips.join(", ") || "<i style='color:#ff4a4a;'>Kosong/Habis</i>"}</span></div>`;
-                });
-                handlePreview(arsHtml);
-            } else { handleError("Arsenal Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/bank" || cmd === "/pelit") {
-        callGAS('getLeagueBank', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let bHtml = `<div class='bot-header'>🏦 Adu Saldo Nganggur (GW ${targetGw})</div>`;
-                res.data.forEach(d => {
-                    bHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#ffcc00;">£${d.bank}M</span></div>`;
-                });
-                handlePreview(bHtml);
-            } else { handleError("Bank Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/vice") {
-        callGAS('getLeagueViceCaptains', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let vHtml = `<div class='bot-header'>🥈 Vice Captaincy Stats (GW ${targetGw})</div>`;
-                if (Object.keys(res.vices).length === 0) {
-                    vHtml += "<i style='font-size:12px; color:#aaa;'>[API Restricted] Data unavailable. Picks are hidden until the Gameweek deadline passes.</i>";
-                }
-                for (let vCap in res.vices) {
-                    let capData = res.vices[vCap];
-                    let isArray = Array.isArray(capData);
-                    let count = isArray ? capData.length : capData;
-                    let namesJson = isArray ? JSON.stringify(capData).replace(/"/g, '&quot;').replace(/'/g, "\\'") : JSON.stringify(["Fitur nama belum didukung."]).replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                    vHtml += `<div class='bot-row'><span>${vCap}</span> <strong style="cursor:pointer; color:#00ff85; text-decoration:underline;" onclick="showManagersModal('Vice Kapten: ${vCap}', '${namesJson}')" title="Klik untuk lihat daftar manager">${count} managers</strong></div>`;
-                }
-                handlePreview(vHtml);
-            } else { handleError("Vice Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/boncos" || cmd === "/total_minus") {
-        callGAS('getLeagueTotalMinus', MY_LEAGUE_ID, null, function(res) {
-            if (res.success) {
-                let mHtml = `<div class='bot-header'>📉 Total Poin Dikorbankan (Minus Transfer)</div>`;
-                res.data.forEach(d => {
-                    let color = d.totalMinus > 0 ? "#ff4a4a" : "#00ff85";
-                    mHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:${color};">-${d.totalMinus} pts</span></div>`;
-                });
-                handlePreview(mHtml);
-            } else { handleError("Boncos Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/form" || cmd === "/onfire") {
-        callGAS('getLeagueForm', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let fHtml = `<div class='bot-header'>🔥 Detektor Manajer Gacor (3 GW Terakhir)</div>`;
-                res.data.forEach(d => {
-                    fHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#ffcc00;">${d.formPts} pts</span></div>`;
-                });
-                handlePreview(fHtml);
-            } else { handleError("Form Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/fomo" || cmd === "/latah") {
-        callGAS('getLeagueFomo', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let fomoHtml = `<div class='bot-header'>🐑 Tren Ikut-ikutan / Transfer In (GW ${targetGw})</div>`;
-                if (res.data.length === 0) {
-                    fomoHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada pergerakan transfer masuk yang masif.</i>";
-                } else {
-                    res.data.forEach(d => {
-                        let namesJson = JSON.stringify(d.owners).replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                        fomoHtml += `<div class='bot-row'><span><b>${d.name}</b> <small>(${d.team})</small></span> <span>Dibeli <strong style="cursor:pointer; color:#33ccff; text-decoration:underline;" onclick="showManagersModal('Latah beli ${d.name}', '${namesJson}')" title="Klik untuk lihat daftar manager">${d.count} manager</strong></span></div>`;
-                    });
-                }
-                handlePreview(fomoHtml);
-            } else { handleError("Fomo Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/bucin" || cmd === "/fansboy") {
-        callGAS('getLeagueBucin', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let bHtml = `<div class='bot-header'>❤️ Deteksi Fans Garis Keras (GW ${targetGw})</div>`;
-                bHtml += `<div style="font-size: 11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom: 6px;">Manajer yang pakai maksimal 3 pemain dari klub yang sama di Starting XI.</div>`;
-                if (res.data.length === 0) {
-                    bHtml += "<i style='font-size:12px; color:#00ff85;'>Wah sehat, skuad di liga ini sangat bervariasi!</i>";
-                } else {
-                    res.data.forEach(d => {
-                        bHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.name}</b> <br><small>(${d.team})</small></span> <span style="font-weight:bold; font-size:12px; color:#ff4a4a; text-align:right;">Triple<br>${d.club}</span></div>`;
-                    });
-                }
-                handlePreview(bHtml);
-            } else { handleError("Bucin Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/cuan" || cmd === "/investor") {
-        callGAS('getLeagueCuan', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let cHtml = `<div class='bot-header'>📈 Adu Cuan Profit/Loss Tim (GW ${targetGw})</div>`;
-                res.data.forEach(d => {
-                    let color = d.profit > 0 ? "#00ff85" : (d.profit < 0 ? "#ff4a4a" : "#aaa");
-                    let icon = d.profit > 0 ? "+" : (d.profit < 0 ? "" : " ");
-                    cHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:${color};">${icon}£${Math.abs(d.profit).toFixed(1)}M</span></div>`;
-                });
-                handlePreview(cHtml);
-            } else { handleError("Cuan Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/hoki" || cmd === "/autosub") {
-        callGAS('getLeagueHoki', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let hHtml = `<div class='bot-header'>🍀 Penyelamatan Auto-Sub (GW ${targetGw})</div>`;
-                if (res.data.length === 0) {
-                    hHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada auto-sub dramatis yang menghasilkan poin besar.</i>";
-                } else {
-                    res.data.forEach(d => {
-                        hHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; color:#00ff85; text-align:right;">Masuk: ${d.playerIn}<br>+${d.points} pts</span></div>`;
-                    });
-                }
-                handlePreview(hHtml);
-            } else { handleError("Hoki Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/nyesel") {
-        callGAS('getLeagueNyesel', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let nHtml = `<div class='bot-header'>🤦 Tragedi Salah Kapten (GW ${targetGw})</div>`;
-                nHtml += `<div style="font-size: 11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom: 6px;">Manajer yang poin Kaptennya dikalahkan telak oleh poin Vice-nya.</div>`;
-                if (res.data.length === 0) {
-                    nHtml += "<i style='font-size:12px; color:#00ff85;'>Luar biasa! Semua pilihan kapten sudah tepat sasaran.</i>";
-                } else {
-                    res.data.forEach(d => {
-                        nHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#ff4a4a;">Cap: ${d.cap} (${d.capPts})</span><br><span style="color:#33ccff;">Vice: ${d.vice} (${d.vicePts})</span></span></div>`;
-                    });
-                }
-                handlePreview(nHtml);
-            } else { handleError("Nyesel Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/roket" || cmd === "/longsor") {
-        callGAS('getLeagueArrows', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let aHtml = `<div class='bot-header'>🚀 Adu Tanda Panah Peringkat (GW ${targetGw})</div>`;
-                res.data.forEach(d => {
-                    let color = d.diff > 0 ? "#00ff85" : (d.diff < 0 ? "#ff4a4a" : "#aaa");
-                    let icon = d.diff > 0 ? "🟢 +" : (d.diff < 0 ? "🔴 " : "⚪ ");
-                    aHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:${color};">${icon}${Math.abs(d.diff).toLocaleString('id-ID')}</span></div>`;
-                });
-                handlePreview(aHtml);
-            } else { handleError("Arrows Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/hipster") {
-        callGAS('getLeagueHipster', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let hipHtml = `<div class='bot-header'>👓 Pasukan Anti-Template (GW ${targetGw})</div>`;
-                hipHtml += `<div style="font-size: 11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom: 6px;">Rata-rata persentase kepemilikan global 11 pemain inti.</div>`;
-                res.data.forEach((d, i) => {
-                    let icon = i === 0 ? "🥇" : "";
-                    hipHtml += `<div class='bot-row'><span>${icon} <b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#00ff85;">${d.avgOwnership}%</span></div>`;
-                });
-                handlePreview(hipHtml);
-            } else { handleError("Hipster Error: " + res.message); }
-        });
-    }
-    else if (cmd === "/jadwal" || cmd === "/fixture") {
-        callGAS('getLeagueFixtures', MY_LEAGUE_ID, targetGw, function(res) {
-            if (res.success) {
-                let jHtml = `<div class='bot-header'>📅 Jadwal & Manajer Terdampak (GW ${targetGw})</div>`;
-                if (res.data.length === 0) {
-                    jHtml += "<i style='font-size:12px; color:#aaa;'>Jadwal belum tersedia. </i>";
-                } else {
-                    res.data.forEach(group => {
-                        jHtml += `<div style="background:rgba(255,255,255,0.1); padding:4px 8px; margin-top:10px; font-weight:bold; font-size:12px; color:#fff; text-align:center; border-radius:4px;">${group.date}</div>`;
-                        group.fixtures.forEach(d => {
-                            jHtml += `<div style="margin-top:6px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom: 6px;">`;
-                            jHtml += `<div style="display: flex; justify-content:space-between; align-items:center;">`;
-                            jHtml += `<span style="color:#ffcc00; font-weight:bold; font-size:13px;">${d.match}</span>`;
-                            jHtml += `<span style="color:#aaa; font-size:11px;">${d.time}</span>`;
-                            jHtml += `</div>`;
-                            if (d.managers.length > 0) {
-                                let modalTitle = `Manajer di Laga ${d.match}`;
-                                let detailedList = [];
-                                d.managers.forEach(m => {
-                                    detailedList.push(`--- ${m.name} (${m.team}) ---`);
-                                    m.players.forEach(p => detailedList.push(` ${p}`));
-                                });
-                                let managersJson = JSON.stringify(detailedList).replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                                jHtml += `<div style="font-size: 12px; margin-top:3px;"><span style="cursor:pointer; color:#00ff85; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('${modalTitle}', '${managersJson}')" title="Klik untuk melihat rincian manajer & pemain">${d.managers.length} manager terlibat</span></div>`;
-                            } else {
-                                jHtml += `<div style="font-size: 11px; color:#aaa; margin-top:2px;"><i>Tidak ada manajer yang pakai pemain di laga ini.</i></div>`;
-                            }
-                            jHtml += `</div>`;
-                        });
-                    });
-                }
-                handlePreview(jHtml);
-            } else { handleError("Jadwal Error: " + res.message); }
-        });
-    }
-    else {
-        handleError("Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /fdr, /or, /arsenal, /bank, /vice, /boncos, /form, /fomo, /bucin, /cuan, /hoki, /nyesel, /roket, /hipster, /jadwal");
-    }
+                let managersJson = JSON.stringify(detailedList).replace(/"/g, '&quot;').replace(/'/g, "\\'");
+                
+                jHtml += `<div style="font-size:12px; margin-top:3px;"><span style="cursor:pointer; color:#00ff85; font-weight:bold; text-decoration:underline;" onclick="showManagersModal('${modalTitle}', '${managersJson}')" title="Klik untuk melihat rincian manajer & pemain">👥 ${d.managers.length} manager terlibat</span></div>`;
+              } else {
+                jHtml += `<div style="font-size:11px; color:#aaa; margin-top:2px;"><i>Tidak ada manajer yang pakai pemain di laga ini.</i></div>`;
+              }
+              jHtml += `</div>`;
+            });
+          });
+        }
+        db.ref(`chats/gw${gw}/${tempKey}`).update({ message: jHtml, isBotHtml: true });
+      } else { db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Jadwal Error: " + res.message }); }
+    });
+  }
+  else {
+    db.ref(`chats/gw${gw}/${tempKey}`).update({ message: "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /fdr, /or, /arsenal, /bank, /vice, /boncos, /form, /fomo, /bucin, /cuan, /hoki, /nyesel, /roket, /hipster, /jadwal" });
+  }
 } // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
   // ==========================================
@@ -2179,50 +2117,8 @@ function processSlashCommand(commandText, gw) {
     chatInput.value = cmd + (cmd === "/h2h" ? " @" : " "); // Tambah spasi (atau '@' khusus untuk perintah h2h)
     chatInput.focus();
   }
-
-    // ==========================================
-// FUNGSI TOGGLE FULLSCREEN CHAT BROWSER
-// ==========================================
-function toggleFullscreenChat() {
-    const body = document.body;
-    const btn = document.getElementById("btn-fullscreen-toggle");
-    if (body.classList.contains("fullscreen-chat")) {
-        body.classList.remove("fullscreen-chat");
-        btn.innerHTML = "⛶"; // Icon Expand
-        btn.title = "Layar Penuh Chat";
-    } else {
-        body.classList.add("fullscreen-chat");
-        btn.innerHTML = "✖"; // Icon Close/Exit
-        btn.title = "Kembali ke Tampilan Normal";
-    }
-    // Auto-scroll ke bawah agar layout pesan terakhir tidak tertutup
-    const box = document.getElementById("chat-box");
-    if (box) box.scrollTop = box.scrollHeight;
-}
-
-    // ==========================================
-// FUNGSI GANTI MODE TAMPILAN LINK BROWSER
-// ==========================================
-function toggleBrowserMode() {
-    const body = document.body;
-    const btn = document.getElementById("btn-browser-mode-toggle");
-    
-    if (body.classList.contains("web-browser-mode")) {
-        body.classList.remove("web-browser-mode");
-        btn.style.background = "rgba(0,0,0,0.4)";
-        btn.style.color = "#00ff85";
-        btn.title = "Ubah ke Mode Web Browser";
-    } else {
-        body.classList.add("web-browser-mode");
-        btn.style.background = "rgba(0,199,116,0.8)";
-        btn.style.color = "#ffffff";
-        btn.title = "Kembali ke Tampilan Aplikasi";
-    }
-    
-    const box = document.getElementById("chat-box");
-    if (box) box.scrollTop = box.scrollHeight;
-}
 </script>
 
 </body>
 </html>
+
