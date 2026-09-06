@@ -105,14 +105,22 @@
 #btn-fullscreen-toggle { background: transparent; border: none; color: #a375aa; font-size: 24px; cursor: pointer; padding: 0; padding-bottom: 5px; flex-shrink: 0; transition: color 0.2s; }
 #btn-fullscreen-toggle:hover { color: #00ff85; }
 
-/* MODE FULLSCREEN BROWSER */
-body.fullscreen-chat .app-header,
-body.fullscreen-chat #install-container,
-body.fullscreen-chat #rewards-banner,
-body.fullscreen-chat .online-status-bar { display: none !important; }
-body.fullscreen-chat .container { padding: 0 !important; max-width: 100% !important; }
-body.fullscreen-chat #chat-box { border-radius: 0 !important; border-left: none !important; border-right: none !important; margin-bottom: 0 !important; }
-body.fullscreen-chat .input-area { padding: 10px !important; background: #2a0030; }
+/* GAYA AWAL: SUDAH SEPERTI APLIKASI PENUH (DEFAULT UNTUK BROWSER LINK) */
+.app-header, #install-container, #rewards-banner, .online-status-bar { display: flex !important; }
+.container { padding: 12px 14px 10px 14px !important; max-width: 800px !important; }
+#chat-box { border-radius: 8px !important; margin-bottom: 6px !important; }
+
+/* KETIKA DIUBAH KE MODE WEB STANDARD (MUNCUL ADDRESS BAR / MENU CHROME) */
+body.web-browser-mode .app-header,
+body.web-browser-mode #install-container,
+body.web-browser-mode #rewards-banner,
+body.web-browser-mode .online-status-bar { display: none !important; }
+
+body.web-browser-mode .container { padding: 0 !important; max-width: 100% !important; height: 100vh; height: 100dvh; }
+body.web-browser-mode #main-section { height: 100%; }
+body.web-browser-mode #tab-chat { height: 100%; display: flex; flex-direction: column; }
+body.web-browser-mode #chat-box { border-radius: 0 !important; border: none !important; flex: 1 !important; margin-bottom: 0 !important; }
+body.web-browser-mode .input-area { background: #2a0030; padding: 10px; }
 
 .input-area textarea { flex: 1; margin: 0; font-size: 15px; padding: 10px 12px; border: 1px solid #4b0053; border-radius: 10px; background: #2a0030; color: #fff; resize: none; height: 40px; max-height: 120px; line-height: 1.3; overflow-y: auto; box-sizing: border-box; transition: border-color 0.2s; }
 .input-area textarea:focus { outline: none; border: 1px solid #00ff85; }
@@ -334,14 +342,15 @@ body.fullscreen-chat .input-area { padding: 10px !important; background: #2a0030
       </div>
 
       <!-- INDIKATOR MANAJER ONLINE -->
-      <div class="online-status-bar">
-        <span class="online-dot"></span>
-        <div class="online-list" id="online-users-text">Manajer Online: Memuat...</div>
-      </div>
-
-      <div id="chat-box"></div>
-      
-      <!-- NOTIFIKASI MENTION MELAYANG -->
+    <div class="online-status-bar">
+<span class="online-dot"></span>
+<div class="online-list" id="online-users-text">Manajer Online: Memuat...</div>
+</div>
+<div id="chat-box" style="position: relative;">
+    <!-- Tombol Transparan Mengambang di Pojok Kanan Atas Chat (Khusus Browser) -->
+    <button id="btn-browser-mode-toggle" onclick="toggleBrowserMode()" title="Ubah Tampilan Browser/Aplikasi" style="display: none; position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.4); color: #00ff85; border: 1px solid rgba(0,255,133,0.3); border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; z-index: 50; align-items: center; justify-content: center; backdrop-filter: blur(2px); transition: all 0.2s;">⚙️</button>
+</div>
+<!-- NOTIFIKASI MENTION MELAYANG -->
       <div id="mention-toast" onclick="scrollToMention()" style="display:none; position:absolute; bottom:130px; right:20px; background:#ff4a4a; color:#fff; padding:8px 15px; border-radius:20px; font-size:13px; font-weight:bold; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.5); z-index:100; border:1px solid #fff;">
         🔔 Disebut oleh <span id="mention-toast-sender">Seseorang</span>
       </div>
@@ -440,19 +449,28 @@ oninput="autoResize Textarea(this); handleMentionInput(this)"></textarea>
   let activeReplyData = null;
 
 window.onload = function() {
-if (window.matchMedia('(display-mode: standalone)').matches ||
-window.navigator.standalone === true) {
-const installContainer = document.getElementById("install-container");
-if (installContainer) {
-installContainer.style.display = "none";
-}
-// Sembunyikan tombol fullscreen jika sudah diinstall sebagai aplikasi
-const fsBtn = document.getElementById("btn-fullscreen-toggle");
-if (fsBtn) {
-fsBtn.style.display = "none";
-}
-}
-let gwOptionsHTML = "";
+    if (window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true) {
+        const installContainer = document.getElementById("install-container");
+        if (installContainer) {
+            installContainer.style.display = "none";
+        }
+        // JIKA SUDAH DI-INSTALL SEBAGAI APLIKASI: Sembunyikan tombol browser mode
+        const browserToggleBtn = document.getElementById("btn-browser-mode-toggle");
+        if (browserToggleBtn) {
+            browserToggleBtn.style.display = "none";
+        }
+    } else {
+        // JIKA DIBUKA LEWAT LINK BROWSER BIASA: Tampilkan tombol pengaturnya di pojok kanan atas chat
+        const browserToggleBtn = document.getElementById("btn-browser-mode-toggle");
+        if (browserToggleBtn) {
+            browserToggleBtn.style.display = "flex";
+        }
+    }
+    
+    let gwOptionsHTML = "";
+    // ... (sisa kode di bawahnya tetap berjalan seperti biasa)
+};
     for (let i = 1; i <= CURRENT_LIVE_GW; i++) {
       let label = (i === CURRENT_LIVE_GW) ? " (Live)" : " (Arsip)";
       let selected = (i === CURRENT_LIVE_GW) ? "selected" : "";
@@ -2170,6 +2188,29 @@ function toggleFullscreenChat() {
         btn.title = "Kembali ke Tampilan Normal";
     }
     // Auto-scroll ke bawah agar layout pesan terakhir tidak tertutup
+    const box = document.getElementById("chat-box");
+    if (box) box.scrollTop = box.scrollHeight;
+}
+
+    // ==========================================
+// FUNGSI GANTI MODE TAMPILAN LINK BROWSER
+// ==========================================
+function toggleBrowserMode() {
+    const body = document.body;
+    const btn = document.getElementById("btn-browser-mode-toggle");
+    
+    if (body.classList.contains("web-browser-mode")) {
+        body.classList.remove("web-browser-mode");
+        btn.style.background = "rgba(0,0,0,0.4)";
+        btn.style.color = "#00ff85";
+        btn.title = "Ubah ke Mode Web Browser";
+    } else {
+        body.classList.add("web-browser-mode");
+        btn.style.background = "rgba(0,199,116,0.8)";
+        btn.style.color = "#ffffff";
+        btn.title = "Kembali ke Tampilan Aplikasi";
+    }
+    
     const box = document.getElementById("chat-box");
     if (box) box.scrollTop = box.scrollHeight;
 }
