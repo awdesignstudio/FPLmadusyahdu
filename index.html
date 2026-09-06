@@ -2035,7 +2035,7 @@ else if (cmd === "/dukun" || cmd === "/gaib") {
       } else { handleSlashResult(gw, cmd, false, "Dukun Error: " + res.message); }
     });
   }
-  else if (cmd === "/pawang" || cmd === "/insting") {
+else if (cmd === "/pawang" || cmd === "/insting") {
     callGAS('getLeaguePawang', MY_LEAGUE_ID, targetGw, function(res) {
       if (res.success) {
         let pHtml = `<div class='bot-header'>🎯 Insting Pawang Kapten (GW ${targetGw})</div>`;
@@ -2046,7 +2046,10 @@ else if (cmd === "/dukun" || cmd === "/gaib") {
             let medal = i === 0 ? "👑" : "🎯";
             pHtml += `<div class='bot-row' style="padding: 4px 0;"><span>${medal} <b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#33ccff;">Kapten: ${d.player}</span><br><span style="color:#00ff85;">Gacor: ${d.points} pts 🔥</span></span></div>`;
           });
-          pHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Yang kemarin kaptenin Haaland nge-blank, sungkem dulu sini sama Suhu! 🙇‍♂️</div>`;
+          
+          // Ambil nama pemain dari manajer urutan pertama (pawang terbaik)
+          let topCaptain = res.data[0].player;
+          pHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Yang kaptennya nge-blank, sungkem dulu sini sama pawangnya ${topCaptain}! 🙇‍♂️</div>`;
         }
         handleSlashResult(gw, cmd, true, pHtml);
       } else { handleSlashResult(gw, cmd, false, "Pawang Error: " + res.message); }
