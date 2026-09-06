@@ -100,8 +100,20 @@
 
       /* INPUT AREA & REPLY PREVIEW */
       .input-area { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-bottom: 0px; }
-      .input-row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
-      .input-area textarea { flex: 1; margin: 0; font-size: 15px; padding: 10px 12px; border: 1px solid #4b0053; border-radius: 10px; background: #2a0030; color: #fff; resize: none; height: 40px; max-height: 120px; line-height: 1.3; overflow-y: auto; box-sizing: border-box; transition: border-color 0.2s; }
+    .input-row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
+#btn-fullscreen-toggle { background: transparent; border: none; color: #a375aa; font-size: 24px; cursor: pointer; padding: 0; padding-bottom: 5px; flex-shrink: 0; transition: color 0.2s; }
+#btn-fullscreen-toggle:hover { color: #00ff85; }
+
+/* MODE FULLSCREEN BROWSER */
+body.fullscreen-chat .app-header,
+body.fullscreen-chat #install-container,
+body.fullscreen-chat #rewards-banner,
+body.fullscreen-chat .online-status-bar { display: none !important; }
+body.fullscreen-chat .container { padding: 0 !important; max-width: 100% !important; }
+body.fullscreen-chat #chat-box { border-radius: 0 !important; border-left: none !important; border-right: none !important; margin-bottom: 0 !important; }
+body.fullscreen-chat .input-area { padding: 10px !important; background: #2a0030; }
+
+input-area textarea { flex: 1; margin: 0; font-size: 15px; padding: 10px 12px; border: 1px
       .input-area textarea:focus { outline: none; border: 1px solid #00ff85; }
       .input-area textarea::placeholder { color: #aaa; }
       
@@ -343,9 +355,11 @@
           <span class="reply-preview-close" onclick="cancelReply()">✕</span>
         </div>
         <div class="input-row">
-          <textarea id="chatMessage" placeholder="Ketik pesan... 😊" rows="1" oninput="autoResizeTextarea(this); handleMentionInput(this)"></textarea>
-          <button id="send-btn" onclick="sendMessage()" title="Kirim">✈️</button>
-        </div>
+<button id="btn-fullscreen-toggle" onclick="toggleFullscreenChat()" title="Layar Penuh Chat">⛶</button>
+<textarea id="chatMessage" placeholder="Ketik pesan..." rows="1"
+oninput="autoResize Textarea(this); handleMentionInput(this)"></textarea>
+<button id="send-btn" onclick="sendMessage()" title="Kirim"> </button>
+</div>
       </div>
     </div>
 
@@ -424,15 +438,20 @@
   const CURRENT_LIVE_GW = calculateCurrentLiveGW();
   let activeReplyData = null;
 
-  window.onload = function() {
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-      const installContainer = document.getElementById("install-container");
-      if (installContainer) {
-        installContainer.style.display = "none";
-      }
-    }
-
-    let gwOptionsHTML = "";
+window.onload = function() {
+if (window.matchMedia('(display-mode: standalone)').matches ||
+window.navigator.standalone === true) {
+const installContainer = document.getElementById("install-container");
+if (installContainer) {
+installContainer.style.display = "none";
+}
+// Sembunyikan tombol fullscreen jika sudah diinstall sebagai aplikasi
+const fsBtn = document.getElementById("btn-fullscreen-toggle");
+if (fsBtn) {
+fsBtn.style.display = "none";
+}
+}
+let gwOptionsHTML = "";
     for (let i = 1; i <= CURRENT_LIVE_GW; i++) {
       let label = (i === CURRENT_LIVE_GW) ? " (Live)" : " (Arsip)";
       let selected = (i === CURRENT_LIVE_GW) ? "selected" : "";
@@ -2133,6 +2152,26 @@ function processSlashCommand(commandText, gw) {
     chatInput.value = cmd + (cmd === "/h2h" ? " @" : " "); // Tambah spasi (atau '@' khusus untuk perintah h2h)
     chatInput.focus();
   }
+
+    // ==========================================
+// FUNGSI TOGGLE FULLSCREEN CHAT BROWSER
+// ==========================================
+function toggleFullscreenChat() {
+    const body = document.body;
+    const btn = document.getElementById("btn-fullscreen-toggle");
+    if (body.classList.contains("fullscreen-chat")) {
+        body.classList.remove("fullscreen-chat");
+        btn.innerHTML = "⛶"; // Icon Expand
+        btn.title = "Layar Penuh Chat";
+    } else {
+        body.classList.add("fullscreen-chat");
+        btn.innerHTML = "✖"; // Icon Close/Exit
+        btn.title = "Kembali ke Tampilan Normal";
+    }
+    // Auto-scroll ke bawah agar layout pesan terakhir tidak tertutup
+    const box = document.getElementById("chat-box");
+    if (box) box.scrollTop = box.scrollHeight;
+}
 </script>
 
 </body>
