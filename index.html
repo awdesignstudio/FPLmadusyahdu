@@ -213,14 +213,15 @@ body.web-browser-mode .input-area { background: #2a0030; padding: 10px; }
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then((reg) => { console.log('Service Worker terdaftar:', reg.scope); })
-            .catch((err) => { console.log('Gagal mendaftarkan Service Worker:', err); });
-        });
-      }
-    </script>
+     <script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+        .then((reg) => { console.log('Service Worker terdaftar:', reg.scope); })
+        .catch((err) => { console.log('Gagal mendaftarkan Service Worker:', err); });
+    });
+}
+</script>
 </head>
 <body>
 
@@ -412,40 +413,37 @@ oninput="autoResize Textarea(this); handleMentionInput(this)"></textarea>
 <script>
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNOARLVkXFnVwiJESkv3H3zBzqS3j9w3W99h78vrvx16B-3b443VZg5ZP7vQHCr2iC/exec";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDDdJPT545c5itfAYNM8-8N017p4QLzUNU",
+ const firebaseConfig = {
+    apiKey: "AlzaSyDDdJPT545c5itfAYNM8-8N017p4QLzUNU",
     authDomain: "fpl-chat-11494.firebaseapp.com",
     projectId: "fpl-chat-11494",
     storageBucket: "fpl-chat-11494.firebasestorage.app",
     messagingSenderId: "672234993639",
     appId: "1:672234993639:web:6e346a7e9b89f8ed3a2f42",
     measurementId: "G-QWHCN08BDZ",
-    databaseURL: "https://fpl-chat-11494-default-rtdb.asia-southeast1.firebasedatabase.app" 
-  };
-  
-  firebase.initializeApp(firebaseConfig); 
+    databaseURL: "https://fpl-chat-11494-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
-  let currentUser = {};
-  let currentChatRef = null;
-  const MY_LEAGUE_ID = 182620;
+let currentUser = {};
+let currentChatRef = null;
+const MY_LEAGUE_ID = 182620;
 
-  // FUNGSI OTOMATIS HITUNG GAMEEWEEK BERDASARKAN KAMIS 3 SEPTEMBER 2026 SEBAGAI AWAL GW 3
-  function calculateCurrentLiveGW() {
-    const baseDate = new Date("2026-09-03T00:00:00"); // Kamis, 3 September 2026 (Mulai GW 3)
+// FUNGSI OTOMATIS HITUNG GAMEEWEEK BERDASARKAN KAMIS 3 SEPTEMBER 2026 SEBAGAI AWAL GW 3
+function calculateCurrentLiveGW() {
+    const baseDate = new Date("2026-09-03T00:00:00"); 
     const baseGw = 3;
     const now = new Date();
-    
     const diffTime = now - baseDate;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.floor(diffTime / (1000*60*60*24));
     
     if (diffDays < 0) return baseGw;
+    
     const weeksPassed = Math.floor(diffDays / 7);
     let calculatedGw = baseGw + weeksPassed;
-    
     return Math.min(calculatedGw, 38); // Batas maksimal 38 GW
-  }
-
-  const CURRENT_LIVE_GW = calculateCurrentLiveGW();
+}
+const CURRENT_LIVE_GW = calculateCurrentLiveGW();
   let activeReplyData = null;
 
 window.onload = function() {
