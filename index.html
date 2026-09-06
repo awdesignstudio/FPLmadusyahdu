@@ -98,9 +98,10 @@
       .msg-actions span { cursor: pointer; text-decoration: none; }
       .msg-actions span:hover { font-weight: bold; color: #00ff85; text-decoration: underline; }
 
-      /* INPUT AREA & REPLY PREVIEW */
-      .input-area { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-bottom: 0px; }
-    .input-row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
+   /* INPUT AREA & REPLY PREVIEW */
+.input-area { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-bottom: 0px; }
+.input-row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
+
 #btn-fullscreen-toggle { background: transparent; border: none; color: #a375aa; font-size: 24px; cursor: pointer; padding: 0; padding-bottom: 5px; flex-shrink: 0; transition: color 0.2s; }
 #btn-fullscreen-toggle:hover { color: #00ff85; }
 
@@ -113,9 +114,9 @@ body.fullscreen-chat .container { padding: 0 !important; max-width: 100% !import
 body.fullscreen-chat #chat-box { border-radius: 0 !important; border-left: none !important; border-right: none !important; margin-bottom: 0 !important; }
 body.fullscreen-chat .input-area { padding: 10px !important; background: #2a0030; }
 
-input-area textarea { flex: 1; margin: 0; font-size: 15px; padding: 10px 12px; border: 1px
-      .input-area textarea:focus { outline: none; border: 1px solid #00ff85; }
-      .input-area textarea::placeholder { color: #aaa; }
+.input-area textarea { flex: 1; margin: 0; font-size: 15px; padding: 10px 12px; border: 1px solid #4b0053; border-radius: 10px; background: #2a0030; color: #fff; resize: none; height: 40px; max-height: 120px; line-height: 1.3; overflow-y: auto; box-sizing: border-box; transition: border-color 0.2s; }
+.input-area textarea:focus { outline: none; border: 1px solid #00ff85; }
+.input-area textarea::placeholder { color: #aaa; }
       
       .reply-preview { display: none; background: rgba(0, 92, 75, 0.6); border-left: 4px solid #00ff85; padding: 8px 10px; border-radius: 6px; font-size: 12px; position: relative; }
       .reply-preview-title { color: #00ff85; font-weight: bold; margin-bottom: 3px; }
