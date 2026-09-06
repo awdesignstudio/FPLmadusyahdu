@@ -699,46 +699,56 @@ window.onload = function() {
     });
   }
 
- function login() {
-    const managerId = document.getElementById("inputManagerId").value;
-    if(!managerId) return;
+function login() {
+    // Perhatikan penulisan inputManagerld (huruf 'l' kecil di 'ld' sesuai HTML asli)
+    const inputEl = document.getElementById("inputManagerld") || document.getElementById("inputManagerId");
+    
+    if (!inputEl) {
+        console.error("Elemen input ID Manajer tidak ditemukan di HTML.");
+        return;
+    }
+
+    const managerId = inputEl.value.trim();
+    if (!managerId) {
+        document.getElementById("login-status").innerText = "Silakan masukkan ID Manajer terlebih dahulu.";
+        return;
+    }
+
     document.getElementById("login-status").innerText = "Mengecek ke server FPL...";
     
     callGAS('verifyFPLManager', managerId, null, function(res) {
-      if (res.success) {
-        document.getElementById("login-status").innerText = "Mengecek keanggotaan Liga Madu Syahdu...";
-        
-        // Pengecekan ekstra: Pastikan manager terdaftar di klasemen Liga Madu Syahdu
-        callGAS('getDashboardData', MY_LEAGUE_ID, CURRENT_LIVE_GW, function(dashboardRes) {
-          if (dashboardRes.success) {
-            // Cari apakah ID manajer yang login ada di dalam leaderboard liga
-            const isMember = dashboardRes.leaderboard.some(item => item.id.toString() === managerId.toString());
+        if (res.success) {
+            document.getElementById("login-status").innerText = "Mengecek keanggotaan Liga Madu Syahdu...";
             
-            if (isMember) {
-              currentUser = res;
-              localStorage.setItem("fpl_current_user", JSON.stringify(res));
-              document.getElementById("login-section").style.display = "none";
-              document.getElementById("main-section").style.display = "block";
-              
-              setupPresenceSystem();
-              const selectedGw = document.getElementById("gwSelect").value;
-              const dashboardGw = document.getElementById("gwDashboardSelect").value;
-              
-              loadChat(selectedGw); 
-              loadRewardsForChat(MY_LEAGUE_ID, selectedGw);
-              buildDashboard(MY_LEAGUE_ID, dashboardGw);
-            } else {
-              document.getElementById("login-status").innerText = "Akses Ditolak: Anda tidak terdaftar di Liga Madu Syahdu.";
-            }
-          } else {
-            document.getElementById("login-status").innerText = "Gagal memverifikasi keanggotaan liga. Coba lagi.";
-          }
-        });
-      } else {
-        document.getElementById("login-status").innerText = res.message;
-      }
+            callGAS('getDashboardData', MY_LEAGUE_ID, CURRENT_LIVE_GW, function(dashboardRes) {
+                if (dashboardRes.success) {
+                    const isMember = dashboardRes.leaderboard.some(item => item.id.toString() === managerId.toString());
+                    
+                    if (isMember) {
+                        currentUser = res;
+                        localStorage.setItem("fpl_current_user", JSON.stringify(res));
+                        document.getElementById("login-section").style.display = "none";
+                        document.getElementById("main-section").style.display = "block";
+                        
+                        setupPresenceSystem();
+                        const selectedGw = document.getElementById("gwSelect").value || CURRENT_LIVE_GW;
+                        const dashboardGw = document.getElementById("gwDashboardSelect").value || CURRENT_LIVE_GW;
+                        
+                        loadChat(selectedGw); 
+                        loadRewardsForChat(MY_LEAGUE_ID, selectedGw);
+                        buildDashboard(MY_LEAGUE_ID, dashboardGw);
+                    } else {
+                        document.getElementById("login-status").innerText = "Akses Ditolak: Anda tidak terdaftar di Liga Madu Syahdu.";
+                    }
+                } else {
+                    document.getElementById("login-status").innerText = "Gagal memverifikasi keanggotaan liga. Coba lagi.";
+                }
+            });
+        } else {
+            document.getElementById("login-status").innerText = res.message || "ID Manajer tidak ditemukan.";
+        }
     });
-  }
+}
   function confirmLogout() {
     showCustomConfirm("Konfirmasi Logout", "Apakah Anda yakin ingin keluar dari akun ini?", function() {
       logout();
