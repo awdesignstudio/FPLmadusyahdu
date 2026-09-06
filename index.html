@@ -1921,7 +1921,7 @@ function processSlashCommand(commandText, gw) {
       } else { handleSlashResult(gw, cmd, false, "Hipster Error: " + res.message); }
     });
   }
-  else if (cmd === "/jadwal" || cmd === "/fixture") {
+else if (cmd === "/jadwal" || cmd === "/fixture") {
     callGAS('getLeagueFixtures', MY_LEAGUE_ID, targetGw, function(res) {
       if (res.success) {
         let jHtml = `<div class='bot-header'>📅 Jadwal & Manajer Terdampak (GW ${targetGw})</div>`;
@@ -1957,8 +1957,86 @@ function processSlashCommand(commandText, gw) {
       } else { handleSlashResult(gw, cmd, false, "Jadwal Error: " + res.message); }
     });
   }
+  else if (cmd === "/mantan" || cmd === "/kualat") {
+    callGAS('getLeagueMantan', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let mHtml = `<div class='bot-header'>💔 Kutukan Mantan (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          mHtml += "<i style='font-size:12px; color:#00ff85;'>Aman! Tidak ada yang kualat jual pemain gacor minggu ini.</i>";
+        } else {
+          res.data.forEach(d => {
+            mHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#ff4a4a;">Jual: ${d.player}</span><br><span style="color:#00ff85;">Malah cetak: ${d.points} pts 😭</span></span></div>`;
+          });
+        }
+        handleSlashResult(gw, cmd, true, mHtml);
+      } else { handleSlashResult(gw, cmd, false, "Mantan Error: " + res.message); }
+    });
+  }
+  else if (cmd === "/preman" || cmd === "/tarkam") {
+    callGAS('getLeaguePreman', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let pHtml = `<div class='bot-header'>🟨 FC Tarkam (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          pHtml += "<i style='font-size:12px; color:#00ff85;'>Liga yang sangat sportif, tidak ada poin minus dari kartu.</i>";
+        } else {
+          res.data.forEach(d => {
+            pHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#ffcc00;">${d.cards} Kartu (-${d.minusPts} pts)</span></div>`;
+          });
+        }
+        handleSlashResult(gw, cmd, true, pHtml);
+      } else { handleSlashResult(gw, cmd, false, "Preman Error: " + res.message); }
+    });
+  }
+  else if (cmd === "/beban" || cmd === "/makangaji") {
+    callGAS('getLeagueBeban', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let bHtml = `<div class='bot-header'>💸 Beban Tim (Makan Gaji Buta GW ${targetGw})</div>`;
+        bHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Pemain termahal di Starting XI yang poinnya 2 atau kurang.</div>`;
+        if (res.data.length === 0) {
+          bHtml += "<i style='font-size:12px; color:#00ff85;'>Semua pemain mahal di liga ini ngasih poin!</i>";
+        } else {
+          res.data.forEach(d => {
+            bHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#ff4a4a;">${d.player} (£${d.price}M)</span><br><span style="color:#aaa;">Cuma ngasih: ${d.points} pts 📉</span></span></div>`;
+          });
+        }
+        handleSlashResult(gw, cmd, true, bHtml);
+      } else { handleSlashResult(gw, cmd, false, "Beban Error: " + res.message); }
+    });
+  }
+  else if (cmd === "/php" || cmd === "/scam") {
+    callGAS('getLeaguePhp', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let pHtml = `<div class='bot-header'>🤡 Korban PHP Massal (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          pHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada pemain hype yang nge-blank parah.</i>";
+        } else {
+          res.data.forEach(d => {
+            let namesJson = JSON.stringify(d.owners).replace(/"/g, '&quot;').replace(/'/g, "\\'");
+            pHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.player}</b> <br><small>Dibeli <strong style="cursor:pointer; color:#33ccff; text-decoration:underline;" onclick="showManagersModal('Korban ${d.player}', '${namesJson}')" title="Klik untuk lihat daftar manager">${d.count} manager</strong></small></span> <span style="font-weight:bold; font-size:12px; color:#ff4a4a; text-align:right;">Hasilnya:<br>${d.points} pts 😭</span></div>`;
+          });
+        }
+        handleSlashResult(gw, cmd, true, pHtml);
+      } else { handleSlashResult(gw, cmd, false, "PHP Error: " + res.message); }
+    });
+  }
+  else if (cmd === "/dukun" || cmd === "/gaib") {
+    callGAS('getLeagueDukun', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let dHtml = `<div class='bot-header'>🔮 Dukun Susuk / Jalur Orang Dalam (GW ${targetGw})</div>`;
+        dHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Pemain kepemilikan global &lt;2% yang mencetak poin besar.</div>`;
+        if (res.data.length === 0) {
+          dHtml += "<i style='font-size:12px; color:#aaa;'>Tidak ada poin gaib di liga ini. Semua main aman.</i>";
+        } else {
+          res.data.forEach(d => {
+            dHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#00ff85;">${d.player} (${d.ownership}%)</span><br><span style="color:#33ccff;">Gacor: ${d.points} pts 🔥</span></span></div>`;
+          });
+        }
+        handleSlashResult(gw, cmd, true, dHtml);
+      } else { handleSlashResult(gw, cmd, false, "Dukun Error: " + res.message); }
+    });
+  }
   else {
-    handleSlashResult(gw, cmd, false, "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /fdr, /or, /arsenal, /bank, /vice, /boncos, /form, /fomo, /bucin, /cuan, /hoki, /nyesel, /roket, /hipster, /jadwal");
+    handleSlashResult(gw, cmd, false, "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /fdr, /or, /arsenal, /bank, /vice, /boncos, /form, /fomo, /bucin, /cuan, /hoki, /nyesel, /roket, /hipster, /jadwal, /mantan, /preman, /beban, /php, /dukun");
   }
 } // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
@@ -2099,8 +2177,13 @@ function processSlashCommand(commandText, gw) {
       { cmd: "/nyesel", desc: "Lacak manajer yang salah pilih Kapten (kalah poin dari Vice-nya).", out: "🤦 Tragedi Salah Kapten: Andi (Cap 2 pts vs Vice 15 pts)" },
      { cmd: "/roket atau /longsor", desc: "Adu perubahan Peringkat Dunia (OR) naik/turun minggu ini.", out: "🚀 Adu Tanda Panah: Joko 🚀 +50.000 rank" },
       { cmd: "/hipster", desc: "Kalkulasi rata-rata kepemilikan global 11 pemain inti. Makin kecil makin hipster.", out: "🕶️ Pasukan Anti-Template: Tono (Rata-rata 5.2%)" },
-      { cmd: "/jadwal atau /fixture", desc: "Cek jadwal tanding (WIB) & lihat manajer mana yang terlibat.", out: "📅 Jadwal: ARS vs LIV | Manajer terlibat: Budi (4)" },
-      { cmd: "/h2h @Nama", desc: "Bandingkan langsung poin dan rank total kamu vs rival.", out: "⚔️ H2H BATTLE: Tim Kamu (50 Pts) vs Tim Budi (42 Pts)" }
+   { cmd: "/jadwal atau /fixture", desc: "Cek jadwal tanding (WIB) & lihat manajer mana yang terlibat.", out: "📅 Jadwal: ARS vs LIV | Manajer terlibat: Budi (4)" },
+      { cmd: "/h2h @Nama", desc: "Bandingkan langsung poin dan rank total kamu vs rival.", out: "⚔️ H2H BATTLE: Tim Kamu (50 Pts) vs Tim Budi (42 Pts)" },
+      { cmd: "/mantan atau /kualat", desc: "Manajer yang jual pemain, eh pemainnya malah hauling.", out: "💔 Kutukan Mantan: Budi jual Mbeumo, hasil 15 poin." },
+      { cmd: "/preman atau /tarkam", desc: "Hitung total minus dari Kartu Kuning & Merah di tim.", out: "🟨 FC Tarkam: Andi (-4 pts dari kartu)." },
+      { cmd: "/beban atau /makangaji", desc: "Pemain termahal di Starting XI tapi cuma ngasih <=2 poin.", out: "💸 Beban Tim: Joko (Haaland - £15.0M) cuma ngasih 2 poin." },
+      { cmd: "/php atau /scam", desc: "Pemain paling banyak di-Transfer In tapi malah nge-blank.", out: "🤡 Korban PHP: 5 manajer beli Jackson, hasil: 2 poin." },
+      { cmd: "/dukun atau /gaib", desc: "Manajer yang dapat poin dari pemain ber-ownership sangat rendah (<2%).", out: "🔮 Dukun Susuk: Dani dapet 12 poin dari Winks." }
     ];
 
     commands.forEach(c => {
