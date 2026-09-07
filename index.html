@@ -1481,7 +1481,6 @@ function postSlashToChat() {
         closeSlashPreview();
     }
 }
-
 // ==========================================
 // LOGIKA SLASH COMMANDS & BOT VAR
 // ==========================================
@@ -1507,7 +1506,6 @@ function processSlashCommand(commandText, gw) {
   document.getElementById("slash-preview-body").innerHTML = `<i style='color:#ccc;'>Sedang mengambil data live (GW ${targetGw}) dari server FPL, mohon tunggu...</i>`;
   document.getElementById("btn-post-slash").style.display = "none";
   document.getElementById("slash-preview-modal").style.display = "flex";
-
   if (cmd === "/captain" || cmd === "/chips") {
     callGAS('getLeagueCaptains', MY_LEAGUE_ID, targetGw, function(res) {
       if (res.success) {
@@ -1556,8 +1554,8 @@ function processSlashCommand(commandText, gw) {
     callGAS('getH2HByName', MY_LEAGUE_ID, { gw: targetGw, myId: currentUser.managerId, targetName: targetName }, function(res) {
       if (res.success) {
         let h2hHtml = `<div class='bot-header'>⚔️ H2H BATTLE (GW ${targetGw})</div>`;
-        h2hHtml += `<div class='bot-row'><span><b>${res.me.team}</b><br><small>${res.me.name}</small></span> <span style="text-align:right;"><b>GW: ${res.me.gwPts}</b><br>Tot: ${res.me.totPts} (Rank ${res.me.rank})</span></div>`;
-        h2hHtml += `<div class='bot-row' style="margin-top:6px; color:#ff4a4a;"><span><b>${res.opponent.team}</b><br><small>${res.opponent.name}</small></span> <span style="text-align:right;"><b>GW: ${res.opponent.gwPts}</b><br>Tot: ${res.opponent.totPts} (Rank ${res.opponent.rank})</span></div>`;
+        h2hHtml += `<div class='bot-row'><span><b>${res.me.team}</b></span> <span style="text-align:right;"><b>GW: ${res.me.gwPts}</b><br>Tot: ${res.me.totPts} (Rank ${res.me.rank})</span></div>`;
+        h2hHtml += `<div class='bot-row' style="margin-top:6px; color:#ff4a4a;"><span><b>${res.opponent.team}</b></span> <span style="text-align:right;"><b>GW: ${res.opponent.gwPts}</b><br>Tot: ${res.opponent.totPts} (Rank ${res.opponent.rank})</span></div>`;
         handleSlashResult(gw, cmd, true, h2hHtml);
       } else { handleSlashResult(gw, cmd, false, "H2H Error: " + res.message); }
     });
@@ -1605,7 +1603,7 @@ function processSlashCommand(commandText, gw) {
           hitHtml += "<i style='font-size:12px; color:#aaa;'>Aman! Belum ada manajer yang ambil minus (hit) di GW ini. Semua main aman.</i>";
         } else {
           res.hitList.forEach(h => {
-            hitHtml += `<div class='bot-row'><span><b>${h.team}</b> <small>(${h.name})</small></span> <span style="color:#ff4a4a; font-weight:bold;">-${h.hit} pts</span></div>`;
+            hitHtml += `<div class='bot-row'><span><b>${h.team}</b></span> <span style="color:#ff4a4a; font-weight:bold;">-${h.hit} pts</span></div>`;
           });
         }
         handleSlashResult(gw, cmd, true, hitHtml);
@@ -1620,7 +1618,7 @@ function processSlashCommand(commandText, gw) {
           blunderHtml += "<i style='font-size:12px; color:#aaa;'>Aman jaya! Belum ada kapten manajer yang bernasib tragis di GW ini.</i>";
         } else {
           res.blunderList.forEach(b => {
-            blunderHtml += `<div class='bot-row'><span><b>${b.team}</b> <small>(${b.name})</small><br>Kapten: <i>${b.captain}</i></span> <span style="color:#ff4a4a; font-weight:bold;">${b.points} pts</span></div>`;
+            blunderHtml += `<div class='bot-row'><span><b>${b.team}</b><br>Kapten: <i>${b.captain}</i></span> <span style="color:#ff4a4a; font-weight:bold;">${b.points} pts</span></div>`;
           });
         }
         handleSlashResult(gw, cmd, true, blunderHtml);
@@ -1635,7 +1633,7 @@ function processSlashCommand(commandText, gw) {
           benchHtml += "<i style='font-size:12px; color:#aaa;'>Hebat! Tidak ada poin terbuang sia-sia di bench minggu ini.</i>";
         } else {
           res.data.forEach(b => {
-            benchHtml += `<div class='bot-row'><span><b>${b.team}</b> <small>(${b.name})</small></span> <span style="color:#ff4a4a; font-weight:bold;">${b.benchPts} pts</span></div>`;
+            benchHtml += `<div class='bot-row'><span><b>${b.team}</b></span> <span style="color:#ff4a4a; font-weight:bold;">${b.benchPts} pts</span></div>`;
           });
           benchHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Nangis di pojokan ngeliat poin bench lebih gede dari poin kapten 😭</div>`;
         }
@@ -1678,7 +1676,7 @@ function processSlashCommand(commandText, gw) {
         } else {
           zombieHtml += "<i style='font-size:12px; color:#aaa;'>Manajer berikut belum melakukan transfer dalam 3+ Gameweek terakhir:</i>";
           res.data.forEach(z => {
-            zombieHtml += `<div class='bot-row'><span><b>${z.team}</b> <small>(${z.name})</small></span> <span style="color:#ffcc00; font-weight:bold;">${z.inactiveWeeks} GW</span></div>`;
+            zombieHtml += `<div class='bot-row'><span><b>${z.name}</b></span> <span style="color:#ffcc00; font-weight:bold;">${z.inactiveWeeks} GW</span></div>`;
           });
         }
         handleSlashResult(gw, cmd, true, zombieHtml);
@@ -1692,7 +1690,7 @@ function processSlashCommand(commandText, gw) {
         gatelHtml += `<div style='font-size:11px; color:#ccc; margin-bottom:6px;'>Total transfer yang dilakukan sejak GW 1:</div>`;
         res.data.forEach((g, i) => {
           let badge = i === 0 ? "🔥 (Knee-Jerker)" : (i === res.data.length - 1 ? "🧘‍♂️ (Sabar)" : "");
-          gatelHtml += `<div class='bot-row'><span><b>${g.team}</b> <small>(${g.name})</small></span> <span style="color:#ff4a4a; font-weight:bold;">${g.transfers}x ${badge}</span></div>`;
+          gatelHtml += `<div class='bot-row'><span><b>${g.name}</b></span> <span style="color:#ff4a4a; font-weight:bold;">${g.transfers}x ${badge}</span></div>`;
         });
         handleSlashResult(gw, cmd, true, gatelHtml);
       } else { handleSlashResult(gw, cmd, false, "Gatel Error: " + res.message); }
@@ -1708,7 +1706,7 @@ function processSlashCommand(commandText, gw) {
           res.data.forEach(p => {
             let color = p.profit > 0 ? "#00ff85" : (p.profit < 0 ? "#ff4a4a" : "#aaa");
             let icon = p.profit > 0 ? "📈" : (p.profit < 0 ? "📉" : "➖");
-            profitHtml += `<div class='bot-row'><span><b>${p.team}</b> <br><small>In: ${p.ptsIn} pts | Out: ${p.ptsOut} pts</small></span> <span style="color:${color}; font-weight:bold;">${icon} ${p.profit > 0 ? '+'+p.profit : p.profit}</span></div>`;
+            profitHtml += `<div class='bot-row'><span><b>${p.name}</b> <br><small>In: ${p.ptsIn} pts | Out: ${p.ptsOut} pts</small></span> <span style="color:${color}; font-weight:bold;">${icon} ${p.profit > 0 ? '+'+p.profit : p.profit}</span></div>`;
           });
         }
         handleSlashResult(gw, cmd, true, profitHtml);
@@ -1739,7 +1737,7 @@ function processSlashCommand(commandText, gw) {
         let fdrHtml = `<div class='bot-header'>📅 Analisis Kesulitan Jadwal (GW ${targetGw})</div>`;
         fdrHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Berdasarkan Starting XI.<br>🟩 Mudah (FDR 1-2) | ⬜ Normal (3) | 🟥 Susah (4-5)</div>`;
         res.data.forEach(d => {
-          fdrHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size: 13px; text-align:right;"><span style="color:#00ff85;">${d.easy} 🟩</span> &nbsp;<span style="color:#aaa;">${d.normal} ⬜</span> &nbsp;<span style="color:#ff4a4a;">${d.hard} 🟥</span></span></div>`;
+          fdrHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b></span> <span style="font-weight:bold; font-size: 13px; text-align:right;"><span style="color:#00ff85;">${d.easy} 🟩</span> &nbsp;<span style="color:#aaa;">${d.normal} ⬜</span> &nbsp;<span style="color:#ff4a4a;">${d.hard} 🟥</span></span></div>`;
         });
         handleSlashResult(gw, cmd, true, fdrHtml);
       } else { handleSlashResult(gw, cmd, false, "FDR Error: " + res.message); }
@@ -1750,7 +1748,7 @@ function processSlashCommand(commandText, gw) {
       if (res.success) {
         let orHtml = `<div class='bot-header'>🌍 Peringkat Dunia / Overall Rank</div>`;
         res.data.forEach(d => {
-          orHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#33ccff;">${d.rank.toLocaleString('id-ID')}</span></div>`;
+          orHtml += `<div class='bot-row'><span><b>${d.team}</b></span> <span style="font-weight:bold; color:#33ccff;">${d.rank.toLocaleString('id-ID')}</span></div>`;
         });
         handleSlashResult(gw, cmd, true, orHtml);
       } else { handleSlashResult(gw, cmd, false, "OR Error: " + res.message); }
@@ -1761,7 +1759,7 @@ function processSlashCommand(commandText, gw) {
       if (res.success) {
         let arsHtml = `<div class='bot-header'>🎒 Sisa Persenjataan (Chips Tersedia)</div>`;
         res.data.forEach(d => {
-          arsHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="text-align:right; font-size:12px; color:#00ff85; font-weight:bold;">${d.chips.join(", ") || "<i style='color:#ff4a4a;'>Kosong/Habis</i>"}</span></div>`;
+          arsHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b></span> <span style="text-align:right; font-size:12px; color:#00ff85; font-weight:bold;">${d.chips.join(", ") || "<i style='color:#ff4a4a;'>Kosong/Habis</i>"}</span></div>`;
         });
         handleSlashResult(gw, cmd, true, arsHtml);
       } else { handleSlashResult(gw, cmd, false, "Arsenal Error: " + res.message); }
@@ -1772,7 +1770,7 @@ function processSlashCommand(commandText, gw) {
       if (res.success) {
         let bHtml = `<div class='bot-header'>🏦 Adu Saldo Nganggur (GW ${targetGw})</div>`;
         res.data.forEach(d => {
-          bHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#ffcc00;">£${d.bank}M</span></div>`;
+          bHtml += `<div class='bot-row'><span><b>${d.team}</b></span> <span style="font-weight:bold; color:#ffcc00;">£${d.bank}M</span></div>`;
         });
         handleSlashResult(gw, cmd, true, bHtml);
       } else { handleSlashResult(gw, cmd, false, "Bank Error: " + res.message); }
@@ -1802,7 +1800,7 @@ function processSlashCommand(commandText, gw) {
         let mHtml = `<div class='bot-header'>📉 Total Poin Dikorbankan (Minus Transfer)</div>`;
         res.data.forEach(d => {
           let color = d.totalMinus > 0 ? "#ff4a4a" : "#00ff85";
-          mHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:${color};">-${d.totalMinus} pts</span></div>`;
+          mHtml += `<div class='bot-row'><span><b>${d.name}</b></span> <span style="font-weight:bold; color:${color};">-${d.totalMinus} pts</span></div>`;
         });
         handleSlashResult(gw, cmd, true, mHtml);
       } else { handleSlashResult(gw, cmd, false, "Boncos Error: " + res.message); }
@@ -1813,7 +1811,7 @@ function processSlashCommand(commandText, gw) {
       if (res.success) {
         let fHtml = `<div class='bot-header'>🔥 Detektor Manajer Gacor (3 GW Terakhir)</div>`;
         res.data.forEach(d => {
-          fHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#ffcc00;">${d.formPts} pts</span></div>`;
+          fHtml += `<div class='bot-row'><span><b>${d.team}</b></span> <span style="font-weight:bold; color:#ffcc00;">${d.formPts} pts</span></div>`;
         });
         handleSlashResult(gw, cmd, true, fHtml);
       } else { handleSlashResult(gw, cmd, false, "Form Error: " + res.message); }
@@ -1844,7 +1842,7 @@ function processSlashCommand(commandText, gw) {
           bHtml += "<i style='font-size:12px; color:#00ff85;'>Wah sehat, skuad di liga ini sangat bervariasi!</i>";
         } else {
           res.data.forEach(d => {
-            bHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.name}</b> <br><small>(${d.team})</small></span> <span style="font-weight:bold; font-size:12px; color:#ff4a4a; text-align:right;">Triple<br>${d.club}</span></div>`;
+            bHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.name}</b></span> <span style="font-weight:bold; font-size:12px; color:#ff4a4a; text-align:right;">Triple<br>${d.club}</span></div>`;
           });
         }
         handleSlashResult(gw, cmd, true, bHtml);
@@ -1858,7 +1856,7 @@ function processSlashCommand(commandText, gw) {
         res.data.forEach(d => {
           let color = d.profit > 0 ? "#00ff85" : (d.profit < 0 ? "#ff4a4a" : "#aaa");
           let icon = d.profit > 0 ? "📈 +" : (d.profit < 0 ? "📉 " : "➖ ");
-          cHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:${color};">${icon}£${Math.abs(d.profit).toFixed(1)}M</span></div>`;
+          cHtml += `<div class='bot-row'><span><b>${d.team}</b></span> <span style="font-weight:bold; color:${color};">${icon}£${Math.abs(d.profit).toFixed(1)}M</span></div>`;
         });
         handleSlashResult(gw, cmd, true, cHtml);
       } else { handleSlashResult(gw, cmd, false, "Cuan Error: " + res.message); }
@@ -1872,7 +1870,7 @@ function processSlashCommand(commandText, gw) {
           hHtml += "<i style='font-size:12px; color:#aaa;'>Belum ada auto-sub dramatis yang menghasilkan poin besar.</i>";
         } else {
           res.data.forEach(d => {
-            hHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; color:#00ff85; text-align:right;">Masuk: ${d.playerIn}<br>+${d.points} pts</span></div>`;
+            hHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.name}</b></span> <span style="font-weight:bold; font-size:12px; color:#00ff85; text-align:right;">Masuk: ${d.playerIn}<br>+${d.points} pts</span></div>`;
           });
         }
         handleSlashResult(gw, cmd, true, hHtml);
@@ -1888,7 +1886,7 @@ function processSlashCommand(commandText, gw) {
           nHtml += "<i style='font-size:12px; color:#00ff85;'>Luar biasa! Semua pilihan kapten sudah tepat sasaran.</i>";
         } else {
           res.data.forEach(d => {
-            nHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#ff4a4a;">Cap: ${d.cap} (${d.capPts})</span><br><span style="color:#33ccff;">Vice: ${d.vice} (${d.vicePts})</span></span></div>`;
+            nHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.name}</b></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#ff4a4a;">Cap: ${d.cap} (${d.capPts})</span><br><span style="color:#33ccff;">Vice: ${d.vice} (${d.vicePts})</span></span></div>`;
           });
         }
         handleSlashResult(gw, cmd, true, nHtml);
@@ -1902,7 +1900,7 @@ function processSlashCommand(commandText, gw) {
         res.data.forEach(d => {
           let color = d.diff > 0 ? "#00ff85" : (d.diff < 0 ? "#ff4a4a" : "#aaa");
           let icon = d.diff > 0 ? "🚀 +" : (d.diff < 0 ? "🔻 " : "➖ ");
-          aHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:${color};">${icon}${Math.abs(d.diff).toLocaleString('id-ID')}</span></div>`;
+          aHtml += `<div class='bot-row'><span><b>${d.team}</b></span> <span style="font-weight:bold; color:${color};">${icon}${Math.abs(d.diff).toLocaleString('id-ID')}</span></div>`;
         });
         handleSlashResult(gw, cmd, true, aHtml);
       } else { handleSlashResult(gw, cmd, false, "Arrows Error: " + res.message); }
@@ -1915,7 +1913,7 @@ function processSlashCommand(commandText, gw) {
         hipHtml += `<div style="font-size:11px; margin-bottom:8px; color:#ccc; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:6px;">Rata-rata persentase kepemilikan global 11 pemain inti.</div>`;
         res.data.forEach((d, i) => {
           let icon = i === 0 ? "👑" : "🔹";
-          hipHtml += `<div class='bot-row'><span>${icon} <b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#00ff85;">${d.avgOwnership}%</span></div>`;
+          hipHtml += `<div class='bot-row'><span>${icon} <b>${d.name}</b></span> <span style="font-weight:bold; color:#00ff85;">${d.avgOwnership}%</span></div>`;
         });
         handleSlashResult(gw, cmd, true, hipHtml);
       } else { handleSlashResult(gw, cmd, false, "Hipster Error: " + res.message); }
@@ -1965,7 +1963,7 @@ else if (cmd === "/jadwal" || cmd === "/fixture") {
           mHtml += "<i style='font-size:12px; color:#00ff85;'>Aman! Tidak ada yang kualat jual pemain gacor minggu ini.</i>";
         } else {
           res.data.forEach(d => {
-            mHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#ff4a4a;">Jual: ${d.player}</span><br><span style="color:#00ff85;">Malah cetak: ${d.points} pts 😭</span></span></div>`;
+            mHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.name}</b></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#ff4a4a;">Jual: ${d.player}</span><br><span style="color:#00ff85;">Malah cetak: ${d.points} pts 😭</span></span></div>`;
           });
         }
         handleSlashResult(gw, cmd, true, mHtml);
@@ -1980,7 +1978,7 @@ else if (cmd === "/jadwal" || cmd === "/fixture") {
           pHtml += "<i style='font-size:12px; color:#00ff85;'>Liga yang sangat sportif, tidak ada poin minus dari kartu.</i>";
         } else {
           res.data.forEach(d => {
-            pHtml += `<div class='bot-row'><span><b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#ffcc00;">${d.cards} Kartu (-${d.minusPts} pts)</span></div>`;
+            pHtml += `<div class='bot-row'><span><b>${d.team}</b></span> <span style="font-weight:bold; color:#ffcc00;">${d.cards} Kartu (-${d.minusPts} pts)</span></div>`;
           });
         }
         handleSlashResult(gw, cmd, true, pHtml);
@@ -1996,7 +1994,7 @@ else if (cmd === "/jadwal" || cmd === "/fixture") {
           bHtml += "<i style='font-size:12px; color:#00ff85;'>Semua pemain mahal di liga ini ngasih poin!</i>";
         } else {
           res.data.forEach(d => {
-            bHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#ff4a4a;">${d.player} (£${d.price}M)</span><br><span style="color:#aaa;">Cuma ngasih: ${d.points} pts 📉</span></span></div>`;
+            bHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#ff4a4a;">${d.player} (£${d.price}M)</span><br><span style="color:#aaa;">Cuma ngasih: ${d.points} pts 📉</span></span></div>`;
           });
         }
         handleSlashResult(gw, cmd, true, bHtml);
@@ -2028,7 +2026,7 @@ else if (cmd === "/dukun" || cmd === "/gaib") {
           dHtml += "<i style='font-size:12px; color:#aaa;'>Tidak ada poin gaib di liga ini. Semua main aman.</i>";
         } else {
           res.data.forEach(d => {
-            dHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#00ff85;">${d.player} (${d.ownership}%)</span><br><span style="color:#33ccff;">Gacor: ${d.points} pts 🔥</span></span></div>`;
+            dHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.name}</b></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#00ff85;">${d.player} (${d.ownership}%)</span><br><span style="color:#33ccff;">Gacor: ${d.points} pts 🔥</span></span></div>`;
           });
         }
         handleSlashResult(gw, cmd, true, dHtml);
@@ -2044,7 +2042,7 @@ else if (cmd === "/pawang" || cmd === "/insting") {
         } else {
           res.data.forEach((d, i) => {
             let medal = i === 0 ? "👑" : "🎯";
-            pHtml += `<div class='bot-row' style="padding: 4px 0;"><span>${medal} <b>${d.team}</b> <br><small>(${d.name})</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#33ccff;">Kapten: ${d.player}</span><br><span style="color:#00ff85;">Gacor: ${d.points} pts 🔥</span></span></div>`;
+            pHtml += `<div class='bot-row' style="padding: 4px 0;"><span>${medal} <b>${d.name}</b></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="color:#33ccff;">Kapten: ${d.player}</span><br><span style="color:#00ff85;">Gacor: ${d.points} pts 🔥</span></span></div>`;
           });
           
           // Ambil nama pemain dari manajer urutan pertama (pawang terbaik)
@@ -2064,7 +2062,7 @@ else if (cmd === "/pawang" || cmd === "/insting") {
         } else {
           res.data.forEach((d, i) => {
             let medal = i === 0 ? "🥇" : "🥈";
-            mHtml += `<div class='bot-row'><span>${medal} <b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#00ff85;">${d.points} pts murni ✨</span></div>`;
+            mHtml += `<div class='bot-row'><span>${medal} <b>${d.team}</b></span> <span style="font-weight:bold; color:#00ff85;">${d.points} pts murni ✨</span></div>`;
           });
           mHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Yang kemarin minus -8 tapi dapetnya dikit, mending diem aja. 🤫</div>`;
         }
@@ -2080,7 +2078,7 @@ else if (cmd === "/pawang" || cmd === "/insting") {
           cHtml += "<i style='font-size:12px; color:#aaa;'>Kosong. Mentok di poin rata-rata aja pada belagu. 🥱</i>";
         } else {
           res.data.forEach(d => {
-            cHtml += `<div class='bot-row'><span>👑 <b>${d.team}</b> <small>(${d.name})</small></span> <span style="font-weight:bold; color:#00ff85;">${d.points} pts 🔥</span></div>`;
+            cHtml += `<div class='bot-row'><span>👑 <b>${d.team}</b></span> <span style="font-weight:bold; color:#00ff85;">${d.points} pts 🔥</span></div>`;
           });
           cHtml += `<div style="margin-top:6px; font-size:11px; font-style:italic; color:#ccc;">Sembah Suhu! Minggir lu semua para medioker! 🙇‍♂️</div>`;
         }
