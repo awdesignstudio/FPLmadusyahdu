@@ -381,12 +381,26 @@
       </div>
       <div class="card">
         <h3>⭐ History Manager Of The Week</h3>
+        <div style="font-size: 11px; color: #a375aa; margin-top: -8px; margin-bottom: 8px;">(Pemimpin Klasemen Keseluruhan)</div>
         <div style="max-height: 240px; overflow-y: auto; padding-right: 4px;">
           <table>
             <thead style="position: sticky; top: 0; background: #37003c; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-              <tr><th>GW</th><th>Tim</th><th>Poin</th></tr>
+              <tr><th>GW</th><th>Tim</th><th>Total Poin</th></tr>
             </thead>
             <tbody id="history-motw-table"><tr><td colspan="3" style="text-align:center;">Belum ada data.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🔥 History Most Point</h3>
+        <div style="font-size: 11px; color: #a375aa; margin-top: -8px; margin-bottom: 8px;">(Poin Tertinggi per Gameweek)</div>
+        <div style="max-height: 240px; overflow-y: auto; padding-right: 4px;">
+          <table>
+            <thead style="position: sticky; top: 0; background: #37003c; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+              <tr><th>GW</th><th>Tim</th><th>GW Pts</th></tr>
+            </thead>
+            <tbody id="history-topscorer-table"><tr><td colspan="3" style="text-align:center;">Belum ada data.</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -809,15 +823,28 @@
           </tr>`;
         });
         document.getElementById("standings-table").innerHTML = standingsHTML;
-        let historyHTML = "";
+    let historyMotwHTML = "";
+        let historyTopScorerHTML = "";
+        
         // Looping dibalik agar GW terbaru muncul di paling atas
         for(let g = 38; g >= 1; g--) {
-          if(res.motwHistory[g]) {
-            historyHTML += `<tr><td>GW ${g}</td><td>${res.motwHistory[g].teamName}</td><td class="highlight">${res.motwHistory[g].points}</td></tr>`;
+          // 1. Data Pemimpin Klasemen Keseluruhan (Manager of the Week)
+          if(res.motwHistory && res.motwHistory[g]) {
+            historyMotwHTML += `<tr><td>GW ${g}</td><td>${res.motwHistory[g].teamName}</td><td class="highlight">${res.motwHistory[g].points}</td></tr>`;
+          }
+          
+          // 2. Data Pencetak Poin Tertinggi (Most Point)
+          // Catatan: Pastikan script Google Apps Script (Backend) Anda juga mengirimkan res.topScorerHistory
+          if(res.topScorerHistory && res.topScorerHistory[g]) {
+            historyTopScorerHTML += `<tr><td>GW ${g}</td><td>${res.topScorerHistory[g].teamName}</td><td class="highlight">${res.topScorerHistory[g].points}</td></tr>`;
           }
         }
-        if(historyHTML === "") historyHTML = "<tr><td colspan='3' style='text-align:center;'>Belum ada data.</td></tr>";
-        document.getElementById("history-motw-table").innerHTML = historyHTML;
+        
+        if(historyMotwHTML === "") historyMotwHTML = "<tr><td colspan='3' style='text-align:center;'>Belum ada data.</td></tr>";
+        if(historyTopScorerHTML === "") historyTopScorerHTML = "<tr><td colspan='3' style='text-align:center;'>Belum ada data.</td></tr>";
+        
+        document.getElementById("history-motw-table").innerHTML = historyMotwHTML;
+        document.getElementById("history-topscorer-table").innerHTML = historyTopScorerHTML;
       }
     });
   }
