@@ -2113,8 +2113,24 @@ else if (cmd === "/pawang" || cmd === "/insting") {
       } else { handleSlashResult(gw, cmd, false, "Cepek Error: " + res.message); }
     });
   }
+ else if (cmd === "/cidera" || cmd === "/bpjs") {
+    callGAS('getLeagueInjuries', MY_LEAGUE_ID, targetGw, function(res) {
+      if (res.success) {
+        let bHtml = `<div class='bot-header'>🏥 BPJS Kesehatan FC (GW ${targetGw})</div>`;
+        if (res.data.length === 0) {
+          bHtml += "<i style='font-size:12px; color:#00ff85;'>Puji syukur, tidak ada pemain cedera di skuad manajer liga ini!</i>";
+        } else {
+          res.data.forEach(d => {
+            let playersJson = JSON.stringify(d.players).replace(/"/g, '&quot;').replace(/'/g, "\\'");
+            bHtml += `<div class='bot-row' style="padding: 4px 0;"><span><b>${d.team}</b><br><small>${d.name}</small></span> <span style="font-weight:bold; font-size:12px; text-align:right;"><span style="cursor:pointer; color:#ff4a4a; text-decoration:underline;" onclick="showManagersModal('Pasien ${d.team}', '${playersJson}')" title="Klik untuk lihat daftar pemain cedera">🚑 ${d.count} Pemain</span></span></div>`;
+          });
+        }
+        handleSlashResult(gw, cmd, true, bHtml);
+      } else { handleSlashResult(gw, cmd, false, "Cidera Error: " + res.message); }
+    });
+  }
   else {
-    handleSlashResult(gw, cmd, false, "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /fdr, /or, /arsenal, /bank, /vice, /boncos, /form, /fomo, /bucin, /cuan, /hoki, /nyesel, /roket, /hipster, /jadwal, /mantan, /preman, /beban, /php, /dukun, /pawang, /murni, /cepek");
+    handleSlashResult(gw, cmd, false, "Perintah tidak dikenali. Coba: /hasil, /bench, /sultan, /template, /zombie, /gatel, /profit, /blunder, /hit, /fdr, /or, /arsenal, /bank, /vice, /boncos, /form, /fomo, /bucin, /cuan, /hoki, /nyesel, /roket, /hipster, /jadwal, /mantan, /preman, /beban, /php, /dukun, /pawang, /murni, /cepek, /cidera");
   }
 } // ==========================================
   // VARIABEL GLOBAL UNTUK DEADLINE
@@ -2263,8 +2279,9 @@ else if (cmd === "/pawang" || cmd === "/insting") {
       { cmd: "/php atau /scam", desc: "Pemain paling banyak di-Transfer In tapi malah nge-blank.", out: "🤡 Korban PHP: 5 manajer beli Jackson, hasil: 2 poin." },
       { cmd: "/dukun atau /gaib", desc: "Manajer yang dapat poin dari pemain ber-ownership sangat rendah (<2%).", out: "🔮 Dukun Susuk: Dani dapet 12 poin dari Winks." },
       { cmd: "/pawang atau /insting", desc: "Pamer manajer yang kaptennya mencetak poin paling gacor minggu ini.", out: "🎯 Insting Pawang: Dani kaptenin Salah dapet 34 pts!" },
-      { cmd: "/murni atau /halal", desc: "Pamer poin tertinggi tanpa nyentuh tombol transfer (minus).", out: "😇 Poin Halal: Joko dapet 70 poin murni tanpa minus." },
-      { cmd: "/cepek atau /klub100", desc: "Klub eksklusif buat manajer yang berhasil nembus 100+ poin.", out: "💯 Klub Elit Cepek: Sembah Suhu Tono (105 Pts)!" }
+     { cmd: "/murni atau /halal", desc: "Pamer poin tertinggi tanpa nyentuh tombol transfer (minus).", out: "😇 Poin Halal: Joko dapet 70 poin murni tanpa minus." },
+      { cmd: "/cepek atau /klub100", desc: "Klub eksklusif buat manajer yang berhasil nembus 100+ poin.", out: "💯 Klub Elit Cepek: Sembah Suhu Tono (105 Pts)!" },
+      { cmd: "/cidera atau /bpjs", desc: "Cek daftar pemain cedera/absen di tim tiap manajer.", out: "🏥 BPJS Kesehatan FC: Budi (🚑 2 Pemain)" }
     ];
     commands.forEach(c => {
       // Ambil perintah utamanya saja (misal ambil "/hasil" dari "/hasil atau /skor")
